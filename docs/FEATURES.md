@@ -13,7 +13,7 @@ Recruiters and the osu!/TETR.IO community, equally. Identity: **Data Scientist &
 - Links straight to a section (e.g. `/#projects`, used on CV and LinkedIn) skip the Intro, Lobby and Warp.
 
 ## Inside the portfolio
-Pages (each its own URL, animated page transitions, header + BGM persist): **Projects** → **Rhythm** (osu!taiko, osu!mania 4K, chart carousel later, SoundCloud) → **TETR.IO** → **About** (Skills, Setups, Timeline) → **Community** (Shoutouts, Guestbook). Footer on every page (LinkedIn, GitHub, Instagram, Discord, Facebook, work email). Full-screen menu overlay comes with the animation pass (see `docs/reviews/2026-11-16-thegeekdesigner-teardown.md`).
+Pages (each its own URL, animated page transitions, header + BGM persist): **Projects** → **osu!** (osu!taiko, osu!mania 4K, chart carousel later, SoundCloud) → **TETR.IO** → **About** (Skills, Setups, Timeline) → **Community** (Shoutouts, Message Board). Footer on every page (LinkedIn, GitHub, Instagram, Discord, Facebook, work email). Full-screen menu overlay comes with the animation pass (see `docs/reviews/2026-11-16-thegeekdesigner-teardown.md`).
 
 - **BGM** at low volume, visibly pausable from the Portfolio header; mute is remembered. Crossfades out when Feature audio plays, back in when it stops.
 - **Projects**: GitHub repos, internship and career work, including **BMW** projects (data science). Filter chips: *data* / *dev*. 2–3 pinned data projects. Each card: one-line outcome (with a number where possible), method/stack, role, link. Private work gets a sanitised write-up instead of a link.
@@ -23,11 +23,12 @@ Pages (each its own URL, animated page transitions, header + BGM persist): **Pro
 - **Seek slider** on every chart preview: drag or use arrows (±5 s), Page Up/Down (±15 s), Home/End; play/pause button and time readout. Turns on automatically once the song file exists; the note renderer will follow it in the animation pass.
 - **Chart players (both)**: **autoplay preview is the default** (the chart plays itself, synced, with hitsounds); **Play** is opt-in, with a practice option (0.75× speed, a 20–30 s section), a calibration tap for audio offset (saved per device), judgement windows (300/100/miss) with early/late feedback. Muted by default. Lane/drum tap zones block page scroll only while playing. osu!mania uses the owner's scroll speeds by default: 29 (4K), 32 (7K), with fall time = 11485 ms ÷ speed as in osu!lazer; visitors can change it. Credit line + "Play on osu!" link to the beatmapset.
 - **TETR.IO**: looping gameplay video (already recorded): poster image, `preload="none"`, plays muted and only while on screen.
+  - **TODO (owner records later): clips to capture from TETR.IO's replay viewer** (replays stay in `D:\Jimmy\GameRelated\TetrisReplays\`, never in the repo): `khet74.ttrm` round 10, `mickey2min150apm.ttrm` round 5, `vsasuu2Lpcend.ttrm` round 12, `funset.ttrm` round 9. Remind the owner when TETR.IO page work starts. Replay re-simulator (`D:\Jimmy\CodingProject\ttrm_player`) parked at 78/246 attacks matched.
 - **Setups**: gaming gear and settings (keys, tablet/keyboard, TETR.IO handling).
 - **Timeline**: high school, university, internship, career only; secondary, not a main focus.
 - **Stats Cards**: osu!, TETR.IO, GitHub; refreshed **daily** by a build job. GitHub leads in the Lobby player card; each card links to the matching profile.
 - **Shoutouts**: friends and people I respect, optional avatar, link and short quote each. Editable as content.
-- **Guestbook**: TH / EN / JP with cute fonts. No accounts, no username verification: visitors type any name, shown as **plain text** (no automatic hover card, avatar or rank). The owner approves every message by hand and may attach a profile link by hand while approving. Per-visitor limits by an HMAC of the IP with a daily-rotated secret (never the raw IP), disclosed on the page: 1 pending, 1 post per day. Paginated: 20 per page, newest first.
+- **Message Board**: TH / EN / JP with cute fonts. No accounts, no username verification: visitors type any name, shown as **plain text** (no automatic hover card, avatar or rank). The owner approves every message by hand and may attach a profile link by hand while approving. Per-visitor limits by an HMAC of the IP with a daily-rotated secret (never the raw IP), disclosed on the page: 1 pending, 1 post per day. Paginated: 20 per page, newest first.
 - **SoundCloud**: embedded playlist (owner's, link to come). Click-to-load so nothing from SoundCloud loads until a visitor asks; volume can duck under Feature audio via SoundCloud's Widget API. Security headers must allow `w.soundcloud.com`.
 - **Blog**: write, edit, add images like a blogger (Sveltia CMS). Hidden until it has a few posts.
 - **Night theme**: switch design coming from owner; night palette designed alongside the day palette.
@@ -42,16 +43,36 @@ Pages (each its own URL, animated page transitions, header + BGM persist): **Pro
 - Accessibility: keyboard for everything, visible focus, toggles with text labels and `aria-pressed`, colour never the only signal.
 - Theme the dull parts too: loaders, scrollbars, focus rings, form errors, 404 ("Miss!").
 
+## Animation direction (grilled 2026-11-16)
+- **Motion language**: soft and floaty everywhere (owner picked this over a game-style layer). The one deliberate game moment is the Intro.
+- **Build order**: rolling numbers → page transitions → menu overlay → orbiting icons and parallax → Warp → Intro → BGM beat pulses.
+- **Intro**: a PC boot-up in the spirit of Needy Streamer Overload (owner's pick; look from KatsuDon Editor's NSO theme in `taiko_arranger/ui/windose.py` and `theme.py`: blue/pink diagonal-stripe wallpaper `#bbddff`/`#eeaaff`, pixel stickers, light pink `#ffc6e3` windows outlined `#ff66aa`, Press Start 2P titles), shown **before the Lobby** (Intro → Lobby). It opens on a power button; clicking it (the audio permission) plays a vectorheart transition, then boot with a glitch burst and sound, the boot text "x3NiGMaZ BIOS v1.0" (lines: CPU/MEM ok ♥, detecting osu!taiko / osu!mania / TETR.IO / Python, booting jimmyreturnz...), our heart logo with a loading bar for the rest, an automatic login for "jimmyreturnz", then the desktop windows pop open and hand off to the Lobby. Glitch = RGB split plus slice jitter in 2–3 short bursts, ≤3 flashes per second, plain fade under reduced motion. Audio is on by default once the power button is clicked, with an adjustable, remembered volume and a mute. Title bars use Press Start 2P (placeholder; owner will change it later, so keep it one font token). Skip from the first frame, once per browser (`localStorage`), replay link in the footer. Our own logo, chime and window art only: no Microsoft or Needy Girl Overdose assets. Fonts are placeholders; the owner may swap in his own display font.
+- **Volume**: two levels, remembered in `localStorage`: effects/SFX 70%, music (BGM and songs) 40%, plus a mute. Audio starts at the power-button interaction.
+- **Power-button sequence** (owner, being refined): hold the power button for a brief moment, it explodes into circle ripples; once the ripples have left the screen, vectorheart arrows appear and travel bottom-left to top-right; then a wave across the middle becomes an audio-visualizer histogram on the floor of the Lobby. All SVG. Up to about 5 s until every Lobby element has popped in (longer than the 0.8 s Warp; the Warp stays short).
+- **Lobby idle loops**: slow gradient drift (cheap CSS) and pulsing circles; no moving arrows in the Lobby for now (the arrows live in the power-button sequence). Orbiting icons have transparent backgrounds.
+- **Menu overlay**: circle reveal from the menu button, one marquee row per page, tinted by the hovered row. Accepted for now.
+- **Intro timing and input** (owner, 2026-11-16): total 3–5 s (storyboard `design-mocks/intro-storyboard.html`, ~4.8 s). Mouse: hold the power button 0.7 s with a circular progress stripe, then it explodes into ripples; phone: one tap; keyboard: hold Space/Enter; screen readers get a plain button. Orbiting icons: glyph only, no background tile. Polish bundle accepted: heart loading bar, "Miss!" 404, pink scrollbars, pulsing focus ring, Message Board submit/arrive animations.
+- **Click feedback**: soft squish plus 3–4 tiny hearts on buttons and tabs (no "GREAT" text pops).
+- **Page transitions**: Flip morph (nav item becomes the next page's title); fade-and-rise fallback for reduced motion and first load.
+- **Warp**: the avatar ring expands into a pink wash with hearts streaming past, then settles; the avatar becomes the header logo. ≤0.8 s, ≤3 flashes per second.
+- **Theme switch**: circular reveal from the switch (View Transitions), plain fade under reduced motion.
+- **Rolling numbers**: odometer columns (Orbitron), ~0.8 s ease-out, on first view and on every change; try this first, fall back to a count-up if it looks off.
+- **Idle loops and reveals**: Lobby only has floating hearts and breathing rings; other pages have none except a gentle header-decoration drift. Headings rise line by line, cards fade up with a small stagger, once only.
+- **Custom cursor**: cute, reimagined pink heart-arrow (own art, NSO palette), desktop only, Intro and Lobby only (CSS cursor image). Portfolio pages use the normal cursor.
+- **Lobby background**: the vectorheart theme, not the NSO stripes: animated colour gradient, moving arrows and pulsing circles (subject to the idle-loop budget, being grilled). NSO look is the Intro desktop only.
+- References studied: Joffrey Spitzer (Astro + GSAP Flip), Framer "Pixel Arcade" (boot screen, scroll HUD), Codrops pixel-mask transition. Pixel art rejected (Sage Agency: undermines a professional look); stay vector.
+
 ## Animation pass: ideas queued (pages first, animation later)
-- **Orbiting icons on the Lobby avatar** (owner's idea; reference: the About section of dousanmiao.com): hovering or focusing the profile picture makes osu!, TETR.IO, Python, Claude and SQL icons orbit around it. On touch, a tap toggles it. Icons from simple-icons (osu!, Python, Claude, a database glyph for SQL); TETR.IO uses our own tetromino mark. Static ring of icons under reduced motion.
+- **Orbiting icons on the Lobby avatar** (owner's idea; reference: the About section of dousanmiao.com): hovering or focusing the profile picture makes osu!, TETR.IO, Python, Claude, SQL and ML icons orbit around it (owner confirmed, added ML). On touch, a tap toggles it. Icons from simple-icons (osu!, Python, Claude, a database glyph for SQL); TETR.IO uses our own tetromino mark; ML uses our own neural-network glyph. Static ring of icons under reduced motion.
 - Full-screen menu overlay with one slow marquee row per Portfolio page; hovering a row tints the overlay in that page's colour (see the thegeekdesigner teardown).
 - Lobby background layers (rings, hearts, blobs) shift gently with the pointer (parallax); off on touch and reduced motion.
-- Beating-heart favicon (2–4 frames).
+- Favicon stays the profile picture (owner); no beating-heart favicon.
 - Header slims down after scrolling past the page title.
 - Suggested extras:
   - **Judgement pop on click**: buttons briefly pop a tiny "300" / "GREAT" like a hit judgement.
-  - **D F J K key lights**: pressing D, F, J or K anywhere on the Rhythm page lights up four lanes in the header (and S D F Space J K L for 7K), with an optional key-press sound.
+  - **D F J K key lights**: pressing D, F, J or K anywhere on the osu! page lights up the lanes in the header: 4K D F J K, taiko kddk also D F J K (D left kat, F left don, J right don, K right kat), 7K S D F Space J K L; optional key-press sound.
   - **Stats count up** when the Player Card or a stats tile first scrolls into view.
+  - **Rolling numbers on every change** (owner): whenever an action swaps the numbers shown (Player Card tab, osu!mania 4K/7K switch, TETR.IO), each number scrolls/counts up from its old or zero value to the new one, odometer-style. Static numbers under reduced motion.
   - **Heart avatar beats to the BGM's BPM** once BGM exists.
   - **TETR.IO page**: stats tiles drop in like tetrominoes and "clear a line" when all are in.
 

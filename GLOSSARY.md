@@ -17,7 +17,7 @@ The transition that morphs the visitor from the Lobby into the Portfolio. Moving
 _Avoid_: Morph, enter animation
 
 **Portfolio**:
-Everything after the Lobby: a set of pages (Projects, Rhythm, TETR.IO, About, Community) sharing one header.
+Everything after the Lobby: a set of pages (Projects, osu!, TETR.IO, About, Community) sharing one header.
 _Avoid_: Main page, dashboard
 
 **Portfolio page**:
@@ -29,7 +29,7 @@ The short animation when moving between Portfolio pages; the header and BGM stay
 _Avoid_: Warp (that is Lobby → Portfolio only)
 
 **Showcase**:
-One self-contained block on a Portfolio page (e.g. osu!taiko, osu!mania, Skills, Shoutouts, Guestbook).
+One self-contained block on a Portfolio page (e.g. osu!taiko, osu!mania, Skills, Shoutouts, Message Board).
 _Avoid_: Section, feature, widget
 
 ## Showcases
@@ -54,9 +54,9 @@ _Avoid_: Journey, about timeline, level map
 A card showing the owner's public profile numbers from one platform (osu!, TETR.IO, or GitHub), refreshed daily.
 _Avoid_: Profile widget, badge
 
-**Guestbook**:
+**Message Board**:
 Where visitors leave short messages for the owner, in Thai, English, or Japanese, under any name they type.
-_Avoid_: Comments, wall, chat
+_Avoid_: Guestbook, comments, wall, chat
 
 ## Audio
 
