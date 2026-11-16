@@ -5,5 +5,5 @@ The osu!mania and osu!taiko players use the full songs rather than short clips, 
 ## Permissions
 
 - **かめりあ – Quaoar**: free to use as long as the use is not illegal; Camellia published the track with a download link himself: https://www.youtube.com/watch?v=yjQmZBvi3WE
-- **Camellia – Circles of Death** (osu!taiko chart, beatmapset 2404655 / difficulty 5216517): owner confirms the song is safe to use under the same Camellia permission.
+- **Camellia – Circles of Death** (osu!taiko chart, beatmapset 2404655 / difficulty 5216517): owner confirms the song is safe to use under the same Camellia permission. Both charts are the owner's own maps; credit reads "Music: <artist> – <title> · Mapped by jimmyreturnz".
 - ~~DJ SHARPNEL – THE POWER OF UNDERGROUND~~: dropped; no written permission could be found.

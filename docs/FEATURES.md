@@ -12,7 +12,7 @@ Showcase order: Projects → osu!taiko → osu!mania → TETR.IO → Skills and 
 
 - **Background music** at low volume. Crossfades out when any feature below plays audio, and back in when it stops.
 - **osu!mania 4K** — chart preview with song + playable chart. Chart: かめりあ – Quaoar (own map, 4K). Audio controls, **muted by default**. Layout reference: kenzync.dev tool cards.
-- **osu!taiko** — chart preview with hitsounds + playable chart. Chart: Camellia – Circles of Death (https://osu.ppy.sh/beatmapsets/2404655#taiko/5216517).
+- **osu!taiko** — chart preview with hitsounds + playable chart. Chart: Camellia – Circles of Death, own map (https://osu.ppy.sh/beatmapsets/2404655#taiko/5216517).
 - **TETR.IO** — looping gameplay video (already recorded).
 - **Projects** — GitHub repos, internship and career work, each linking out.
 - **LinkedIn** link/card.
@@ -20,7 +20,7 @@ Showcase order: Projects → osu!taiko → osu!mania → TETR.IO → Skills and 
 - **Skills and Setups** — tech skills plus gaming gear and settings.
 - **Timeline** — high school, university, internship, career only; secondary, not a main focus.
 - **Stats Cards** — osu!, TETR.IO, GitHub; refreshed daily. Compact player card in the Lobby (TBD after mockup); each links to the matching profile.
-- **Guestbook** — TH / EN / JP with cute fonts. Approve-before-publish. Optional osu!/TETR.IO username with hover profile card + click-through.
+- **Guestbook** — TH / EN / JP with cute fonts. Approve-before-publish. Optional osu!/TETR.IO username with hover profile card + click-through. No accounts: per-visitor limits by salted IP hash (1 pending, 1 post/day); a game username reused from a different IP hash is flagged as possible impersonation in the approval queue; guests without a game username show a plain name tag.
 - **Night theme** — switch design coming from owner.
 - **Content board / blog** — write, edit, add images like a blogger (Sveltia CMS). Features to be requested later.
 
