@@ -39,6 +39,6 @@ for (const [id, file] of JOBS) {
     else notes.push([time, hs & 10 ? 1 : 0, hs & 4 ? 1 : 0, +posAt(time).toFixed(4)]); // [t, 0don|1kat, big, pos]
   }
   const bars = reds.map((p) => [p[0], p[1], p[2] || 4]);
-  writeFileSync(`../assets/charts/${id}.json`, JSON.stringify({ mode: mode === 3 ? 'mania' : 'taiko', keys, bars, knots: mode === 3 ? [] : knots, notes }));
+  writeFileSync(`../assets/charts/${id}.json`, JSON.stringify({ sm, mode: mode === 3 ? 'mania' : 'taiko', keys, bars, knots: mode === 3 ? [] : knots, notes }));
   console.log(id, mode, keys, notes.length, 'notes', reds.length, 'redlines');
 }
