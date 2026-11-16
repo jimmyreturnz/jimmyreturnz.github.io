@@ -20,7 +20,7 @@ Showcase order: Projects → osu!taiko → osu!mania → TETR.IO → Skills and 
 - **Skills and Setups** — tech skills plus gaming gear and settings.
 - **Timeline** — high school, university, internship, career only; secondary, not a main focus.
 - **Stats Cards** — osu!, TETR.IO, GitHub; refreshed daily. Compact player card in the Lobby (TBD after mockup); each links to the matching profile.
-- **Guestbook** — TH / EN / JP with cute fonts. Approve-before-publish. Optional osu!/TETR.IO username with hover profile card + click-through. No accounts: per-visitor limits by salted IP hash (1 pending, 1 post/day); guests without a game username show a plain name tag. Paginated from day one: 20 messages per page, newest first. Game-username verification: TBD (see storyboard).
+- **Guestbook** — TH / EN / JP with cute fonts. Approve-before-publish. Optional osu!/TETR.IO username with hover profile card + click-through. No accounts: per-visitor limits by salted IP hash (1 pending, 1 post/day); guests without a game username show a plain name tag. Paginated from day one: 20 messages per page, newest first. No username verification: visitors type any name; the owner approves every message by hand.
 - **Night theme** — switch design coming from owner.
 - **Content board / blog** — write, edit, add images like a blogger (Sveltia CMS). Features to be requested later.
 
