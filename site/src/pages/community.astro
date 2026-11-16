@@ -1,0 +1,41 @@
+---
+import Page from '../layouts/Page.astro';
+import Showcase from '../components/Showcase.astro';
+import Vh from '../components/Vh.astro';
+import { shoutouts } from '../data/site';
+---
+<Page title="Community" description="Shoutouts and a Guestbook for friends, fellow players and visitors.">
+  <header class="page-hero">
+    <h1>Community</h1>
+    <p>The people who make this fun, and a spot for you to say hi.</p>
+  </header>
+
+  <Showcase id="shoutouts" title="Shoutouts" lead="Friends and people I look up to." motif="vh-sparkle" tint="butter">
+    {shoutouts.length ? (
+      <div class="grid3">{shoutouts.map((s) => <div class="card pad"><b>{s.name}</b>{s.quote && <p>“{s.quote}”</p>}</div>)}</div>
+    ) : (
+      <div class="card pad empty"><Vh name="vh-heart-outline" /><p>The first shoutouts are on their way.</p></div>
+    )}
+  </Showcase>
+
+  <Showcase id="guestbook" title="Guestbook" lead="Leave a short message in Thai, English or Japanese. I read every one before it appears." motif="vh-heart" tint="pink">
+    <div class="guest">
+      <div class="card pad empty"><Vh name="vh-heart-target" /><p>No messages yet. Be the first!</p></div>
+      <form class="card pad gform" aria-describedby="gb-note" onsubmit="return false">
+        <label>Name<input name="name" maxlength="40" autocomplete="nickname" disabled /></label>
+        <label>Message <small>(max 300)</small><textarea name="message" maxlength="300" rows="4" disabled></textarea></label>
+        <button class="btn fill" type="submit" disabled>Send ♥</button>
+        <p id="gb-note" class="meta">Opening soon. Messages show after I approve them. To limit spam, I keep a one-way scrambled fingerprint of your IP for a day, never the address itself.</p>
+      </form>
+    </div>
+  </Showcase>
+</Page>
+
+<style>
+  .guest{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .gform{display:flex;flex-direction:column;gap:12px}
+  .gform label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px}
+  .gform input,.gform textarea{font:inherit;border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk);color:var(--ink)}
+  .gform [disabled]{opacity:.6}
+  @media (max-width:900px){ .guest{grid-template-columns:1fr} }
+</style>

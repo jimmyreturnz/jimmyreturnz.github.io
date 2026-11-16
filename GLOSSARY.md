@@ -13,15 +13,23 @@ Everything before the Portfolio: profile, info, and the Enter button.
 _Avoid_: Landing, home, title screen, gate
 
 **Warp**:
-The transition that morphs the visitor from the Lobby into the Portfolio.
-_Avoid_: Morph, page transition, enter animation
+The transition that morphs the visitor from the Lobby into the Portfolio. Moving between Portfolio pages uses lighter page transitions, not the Warp.
+_Avoid_: Morph, enter animation
 
 **Portfolio**:
-The main page, made of Showcases.
+Everything after the Lobby: a set of pages (Projects, Rhythm, TETR.IO, About, Community) sharing one header.
 _Avoid_: Main page, dashboard
 
+**Portfolio page**:
+One page of the Portfolio, holding one or more Showcases.
+_Avoid_: Tab, screen, section
+
+**Page transition**:
+The short animation when moving between Portfolio pages; the header and BGM stay put.
+_Avoid_: Warp (that is Lobby → Portfolio only)
+
 **Showcase**:
-One self-contained block inside the Portfolio (e.g. Mania, Taiko, TETR.IO, Projects, Shoutouts, Blog).
+One self-contained block on a Portfolio page (e.g. osu!taiko, osu!mania, Skills, Shoutouts, Guestbook).
 _Avoid_: Section, feature, widget
 
 ## Showcases

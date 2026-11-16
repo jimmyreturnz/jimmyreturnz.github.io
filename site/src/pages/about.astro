@@ -1,0 +1,49 @@
+---
+import Page from '../layouts/Page.astro';
+import Showcase from '../components/Showcase.astro';
+import Ph from '../components/Ph.astro';
+import { profile, skills, setups, timeline } from '../data/site';
+---
+<Page title="About" description="Skills, setups and timeline of Jimmy (Apiwat Kongsawat).">
+  <header class="page-hero">
+    <h1>About</h1>
+    <p>{profile.fullName} ({profile.nickname}) · {profile.role} · {profile.location}</p>
+  </header>
+
+  <Showcase id="skills" title="Skills" lead="Grouped, and each one will link to where I used it." motif="vh-dots" tint="mint">
+    <div class="grid3">
+      {skills.map((g) => (
+        <div class="card pad"><h3>{g.group}</h3><div class="chips">{g.items.map((s) => <span class="chip">{s}</span>)}</div></div>
+      ))}
+    </div>
+  </Showcase>
+
+  <Showcase id="setups" title="Setups" lead="Gear and settings, for the curious." motif="vh-eq" tint="lav">
+    <div class="grid3">
+      {setups.map((g) => (
+        <div class="card pad"><h3>{g.group}</h3>
+          <dl>{g.items.map((i) => <><dt>{i.label}</dt><dd><Ph value={i.value} hint="…" /></dd></>)}</dl>
+        </div>
+      ))}
+    </div>
+  </Showcase>
+
+  <Showcase id="timeline" title="Timeline" lead="The short version." motif="vh-arrow-thin" tint="sky">
+    <ol class="timeline">
+      {timeline.map((t) => (
+        <li class="card pad"><span class="when"><Ph value={t.when} hint="year" /></span><b>{t.what}</b><span class="meta"><Ph value={t.where} hint="where" /></span></li>
+      ))}
+    </ol>
+  </Showcase>
+</Page>
+
+<style>
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips .chip{cursor:default}
+  dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+  dt{color:var(--muted);font-weight:700} dd{margin:0}
+  .timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .timeline li{display:flex;flex-direction:column;gap:4px}
+  .when{font:700 13px var(--hud);color:var(--accent)}
+  @media (max-width:900px){ .timeline{grid-template-columns:1fr 1fr} }
+</style>

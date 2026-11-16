@@ -1,8 +1,8 @@
 ---
+import SoundToggle from './SoundToggle.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
 ---
 <div class="settings" role="group" aria-label="Site settings">
-  <button class="tg" type="button" aria-pressed="false" data-setting="sound"><i></i><span>Sound</span></button>
-  <button class="tg" type="button" aria-pressed="false" data-setting="lite"><i></i><span>Lite</span></button>
+  <SoundToggle />
   <ThemeSwitch />
 </div>

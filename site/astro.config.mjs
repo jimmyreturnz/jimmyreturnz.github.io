@@ -6,4 +6,6 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   publicDir: '../assets',
   build: { format: 'directory' },
+  // the old one-page Portfolio address
+  redirects: { '/portfolio': '/projects/' },
 });

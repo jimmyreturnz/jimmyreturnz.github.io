@@ -1,0 +1,38 @@
+---
+import Page from '../layouts/Page.astro';
+import Showcase from '../components/Showcase.astro';
+import ChartPlayer from '../components/ChartPlayer.astro';
+import SoundCloud from '../components/SoundCloud.astro';
+import { charts, profile } from '../data/site';
+import { stats, fmt, rank } from '../lib/stats';
+const { osu } = stats;
+const m4 = osu.mania?.fourK ?? osu.mania;
+---
+<Page title="Rhythm" description="Jimmy’s own osu!taiko and osu!mania 4K maps, playable in the browser.">
+  <header class="page-hero">
+    <h1>Rhythm</h1>
+    <p>My own maps. Watch them play, then try them yourself. Chart carousel coming soon.</p>
+  </header>
+
+  <Showcase id="taiko" title="osu!taiko" lead="Camellia – Circles of Death." motif="vh-target" tint="mint">
+    <ChartPlayer mode="taiko" {...charts.taiko} stats={[
+      { label: 'global rank', value: rank(osu.taiko?.globalRank), hint: '#00,000' },
+      { label: '🇹🇭 Thailand', value: rank(osu.taiko?.countryRank), hint: '#000' },
+      { label: 'pp', value: fmt(osu.taiko?.pp), hint: '0,000' },
+    ]} />
+  </Showcase>
+
+  <Showcase id="mania" title="osu!mania 4K" lead="Quaoar, 4K. Dense, so the preview plays it for you first." motif="vh-chevrons" tint="pink">
+    <ChartPlayer mode="mania" {...charts.mania} stats={[
+      { label: 'global rank (4K)', value: rank(m4?.globalRank), hint: '#00,000' },
+      { label: '🇹🇭 Thailand (4K)', value: rank(m4?.countryRank), hint: '#000' },
+      { label: 'pp (4K)', value: fmt(m4?.pp), hint: '0,000' },
+    ]} />
+  </Showcase>
+
+  {profile.links.soundcloud && (
+    <Showcase id="soundcloud" title="On repeat" lead="Hardcore EDM I keep coming back to." motif="vh-eq" tint="lav">
+      <SoundCloud url={profile.links.soundcloud} />
+    </Showcase>
+  )}
+</Page>

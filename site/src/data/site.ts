@@ -21,6 +21,8 @@ export const profile = {
     instagram: 'https://www.instagram.com/jimmyreturnz/' as string | null,
     discord: 'https://discord.com/users/240829609879273472' as string | null, // @jimmyreturnz
     facebook: null as string | null,
+    /** Paste a SoundCloud playlist or track URL to show the embedded player. */
+    soundcloud: null as string | null,
   },
 };
 

@@ -14,11 +14,11 @@ Read these before working:
 ## Stack (decided)
 - **Hosting:** Cloudflare Pages, built from this repo; free `*.pages.dev` address first, `jimmyreturnz.dev` later (ADR 0001). Repo name stays `jimmyreturnz.github.io`; GitHub Pages will only serve a redirect.
 - **Site:** Astro + TypeScript. React islands only where state is complex (Guestbook form, Guestbook admin). Chart players and animation are plain TypeScript.
-- **Animation:** GSAP (Intro, Warp, UI motion); PixiJS for the taiko/mania players, lazy-loaded near their Showcase; CSS for idle loops. Target 60fps on a mid-range Android. Respect `prefers-reduced-motion`; offer a Lite mode toggle.
+- **Animation:** GSAP (Intro, Warp, UI motion); PixiJS for the taiko/mania players, lazy-loaded near their Showcase; CSS for idle loops. Target 60fps on a mid-range Android. Respect `prefers-reduced-motion`. No Lite toggle (owner's call); drop idle loops automatically on low frame rate.
 - **API:** Hono on Cloudflare Workers (ADR 0003). Data in Cloudflare D1.
 - **Content:** Sveltia CMS at `/admin` edits Blog, Projects, Shoutouts, Timeline, Skills, Setups (Markdown/data files in the repo).
 - **Tooling:** Bun (package manager + scripts), Biome (format + lint), GitHub Actions (checks on push; daily Stats Card refresh). Cloudflare deploys `main`, preview per branch.
-- **Current state:** pages only (Lobby at `/`, Portfolio at `/portfolio/`). No Intro/Warp/player animation yet; the owner asked for pages first. Light theme is default; dark uses `#1f1e33`. Ink is navy `#1f1e33` for now (plum `#3b2a4d` is the alternative, one token in `site/src/styles/global.css`).
+- **Current state:** Lobby at `/`; Portfolio pages `/projects/`, `/rhythm/`, `/tetrio/`, `/about/`, `/community/` (Astro ClientRouter: client-side page transitions, header persists; scripts must init on `astro:page-load`). No Intro/Warp/player animation yet; the owner asked for pages first. Light theme is default; dark uses `#1f1e33`. Ink is navy `#1f1e33` for now (plum `#3b2a4d` is the alternative, one token in `site/src/styles/global.css`).
 - **Analytics:** Cloudflare Web Analytics only (no cookies, no banner).
 
 ## Planned layout
@@ -34,7 +34,7 @@ docs/             FEATURES.md, adr/, reviews/
 - No secrets in client code. API keys (osu! API, GitHub) live in GitHub Actions secrets or Worker secrets only.
 - Guestbook: approve-before-publish, Turnstile, per-visitor rate limits, 300-char limit, no links, plain text escaped on output. Typed names are shown as plain text; there is no verification. The only profile links are ones the owner attaches by hand while approving. Rate limits use an HMAC of the IP with a daily-rotated secret, never the raw IP, disclosed on the page.
 - Work email `apiwatkon.rtz@gmail.com` shown as a text link (Cloudflare Email Obfuscation) plus a labelled copy button; no contact form. It is also the takedown contact.
-- Security headers via Cloudflare (`_headers`): CSP, HSTS, frame-ancestors, etc.
+- Security headers via Cloudflare (`_headers`): CSP, HSTS, frame-ancestors, etc. CSP must allow `frame-src https://w.soundcloud.com` for the SoundCloud embed.
 
 ## Audio rules
 - BGM plays quietly in the Portfolio; it crossfades out whenever Feature audio plays and back in after.

@@ -1,39 +1,34 @@
-// Theme (light default), Lite mode and Sound preference, remembered per browser.
-type Key = 'theme' | 'lite' | 'sound';
+// Theme (light default) and Sound preference, remembered per browser.
+// Uses event delegation so it keeps working across client-side page changes (Astro ClientRouter).
+type Key = 'theme' | 'sound';
 const store = {
   get(k: Key): string | null { try { return localStorage.getItem(`jr.${k}`); } catch { return null; } },
   set(k: Key, v: string) { try { localStorage.setItem(`jr.${k}`, v); } catch { /* private mode */ } },
 };
-
 const root = document.documentElement;
 
-function applyTheme(dark: boolean) {
+function syncControls() {
+  const dark = store.get('theme') === 'dark';
   root.dataset.theme = dark ? 'dark' : 'light';
-  document.querySelectorAll<HTMLElement>('[data-theme-switch]').forEach((b) => b.setAttribute('aria-checked', String(dark)));
+  document.querySelectorAll('[data-theme-switch]').forEach((b) => b.setAttribute('aria-checked', String(dark)));
+  const sound = store.get('sound') === 'true';
+  document.querySelectorAll('[data-setting="sound"]').forEach((b) => b.setAttribute('aria-pressed', String(sound)));
 }
 
-function bindToggle(name: 'lite' | 'sound', onChange?: (on: boolean) => void) {
-  const on = store.get(name) === 'true';
-  if (name === 'lite') root.dataset.lite = String(on);
-  document.querySelectorAll<HTMLElement>(`[data-setting="${name}"]`).forEach((b) => {
-    b.setAttribute('aria-pressed', String(on));
-    b.addEventListener('click', () => {
-      const next = b.getAttribute('aria-pressed') !== 'true';
-      document.querySelectorAll(`[data-setting="${name}"]`).forEach((x) => x.setAttribute('aria-pressed', String(next)));
-      store.set(name, String(next));
-      if (name === 'lite') root.dataset.lite = String(next);
-      onChange?.(next);
-    });
-  });
-}
+document.addEventListener('click', (e) => {
+  const t = e.target as Element | null;
+  if (t?.closest('[data-theme-switch]')) {
+    store.set('theme', root.dataset.theme === 'dark' ? 'light' : 'dark');
+    syncControls();
+  } else if (t?.closest('[data-setting="sound"]')) {
+    const next = store.get('sound') !== 'true';
+    store.set('sound', String(next));
+    syncControls();
+    document.dispatchEvent(new CustomEvent('jr:sound', { detail: next }));
+  }
+});
 
-applyTheme(store.get('theme') === 'dark');
-document.querySelectorAll<HTMLElement>('[data-theme-switch]').forEach((b) =>
-  b.addEventListener('click', () => {
-    const dark = root.dataset.theme !== 'dark';
-    applyTheme(dark);
-    store.set('theme', dark ? 'dark' : 'light');
-  }),
-);
-bindToggle('lite');
-bindToggle('sound', (on) => document.dispatchEvent(new CustomEvent('jr:sound', { detail: on })));
+// The new page's <html> replaces ours on navigation, so re-apply before it paints.
+document.addEventListener('astro:after-swap', syncControls);
+document.addEventListener('astro:page-load', syncControls);
+syncControls();

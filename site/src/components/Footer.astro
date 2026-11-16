@@ -1,0 +1,48 @@
+---
+import Socials from './Socials.astro';
+import Vh from './Vh.astro';
+import { profile, charts } from '../data/site';
+import { pages } from '../data/pages';
+---
+<footer class="foot">
+  <div class="wrap fgrid">
+    <div>
+      <a class="wordmark" href="/"><Vh name="vh-heart" />jimmyreturnz</a>
+      <p class="meta">{profile.role} · {profile.location}</p>
+      <nav aria-label="Footer" class="fnav">{pages.map((p) => <a href={p.href}>{p.label}</a>)}</nav>
+    </div>
+    <div>
+      <p class="label">Find me</p>
+      <Socials compact />
+      <p class="mail">Work email: <a href={`mailto:${profile.email}`}>{profile.email}</a>
+        <button class="chip copy" type="button" data-copy={profile.email}>Copy</button><span class="sr-only" aria-live="polite" data-copied></span></p>
+    </div>
+    <div>
+      <p class="label">Music credits</p>
+      <p class="meta">{charts.taiko.artist} – {charts.taiko.title}<br /><span lang="ja">{charts.mania.artist}</span> – {charts.mania.title}<br />Both mapped by {charts.taiko.mapper}. Rights holders: email me and I’ll remove a track the same day.</p>
+    </div>
+  </div>
+  <p class="wrap tiny">© {new Date().getFullYear()} jimmyreturnz · <a href="/">Back to the Lobby</a></p>
+</footer>
+
+<style>
+  .foot{margin-top:40px;border-top:var(--stroke) solid var(--ink);background:var(--paper);padding:32px 0 18px}
+  .fgrid{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:24px}
+  .foot .label{margin:0 0 10px}
+  .fnav{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:14px}
+  .mail{font-size:14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 0}
+  .copy{font-size:12px;min-height:26px;padding:0 10px}
+  .tiny{font-size:12px;color:var(--muted);margin:24px auto 0}
+  @media (max-width:900px){ .fgrid{grid-template-columns:1fr} }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+      const live = document.querySelector<HTMLElement>('[data-copied]');
+      try { await navigator.clipboard.writeText(b.dataset.copy!); b.textContent = 'Copied!'; if (live) live.textContent = 'Email copied'; }
+      catch { b.textContent = 'Select & copy'; }
+      setTimeout(() => (b.textContent = 'Copy'), 1800);
+    }));
+  });
+</script>

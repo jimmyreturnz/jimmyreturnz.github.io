@@ -1,0 +1,36 @@
+---
+// Sound on/off. Adapted from Uiverse.io by vinodjangid07 ("average-jellyfish-29", MIT, © 2023 Uiverse.io):
+// recoloured to the pastel theme and turned into a real <button aria-pressed> so it works with keyboard + screen readers.
+---
+<button class="sound" type="button" aria-pressed="false" data-setting="sound" title="Sound">
+  <span class="sr-only">Sound</span>
+  <span class="speaker" aria-hidden="true">
+    <svg viewBox="0 0 75 75">
+      <path d="M39.389,13.769 L22.235,28.606 L6,28.606 L6,47.699 L21.989,47.699 L39.389,62.75 L39.389,13.769z" />
+      <path class="waves" d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6" />
+    </svg>
+  </span>
+  <span class="mute" aria-hidden="true">
+    <svg viewBox="0 0 75 75">
+      <path d="m39,14-17,15H6V48H22l17,15z" />
+      <path class="x" d="m49,26 20,24m0-24-20,24" />
+    </svg>
+  </span>
+</button>
+
+<style>
+  .sound{position:relative;flex:none;width:var(--ctl);height:var(--ctl);border-radius:50%;border:2px solid var(--ink);background:var(--pink);
+         display:grid;place-items:center;cursor:pointer;overflow:hidden;padding:0;transition:transform .15s,background-color .3s;
+         box-shadow:2px 2px 0 var(--shadow-c)}
+  .sound:hover{background:var(--butter)}
+  .sound:active{transform:scale(.8)}
+  .speaker,.mute{position:absolute;inset:0;display:grid;place-items:center;transition:opacity .3s}
+  svg{width:18px;height:18px}
+  path{fill:#1f1e33;stroke:#1f1e33;stroke-width:5;stroke-linejoin:round}
+  .waves,.x{fill:none;stroke-linecap:round}
+  /* off (default) shows the muted speaker */
+  .speaker{opacity:0} .mute{opacity:1}
+  .sound[aria-pressed="true"] .speaker{opacity:1}
+  .sound[aria-pressed="true"] .mute{opacity:0}
+  .sound[aria-pressed="true"]{background:var(--mint)}
+</style>

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import sprite from '../../../assets/vectorheart/vectorheart.svg?raw';
 
 interface Props { title: string; description?: string }
@@ -17,14 +18,15 @@ const { title, description = 'Jimmy (Apiwat Kongsawat): Data Scientist & Develop
     <link rel="preload" href="/fonts/zen-dots/zen-dots-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css" />
     <link rel="stylesheet" href="/fonts/fonts-jp.css" />
-    <!-- apply saved theme / lite before first paint to avoid a flash -->
+    <!-- apply saved theme before first paint to avoid a flash -->
     <script is:inline>
       try {
         const r = document.documentElement;
         if (localStorage.getItem('jr.theme') === 'dark') r.dataset.theme = 'dark';
-        if (localStorage.getItem('jr.lite') === 'true') r.dataset.lite = 'true';
       } catch {}
     </script>
+    <!-- client-side page changes: pages animate into each other and the header/BGM persists -->
+    <ClientRouter fallback="swap" />
   </head>
   <body>
     <div hidden set:html={sprite} />

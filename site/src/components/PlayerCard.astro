@@ -94,7 +94,7 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
 </style>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
+  document.addEventListener('astro:page-load', () => document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
     const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
     const select = (t: HTMLButtonElement, focus = false) => {
       tabs.forEach((x) => {
@@ -113,5 +113,5 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
         if (d) { e.preventDefault(); select(tabs[(i + d + tabs.length) % tabs.length]!, true); }
       });
     });
-  });
+  }));
 </script>
