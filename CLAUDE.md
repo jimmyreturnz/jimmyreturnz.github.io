@@ -46,4 +46,4 @@ docs/             FEATURES.md, adr/
 - Inspiration: kenzync.dev (tool-card layout), hirokaze.net (theme applied to every bit of UI). Do not copy their assets.
 
 ## Skills in `.claude/skills/`
-ui-ux-pro-max, storyboard, web-performance, gsap-*, 60fps-animation, pixijs-2d, sveltia-cms, grill-with-docs (+ grilling, domain-modeling), graphify. Provenance in `SOURCES.md`. Once there is real code, run `/graphify .` and keep `graphify-out/GRAPH_REPORT.md` current.
+ui-ux-pro-max, storyboard, web-performance, gsap-*, 60fps-animation, pixijs-2d, sveltia-cms, grill-with-docs (+ grilling, domain-modeling), graphify, unslop. Run `/unslop` on any prose visitors will read (bio, project write-ups, blog drafts) before committing it. Provenance in `SOURCES.md`. Once there is real code, run `/graphify .` and keep `graphify-out/GRAPH_REPORT.md` current.

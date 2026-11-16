@@ -11,3 +11,4 @@
 | sveltia-cms | secondsky/claude-skills version, via mirror github.com/ComeOnOliver/skillshub (removed from upstream) |
 | grill-with-docs, grilling, domain-modeling | github.com/mattpocock/skills (`engineering/grill-with-docs`, `productivity/grilling`, `engineering/domain-modeling`; grill-with-docs needs the other two) |
 | graphify | PyPI `graphifyy` 0.9.111 (github.com/safishamsi/graphify) — `skill.md` + `skills/claude/references`; needs `pip install graphifyy` at run time (the skill does this itself) |
+| unslop | github.com/theclaymethod/unslop v2.3.0 — SKILL.md, references, presets, assets, scripts (minus wiki_sync/contribute/refresh_status, which talk to GitHub) |
