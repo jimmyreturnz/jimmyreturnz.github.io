@@ -35,4 +35,5 @@ Showcase order: Projects → osu!taiko → osu!mania → TETR.IO → Skills and 
 - Résumé download. Now playing (copyright risk). Achievements.
 
 ## Open questions
+- BGM and SFX tracks: owner is choosing songs with clear, low-risk licences that fit the theme.
 - NuageRose font (Gumroad, free) — owner to download and add to `assets/fonts/nuagerose/` with its license.
