@@ -2,11 +2,15 @@
 // Chart Showcase shell. Playback (autoplay preview, Play, calibration) arrives with the song + .osu files.
 import Vh from './Vh.astro';
 import Ph from './Ph.astro';
+import KeySwitch from './KeySwitch.astro';
+import { maniaScrollSpeed, maniaScrollTimeMs } from '../data/site';
 interface Stat { label: string; value: string | null; hint: string }
 interface Props {
   mode: 'taiko' | 'mania'; artist: string; title: string; mapper: string; beatmapUrl: string; keys: string; stats: Stat[];
+  /** Optional per-key-mode rankings (osu!mania 4K / 7K); replaces `stats` with a switch. */
+  variants?: { id: string; label: string; stats: Stat[] }[];
 }
-const { mode, artist, title, mapper, beatmapUrl, keys, stats } = Astro.props;
+const { mode, artist, title, mapper, beatmapUrl, keys, stats, variants } = Astro.props;
 const lanes = mode === 'mania' ? 4 : 1;
 ---
 <div class:list={['player card', `p-${mode}`]}>
@@ -14,18 +18,30 @@ const lanes = mode === 'mania' ? 4 : 1;
     <p class="label">{mode === 'taiko' ? 'osu!taiko' : 'osu!mania 4K'} · my map</p>
     <h3><span lang={/[^\x00-\x7F]/.test(artist) ? 'ja' : undefined}>{artist}</span> – {title}</h3>
     <p class="credit">Music: {artist} – {title} · Mapped by {mapper}</p>
-    <div class="stats">
-      {stats.map((s) => <div class="stat"><b><Ph value={s.value} hint={s.hint} /></b><small>{s.label}</small></div>)}
-    </div>
+    {variants ? (
+      <div class="vwrap" data-keys>
+        <div class="vhead"><span class="label">My ranking</span><KeySwitch options={variants.map((v) => ({ id: v.id, label: v.label }))} label="osu!mania key mode" /></div>
+        {variants.map((v, k) => (
+          <div class="stats" data-keys-panel={v.id} hidden={k !== 0}>
+            {v.stats.map((s) => <div class="stat"><b><Ph value={s.value} hint={s.hint} /></b><small>{s.label}</small></div>)}
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div class="stats">
+        {stats.map((s) => <div class="stat"><b><Ph value={s.value} hint={s.hint} /></b><small>{s.label}</small></div>)}
+      </div>
+    )}
     <div class="controls">
       <button class="btn fill" type="button" disabled>▶ Preview</button>
       <button class="btn" type="button" disabled>Play</button>
       <a class="btn" href={beatmapUrl} target="_blank" rel="noopener noreferrer">Play on osu! ↗</a>
     </div>
-    <p class="soon">🔇 Muted by default. Song + chart playback coming soon · keys <kbd>{keys}</kbd></p>
+    <p class="soon">🔇 Muted by default. Song + chart playback coming soon · keys <kbd>{keys}</kbd>
+      {mode === 'mania' && <> · my scroll speed <b>{maniaScrollSpeed['4k']}</b> (4K) / <b>{maniaScrollSpeed['7k']}</b> (7K)</>}</p>
   </div>
 
-  <div class="stage" aria-hidden="true">
+  <div class="stage" aria-hidden="true" data-scroll-ms={mode === 'mania' ? maniaScrollTimeMs(maniaScrollSpeed['4k']) : undefined}>
     {mode === 'taiko' ? (
       <div class="taiko">
         <div class="drum"><span></span></div>
@@ -55,6 +71,9 @@ const lanes = mode === 'mania' ? 4 : 1;
   h3{font-size:clamp(20px,2.6vw,28px);margin:0}
   .credit{margin:0;font-size:13px;color:var(--muted);font-weight:700}
   .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stats[hidden]{display:none}
+  .vwrap{display:flex;flex-direction:column;gap:8px}
+  .vhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .stat{border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk);min-width:0}
   .stat b{display:block;font:700 18px/1.2 var(--hud);overflow-wrap:anywhere}
   .stat small{font-size:12px;color:var(--muted);font-weight:700}

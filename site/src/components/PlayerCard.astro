@@ -1,19 +1,20 @@
 ---
 import { github } from '../data/site';
-import rawStats from '../data/stats.json';
-import type { Stats } from '../../scripts/fetch-stats';
-const stats = rawStats as unknown as Stats;
+import { stats, fmt, rank } from '../lib/stats';
 import Ph from './Ph.astro';
 import Icon from './Icon.astro';
+import KeySwitch from './KeySwitch.astro';
 
-const fmt = (n: number | null | undefined, d = 0) => (n == null ? null : n.toLocaleString('en-US', { maximumFractionDigits: d }));
-const rank = (n: number | null | undefined) => (n == null ? null : `#${n.toLocaleString('en-US')}`);
 const { osu, tetrio } = stats;
-const mania = osu.mania;
-const maniaRank = mania?.fourK ?? mania;
+const variantTiles = (v: { globalRank: number | null; countryRank: number | null; pp: number | null } | undefined, k: string): Tile[] => [
+  { label: `global rank (${k})`, value: rank(v?.globalRank), hint: '#00,000' },
+  { label: `🇹🇭 Thailand (${k})`, value: rank(v?.countryRank), hint: '#000' },
+  { label: `pp (${k})`, value: fmt(v?.pp), hint: '0,000' },
+];
 
 type Tile = { label: string; value: string | null; hint: string };
-const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avatar: string | null; href: string; tiles: Tile[] }[] = [
+type Variant = { id: string; label: string; tiles: Tile[] };
+const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avatar: string | null; href: string; tiles: Tile[]; variants?: Variant[] }[] = [
   { id: 'github', label: 'GitHub', icon: 'github', avatar: null, href: github.url, tiles: [
     { label: 'public repos', value: fmt(github.publicRepos), hint: '0' },
     { label: 'followers', value: fmt(github.followers), hint: '0' },
@@ -24,10 +25,9 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
     { label: '🇹🇭 Thailand rank', value: rank(osu.taiko?.countryRank), hint: '#000' },
     { label: 'pp', value: fmt(osu.taiko?.pp), hint: '0,000' },
   ] },
-  { id: 'mania', label: 'osu!mania 4K', icon: 'osu', avatar: osu.avatar, href: `${osu.profileUrl}/mania`, tiles: [
-    { label: 'global rank (4K)', value: rank(maniaRank?.globalRank), hint: '#00,000' },
-    { label: '🇹🇭 Thailand rank (4K)', value: rank(maniaRank?.countryRank), hint: '#000' },
-    { label: 'pp (4K)', value: fmt(maniaRank?.pp), hint: '0,000' },
+  { id: 'mania', label: 'osu!mania', icon: 'osu', avatar: osu.avatar, href: `${osu.profileUrl}/mania`, tiles: [], variants: [
+    { id: '4k', label: '4K', tiles: variantTiles(osu.mania?.fourK, '4K') },
+    { id: '7k', label: '7K', tiles: variantTiles(osu.mania?.sevenK, '7K') },
   ] },
   { id: 'tetrio', label: 'TETR.IO', icon: 'tetrio', avatar: tetrio.avatar, href: tetrio.profileUrl, tiles: [
     { label: 'global rank', value: rank(tetrio.league?.globalRank), hint: '#000' },
@@ -51,14 +51,21 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
 
   {tabs.map((t, i) => (
     <div class="panel" role="tabpanel" id={`pc-${t.id}`} aria-labelledby={`t-${t.id}`} hidden={i !== 0}>
-      {t.avatar && (
-        <div class="who">
-          <img src={t.avatar} alt={`${t.label} profile picture`} width="44" height="44" loading="lazy" decoding="async" />
-          <span><b>jimmyreturnz</b><small>{t.label}</small></span>
-        </div>
-      )}
-      <div class:list={['stats', t.tiles.length > 3 && 'six']}>
-        {t.tiles.map((x) => <div class="stat"><b><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}
+      <div data-keys>
+        {t.avatar && (
+          <div class="who">
+            <img src={t.avatar} alt={`${t.label} profile picture`} width="44" height="44" loading="lazy" decoding="async" />
+            <span><b>jimmyreturnz</b><small>{t.label}</small></span>
+            {t.variants && <KeySwitch options={t.variants.map((v) => ({ id: v.id, label: v.label }))} label="osu!mania key mode" />}
+          </div>
+        )}
+        {t.variants
+          ? t.variants.map((v, k) => (
+              <div class="stats" data-keys-panel={v.id} hidden={k !== 0}>
+                {v.tiles.map((x) => <div class="stat"><b><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}
+              </div>
+            ))
+          : <div class="stats">{t.tiles.map((x) => <div class="stat"><b><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}</div>}
       </div>
       {t.id === 'github' && (
         <div class="langs">
@@ -81,6 +88,8 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
   .who{display:flex;align-items:center;gap:10px;padding:12px 16px 0}
   .who img{width:44px;height:44px;border-radius:12px;border:2px solid var(--ink);object-fit:cover}
   .who b{display:block;font:14px var(--display)} .who small{color:var(--muted);font-weight:700;font-size:12px}
+  .who :global(.keys){margin-left:auto}
+  .stats[hidden]{display:none}
   .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 16px}
   .stat{border:2px solid var(--ink);border-radius:12px;padding:9px 10px;background:var(--sunk);min-width:0}
   .stat b{display:block;font:700 clamp(16px,2vw,22px)/1.15 var(--hud);overflow-wrap:anywhere}

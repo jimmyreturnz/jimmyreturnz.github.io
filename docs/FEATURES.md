@@ -20,7 +20,7 @@ Pages (each its own URL, animated page transitions, header + BGM persist): **Pro
 - **Skills**: tech skills only, grouped, each backed by evidence (a project or link).
 - **osu!taiko**: Camellia – Circles of Death, own map (https://osu.ppy.sh/beatmapsets/2404655#taiko/5216517).
 - **osu!mania 4K**: かめりあ – Quaoar, own map, 4K. Layout reference: kenzync.dev tool cards.
-- **Chart players (both)**: **autoplay preview is the default** (the chart plays itself, synced, with hitsounds); **Play** is opt-in, with a practice option (0.75× speed, a 20–30 s section), a calibration tap for audio offset (saved per device), judgement windows (300/100/miss) with early/late feedback. Muted by default. Lane/drum tap zones block page scroll only while playing. Credit line + "Play on osu!" link to the beatmapset.
+- **Chart players (both)**: **autoplay preview is the default** (the chart plays itself, synced, with hitsounds); **Play** is opt-in, with a practice option (0.75× speed, a 20–30 s section), a calibration tap for audio offset (saved per device), judgement windows (300/100/miss) with early/late feedback. Muted by default. Lane/drum tap zones block page scroll only while playing. osu!mania uses the owner's scroll speeds by default: 29 (4K), 32 (7K), with fall time = 11485 ms ÷ speed as in osu!lazer; visitors can change it. Credit line + "Play on osu!" link to the beatmapset.
 - **TETR.IO**: looping gameplay video (already recorded): poster image, `preload="none"`, plays muted and only while on screen.
 - **Setups**: gaming gear and settings (keys, tablet/keyboard, TETR.IO handling).
 - **Timeline**: high school, university, internship, career only; secondary, not a main focus.
@@ -40,6 +40,19 @@ Pages (each its own URL, animated page transitions, header + BGM persist): **Pro
 - Smooth (60fps target) and **mobile-friendly**; respect `prefers-reduced-motion` (still title card instead of Intro, fade instead of Warp).
 - Accessibility: keyboard for everything, visible focus, toggles with text labels and `aria-pressed`, colour never the only signal.
 - Theme the dull parts too: loaders, scrollbars, focus rings, form errors, 404 ("Miss!").
+
+## Animation pass: ideas queued (pages first, animation later)
+- **Orbiting icons on the Lobby avatar** (owner's idea; reference: the About section of dousanmiao.com): hovering or focusing the profile picture makes osu!, TETR.IO, Python, Claude and SQL icons orbit around it. On touch, a tap toggles it. Icons from simple-icons (osu!, Python, Claude, a database glyph for SQL); TETR.IO uses our own tetromino mark. Static ring of icons under reduced motion.
+- Full-screen menu overlay with one slow marquee row per Portfolio page; hovering a row tints the overlay in that page's colour (see the thegeekdesigner teardown).
+- Lobby background layers (rings, hearts, blobs) shift gently with the pointer (parallax); off on touch and reduced motion.
+- Beating-heart favicon (2–4 frames).
+- Header slims down after scrolling past the page title.
+- Suggested extras:
+  - **Judgement pop on click**: buttons briefly pop a tiny "300" / "GREAT" like a hit judgement.
+  - **D F J K key lights**: pressing D, F, J or K anywhere on the Rhythm page lights up four lanes in the header (and S D F Space J K L for 7K), with an optional key-press sound.
+  - **Stats count up** when the Player Card or a stats tile first scrolls into view.
+  - **Heart avatar beats to the BGM's BPM** once BGM exists.
+  - **TETR.IO page**: stats tiles drop in like tetrominoes and "clear a line" when all are in.
 
 ## Parked ideas (not building)
 - Easter eggs (Konami code, typing "osu" on the Lobby).

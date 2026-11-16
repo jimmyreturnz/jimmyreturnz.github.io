@@ -6,7 +6,11 @@ import SoundCloud from '../components/SoundCloud.astro';
 import { charts, profile } from '../data/site';
 import { stats, fmt, rank } from '../lib/stats';
 const { osu } = stats;
-const m4 = osu.mania?.fourK ?? osu.mania;
+const mv = (v: { globalRank: number | null; countryRank: number | null; pp: number | null } | undefined, k: string) => [
+  { label: `global rank (${k})`, value: rank(v?.globalRank), hint: '#00,000' },
+  { label: `🇹🇭 Thailand (${k})`, value: rank(v?.countryRank), hint: '#000' },
+  { label: `pp (${k})`, value: fmt(v?.pp), hint: '0,000' },
+];
 ---
 <Page title="Rhythm" description="Jimmy’s own osu!taiko and osu!mania 4K maps, playable in the browser.">
   <header class="page-hero">
@@ -22,11 +26,10 @@ const m4 = osu.mania?.fourK ?? osu.mania;
     ]} />
   </Showcase>
 
-  <Showcase id="mania" title="osu!mania 4K" lead="Quaoar, 4K. Dense, so the preview plays it for you first." motif="vh-chevrons" tint="pink">
-    <ChartPlayer mode="mania" {...charts.mania} stats={[
-      { label: 'global rank (4K)', value: rank(m4?.globalRank), hint: '#00,000' },
-      { label: '🇹🇭 Thailand (4K)', value: rank(m4?.countryRank), hint: '#000' },
-      { label: 'pp (4K)', value: fmt(m4?.pp), hint: '0,000' },
+  <Showcase id="mania" title="osu!mania" lead="Quaoar is my 4K map; I rank in 4K and 7K. Dense, so the preview plays it for you first." motif="vh-chevrons" tint="pink">
+    <ChartPlayer mode="mania" {...charts.mania} stats={[]} variants={[
+      { id: '4k', label: '4K', stats: mv(osu.mania?.fourK, '4K') },
+      { id: '7k', label: '7K', stats: mv(osu.mania?.sevenK, '7K') },
     ]} />
   </Showcase>
 

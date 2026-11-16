@@ -1,17 +1,43 @@
 {
-  "fetchedAt": "2026-11-16T09:55:00.572Z",
+  "fetchedAt": "2026-11-16T10:12:15.295Z",
   "osu": {
-    "fetchedAt": null,
+    "fetchedAt": "2026-11-16T10:12:15.291Z",
     "username": "jimmyreturnz",
     "userId": 11306153,
     "profileUrl": "https://osu.ppy.sh/users/11306153",
     "avatar": "/stats/osu-avatar.jpg",
-    "country": null,
-    "taiko": null,
-    "mania": null
+    "country": "TH",
+    "taiko": {
+      "globalRank": 243,
+      "countryRank": 4,
+      "pp": 15886,
+      "accuracy": 95.21,
+      "playCount": 15146,
+      "playTimeHours": 303,
+      "level": 94
+    },
+    "mania": {
+      "globalRank": 3601,
+      "countryRank": 88,
+      "pp": 11942,
+      "accuracy": 95.86,
+      "playCount": 20166,
+      "playTimeHours": 502,
+      "level": 96,
+      "fourK": {
+        "globalRank": 3923,
+        "countryRank": 114,
+        "pp": 10969
+      },
+      "sevenK": {
+        "globalRank": 1475,
+        "countryRank": 31,
+        "pp": 10657
+      }
+    }
   },
   "tetrio": {
-    "fetchedAt": "2026-11-16T09:55:00.175Z",
+    "fetchedAt": "2026-11-16T10:12:13.974Z",
     "username": "jimmyreturnz",
     "profileUrl": "https://ch.tetr.io/u/jimmyreturnz",
     "avatar": "/stats/tetrio-avatar.jpg",
@@ -24,8 +50,8 @@
       "rank": "u",
       "bestRank": "u",
       "tr": 22287.816699821866,
-      "globalRank": 594,
-      "countryRank": 5,
+      "globalRank": 596,
+      "countryRank": 6,
       "apm": 114.22,
       "pps": 2.67,
       "vs": 225.49

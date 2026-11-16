@@ -1,0 +1,27 @@
+---
+// 4K / 7K switch for osu!mania. Wrap the switch and the matching panels in an element with [data-keys].
+// Panels: elements with data-keys-panel="4k" / "7k".
+interface Props { options: { id: string; label: string }[]; label?: string }
+const { options, label = 'Key mode' } = Astro.props;
+---
+<div class="keys" role="group" aria-label={label}>
+  {options.map((o, i) => <button type="button" class="k" aria-pressed={i === 0 ? 'true' : 'false'} data-keys-btn={o.id}>{o.label}</button>)}
+</div>
+
+<style>
+  .keys{display:inline-flex;border:2px solid var(--ink);border-radius:99px;padding:2px;background:var(--sunk);gap:2px}
+  .k{border:0;background:none;border-radius:99px;min-height:26px;padding:0 12px;font:700 12px var(--hud);letter-spacing:.06em;cursor:pointer;color:var(--ink)}
+  .k[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLElement>('[data-keys]').forEach((root) => {
+      const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-keys-btn]')];
+      btns.forEach((b) => b.addEventListener('click', () => {
+        btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        root.querySelectorAll<HTMLElement>('[data-keys-panel]').forEach((p) => { p.hidden = p.dataset.keysPanel !== b.dataset.keysBtn; });
+      }));
+    });
+  });
+</script>

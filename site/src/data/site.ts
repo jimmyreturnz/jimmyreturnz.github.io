@@ -72,6 +72,11 @@ export const skills: { group: string; items: string[] }[] = [
   { group: 'Web', items: ['TypeScript', 'Astro'] },
 ];
 
+/** osu!lazer mania: a note's fall time to the hit line is MANIA_MAX_TIME_RANGE / scroll speed (ms). */
+export const MANIA_MAX_TIME_RANGE = 11485;
+export const maniaScrollSpeed = { '4k': 29, '7k': 32 } as const;
+export const maniaScrollTimeMs = (speed: number) => Math.round(MANIA_MAX_TIME_RANGE / speed);
+
 export const charts = {
   taiko: {
     artist: 'Camellia', title: 'Circles of Death', mapper: 'jimmyreturnz',
@@ -87,7 +92,7 @@ export const charts = {
 
 export const setups: { group: string; items: { label: string; value: string | null }[] }[] = [
   { group: 'osu!taiko', items: [{ label: 'Keys', value: null }, { label: 'Keyboard', value: null }] },
-  { group: 'osu!mania 4K', items: [{ label: 'Keys', value: null }, { label: 'Scroll speed', value: null }] },
+  { group: 'osu!mania', items: [{ label: 'Keys (4K)', value: null }, { label: 'Scroll speed', value: '29 (4K) · 32 (7K)' }] },
   { group: 'TETR.IO', items: [{ label: 'ARR / DAS / SDF', value: null }, { label: 'Controls', value: null }] },
 ];
 
