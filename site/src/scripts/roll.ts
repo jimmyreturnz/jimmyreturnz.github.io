@@ -2,9 +2,9 @@
 // Mark a number with `data-roll`. Numbers in a tab or key-mode panel roll when `rollIn(panel)` is called (stacked panels
 // stay rendered, so visibility observers can't see a switch); other numbers roll once when scrolled into view. For a value that changes in place, call `rollTo(el, '1,234')` and it rolls from the old digits.
 import { gsap } from 'gsap';
+import { reduced } from './motion';
 
 const DURATION = 0.8, STAGGER = 0.06;
-const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isDigit = (c: string) => c >= '0' && c <= '9';
 const ONE_TO_NINE = '0123456789';
 
@@ -13,7 +13,7 @@ const tweens = new WeakMap<HTMLElement, gsap.core.Timeline>();
 export function rollTo(el: HTMLElement, to: string, from: string = el.dataset.rv ?? ''): void {
   tweens.get(el)?.kill();
   el.dataset.rv = to;
-  if (reduce() || !/\d/.test(to) || from === to && el.dataset.rolled) { el.textContent = to; return; }
+  if (reduced() || !/\d/.test(to) || from === to && el.dataset.rolled) { el.textContent = to; return; }
   el.dataset.rolled = '1';
   el.setAttribute('aria-label', to);
   const cols: { col: HTMLElement; d: number; d0: number }[] = [];

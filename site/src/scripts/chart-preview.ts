@@ -59,6 +59,7 @@ function setup(root: HTMLElement) {
     render(audio.currentTime);
     document.dispatchEvent(new CustomEvent('jr:feature-audio', { detail: { playing: false, id } }));
   };
+  audio.addEventListener('seeked', () => { if (!dragging) render(audio.currentTime); }); // the browser lands on its own nearest frame: show where it really is
   audio.addEventListener('pause', stopped);
   audio.addEventListener('ended', stopped);
 

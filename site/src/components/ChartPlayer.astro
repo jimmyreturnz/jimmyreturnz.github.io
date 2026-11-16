@@ -64,8 +64,7 @@ const laneColour = (lanes: number, i: number) =>
             <button class="btn" type="button" disabled title="Play mode coming soon">Play</button>
             <a class="btn" href={c.beatmapUrl} target="_blank" rel="noopener noreferrer">osu! link ↗</a>
           </div>
-          <p class="foot">🔇 Silent until you press play · keys <kbd>{c.keys}</kbd>
-            {c.scrollSpeed && <> · my scroll speed <b>{c.scrollSpeed}</b></>}</p>
+          {c.scrollSpeed && <p class="foot">Scroll speed: <b>{c.scrollSpeed}</b></p>}
         </div>
 
         <div class="stage" aria-hidden="true" data-scroll-ms={c.scrollSpeed ? maniaScrollTimeMs(c.scrollSpeed) : undefined}>

@@ -3,6 +3,7 @@
 // histogram while the desktop windows fly into the Lobby cards. About 4.8 s after the hold; Skip is always there.
 import { gsap } from 'gsap';
 import { reduced } from './motion';
+import { rollIn } from './roll';
 import { sfx, unlock, setSound } from './audio';
 
 const root = document.documentElement;
@@ -39,10 +40,14 @@ function sticker(name: string, px: number): SVGSVGElement {
 }
 
 /** The Lobby's pieces pop in one by one (also used on its own when the Intro is not shown). */
+const INTRO_SPEED = 0.5;
+
 export function lobbyIn(delay = 0) {
   const els = gsap.utils.toArray<HTMLElement>(LOBBY);
   if (!els.length) return;
   if (reduced()) { gsap.set(els, { clearProps: 'all' }); return; }
+  // the Player Card numbers count up as it arrives (stacked tab panels aren't seen by scroll observers)
+  gsap.delayedCall(delay + 0.45, () => { const pc = document.querySelector<HTMLElement>('.lobby .player'); if (pc) rollIn(pc); });
   gsap.fromTo(els, { y: 24, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.6, delay, stagger: 0.06, ease: 'back.out(1.4)', clearProps: 'all' });
 }
 
@@ -112,6 +117,7 @@ function run(el: HTMLElement) {
     const w = W(), h = H();
     gsap.set(lobbyEls, { opacity: 0 });
     tl = gsap.timeline({ onComplete: () => { finish(el); gsap.set(lobbyEls, { clearProps: 'all' }); } });
+    tl.timeScale(INTRO_SPEED); // the whole Intro runs at this speed (0.5 = about 10 seconds)
 
     // 1 · ripples
     tl.call(() => sfx.boom(), [], 0)
