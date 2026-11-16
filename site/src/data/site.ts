@@ -32,13 +32,6 @@ export const github = {
   publicRepos: 8,
   followers: 6,
   commitsThisYear: null as number | null,
-  topLanguages: [
-    { name: 'Python', share: 46 },
-    { name: 'Jupyter', share: 24 },
-    { name: 'SQL', share: 18 },
-    { name: 'TypeScript', share: 12 },
-  ],
-  languagesAreSample: true,
 };
 
 

@@ -103,9 +103,9 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu-taiko' | 'osu-man
       )}
       {t.id === 'github' && (
         <div class="langs">
-          <div class="label">Top languages {github.languagesAreSample && <em class="ph">sample</em>}</div>
-          <div class="langbar">{github.topLanguages.map((l, k) => <i style={`width:${l.share}%`} class={['bg-sky','bg-pink','bg-mint','bg-butter'][k % 4]} />)}</div>
-          <div class="legend">{github.topLanguages.map((l, k) => <span><i class={['bg-sky','bg-pink','bg-mint','bg-butter'][k % 4]} />{l.name}</span>)}</div>
+          <div class="label">Top languages</div>
+          <div class="langbar">{(gh.languages ?? []).map((l, k) => <i style={`width:${l.share}%`} class={['bg-sky','bg-pink','bg-mint','bg-butter'][k % 4]} />)}</div>
+          <div class="legend">{(gh.languages ?? []).map((l, k) => <span><i class={['bg-sky','bg-pink','bg-mint','bg-butter'][k % 4]} />{l.name} {Math.round(l.share)}%</span>)}</div>
         </div>
       )}
       <footer><a href={t.href} target="_blank" rel="noopener noreferrer">View {t.label} profile ↗</a></footer>

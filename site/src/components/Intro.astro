@@ -17,6 +17,7 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
   <div class="layer power" data-l="power">
     <button class="pbtn" type="button" aria-label="Power on. Hold the button, or press Space or Enter.">
       <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle class="breathe" cx="60" cy="60" r="57" />
         <circle class="track" cx="60" cy="60" r="52" />
         <circle class="prog" cx="60" cy="60" r="52" transform="rotate(-90 60 60)" />
         <circle class="face" cx="60" cy="60" r="38" />
@@ -62,6 +63,11 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
   .intro .pbtn svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 calc(14px + var(--hold,0) * 34px) color-mix(in srgb,#ff7baf calc(55% + var(--hold,0) * 45%),transparent))}
   .intro::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:4;background:radial-gradient(circle at 50% 50%,transparent calc(75% - var(--hold,0) * 45%),#ff7baf calc(130% - var(--hold,0) * 30%));opacity:calc(var(--hold,0) * .55)}
   .intro .spark{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border-radius:50%;background:#ffd0e4;box-shadow:0 0 10px #ff7baf;pointer-events:none}
+  /* the breathing ring is drawn in the same SVG as the button, so it is exactly concentric; the browser's own focus outline is replaced by it */
+  .intro .pbtn:focus,.intro .pbtn:focus-visible{outline:none;animation:none}
+  .intro .breathe{fill:none;stroke:#ff7baf;stroke-width:2;transform-box:view-box;transform-origin:60px 60px;animation:intro-breathe 2.4s ease-in-out infinite}
+  @keyframes intro-breathe{0%,100%{transform:scale(1);opacity:.35}50%{transform:scale(1.12);opacity:.8}}
+  .intro .pbtn:focus-visible .track{stroke:#ff7baf99}
   .intro .track{fill:none;stroke:#ff7baf33;stroke-width:7}
   .intro .prog{fill:none;stroke:#ff7baf;stroke-width:7;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7}
   .intro .face{fill:#2e2c4d;stroke:#ff7baf;stroke-width:3}
@@ -95,6 +101,7 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
   .intro .wb small{color:#6b5b7d;font-weight:700}
   .intro .arrows{position:absolute;inset:0;pointer-events:none}
   .intro .arrows .vh{position:absolute;left:0;top:0;width:clamp(90px,16vw,200px);color:var(--pink);opacity:0}
+  .intro .arrows .chev{position:absolute;left:0;top:0;opacity:0;overflow:visible}
   .intro .arrows .vh:nth-child(2){color:var(--lav)}.intro .arrows .vh:nth-child(3){color:var(--sky)}
   .intro .wave{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   .intro .wave path{fill:none;stroke:#ff7baf;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:0}

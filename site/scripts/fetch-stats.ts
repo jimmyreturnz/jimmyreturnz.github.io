@@ -28,6 +28,8 @@ export type Github = {
   fetchedAt: string | null; publicRepos: number | null; followers: number | null;
   /** by year; the public contribution graph, so public activity only */
   years: Record<string, GhYear>;
+  /** top languages by bytes across the public, non-fork repos (shares sum to 100) */
+  languages: { name: string; share: number }[];
 };
 export type Stats = {
   fetchedAt: string | null;
@@ -42,7 +44,7 @@ export type Stats = {
 
 const empty: Stats = {
   fetchedAt: null,
-  github: { fetchedAt: null, publicRepos: null, followers: null, years: {} },
+  github: { fetchedAt: null, publicRepos: null, followers: null, years: {}, languages: [] },
   osu: { fetchedAt: null, username: 'jimmyreturnz', userId: OSU_USER_ID, profileUrl: `https://osu.ppy.sh/users/${OSU_USER_ID}`,
          avatar: null, country: null, taiko: null, mania: null },
   tetrio: { fetchedAt: null, username: TETRIO_USER, profileUrl: `https://ch.tetr.io/u/${TETRIO_USER}`, avatar: null, country: null,
@@ -179,7 +181,18 @@ async function fetchGithub(prev: Github): Promise<Github> {
     try { years[y] = await ghYearPublic(y); }
     catch (e) { console.warn(`  GitHub ${y}: ${(e as Error).message}`); }
   }
-  return { fetchedAt: new Date().toISOString(), publicRepos: u.public_repos ?? null, followers: u.followers ?? null, years };
+  // languages: public, non-fork repos only
+  const bytes: Record<string, number> = {};
+  try {
+    const repos = (await getJson(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&type=owner`)) as { name: string; fork: boolean }[];
+    for (const r of repos.filter((x) => !x.fork)) {
+      const l = (await getJson(`https://api.github.com/repos/${GITHUB_USER}/${r.name}/languages`)) as Record<string, number>;
+      for (const [k, v] of Object.entries(l)) bytes[k] = (bytes[k] ?? 0) + v;
+    }
+  } catch (e) { console.warn(`  GitHub languages: ${(e as Error).message}`); }
+  const total = Object.values(bytes).reduce((a, b) => a + b, 0);
+  const languages = total ? Object.entries(bytes).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([name, n]) => ({ name, share: Math.round((n / total) * 1000) / 10 })) : prev.languages ?? [];
+  return { fetchedAt: new Date().toISOString(), publicRepos: u.public_repos ?? null, followers: u.followers ?? null, years, languages };
 }
 
 async function main() {

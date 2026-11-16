@@ -165,6 +165,35 @@ function run(el: HTMLElement) {
     const ang = Math.atan2(-(h + 180), w + 260) * (180 / Math.PI);
     arrows.forEach((a, i) => tl!.fromTo(a, { x: -220, y: h + 40 - i * 90, rotation: ang, opacity: 1 }, { x: w + 40, y: -140 - i * 90 + (h * 0.15), duration: 0.85, ease: 'power2.inOut' }, 2.7 + i * 0.13));
 
+    // a swarm of small chevrons streams from the bottom-left to the top-right (the owner's draft), with two flowing ribbons crossing it
+    const layer = q('.arrows'), svgNS = 'http://www.w3.org/2000/svg', slope = Math.atan2(-h, w) * (180 / Math.PI), cols = ['#1f1e33', '#ff7baf', '#6fc3ff', '#b79cff'];
+    for (let i = 0; i < 34; i++) {
+      const big = i % 9 === 0, sz = big ? 64 : 22 + Math.random() * 20, c = document.createElementNS(svgNS, 'svg');
+      c.setAttribute('viewBox', '0 0 28 28'); c.setAttribute('width', String(sz)); c.setAttribute('height', String(sz)); c.classList.add('chev');
+      c.innerHTML = `<polyline points="6,4 20,14 6,24" fill="none" stroke="${cols[i % 4]}" stroke-width="${big ? 3 : 3.4}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      layer.append(c);
+      const x0 = -40 + Math.random() * w * 0.22, y0 = h * (0.62 + Math.random() * 0.4), run = w * (0.9 + Math.random() * 0.4);
+      const t0 = 2.7 + Math.random() * 0.8, dur = 0.9 + Math.random() * 0.7;
+      tl.fromTo(c, { x: x0, y: y0, rotation: slope }, { x: x0 + run, y: y0 - run * (h / w) * (0.9 + Math.random() * 0.25), duration: dur, ease: 'power2.in' }, t0)
+        .fromTo(c, { opacity: 0 }, { opacity: 1, duration: 0.15 }, t0)
+        .to(c, { opacity: 0, duration: 0.2 }, t0 + dur - 0.2);
+    }
+    const ribbons = [['#6fc3ff', 0], ['#b79cff', 1.6]].map(([col, off]) => {
+      const pth = document.createElementNS(svgNS, 'path'); pth.setAttribute('fill', 'none'); pth.style.stroke = col as string;
+       pth.style.opacity = '0'; path.parentNode!.insertBefore(pth, path);
+      return { pth, off: off as number };
+    });
+    const rb = { r: 0, ph: 0 };
+    const drawRibbons = () => ribbons.forEach(({ pth, off }) => {
+      const n = Math.max(2, Math.round(60 * rb.r));
+      pth.setAttribute('d', Array.from({ length: n }, (_, i) => {
+        const u = (i / 59), x = u * w, y = h * (0.72 - 0.45 * u) + Math.sin(u * 7 + rb.ph + off) * h * 0.09 * (1 - 0.3 * u);
+        return `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`;
+      }).join(''));
+    });
+    ribbons.forEach(({ pth }, i) => tl!.to(pth, { opacity: 0.9, duration: 0.2 }, 2.85 + i * 0.1).to(pth, { opacity: 0, duration: 0.3 }, 3.4));
+    tl.to(rb, { r: 1, ph: 3, duration: 0.8, ease: 'power1.out', onUpdate: drawRibbons }, 2.85);
+
     // 4 · the wave falls into the floor histogram; windows fly into the Lobby; the Lobby pops in
     const N = 48, st = { p: 0, ph: 0, a: 1 };
     const floorTop = () => { const f = document.querySelector('svg.floor')?.getBoundingClientRect(); return f ? f.top + f.height * 0.7 : h - 40; };
