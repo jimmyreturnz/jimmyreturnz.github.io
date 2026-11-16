@@ -1,11 +1,11 @@
 # jimmyreturnz portfolio
 
-A personal portfolio site that presents its owner as a developer and as a rhythm-game player, in a pastel vectorheart style.
+A personal portfolio site that presents its owner as a data scientist and developer first, and a rhythm-game player second, in a pastel vectorheart style.
 
 ## Visitor journey
 
 **Intro**:
-The game-like animation a visitor sees on their first visit, built from vectorheart elements. Always skippable.
+The game-like animation a visitor sees on their first visit, built from vectorheart elements. Always skippable; it ends as the Lobby.
 _Avoid_: Splash, loading screen, opening
 
 **Lobby**:
@@ -26,9 +26,13 @@ _Avoid_: Section, feature, widget
 
 ## Showcases
 
-**Skills and Setups**:
-The Showcase listing tech skills alongside gaming gear and settings.
-_Avoid_: Loadout, skills card, gear
+**Skills**:
+The Showcase listing the owner's technical skills, each backed by evidence.
+_Avoid_: Tech stack, skill bars
+
+**Setups**:
+The Showcase listing gaming gear and in-game settings.
+_Avoid_: Loadout, gear, rig
 
 **Shoutouts**:
 The Showcase naming friends and people the owner respects, each with an optional quote.
@@ -39,11 +43,11 @@ A secondary, scrollable history covering high school, university, internship, an
 _Avoid_: Journey, about timeline, level map
 
 **Stats Card**:
-A card showing the owner's live public profile numbers from one platform (osu!, TETR.IO, or GitHub).
+A card showing the owner's public profile numbers from one platform (osu!, TETR.IO, or GitHub), refreshed daily.
 _Avoid_: Profile widget, badge
 
 **Guestbook**:
-Where visitors leave short messages for the owner, in Thai, English, or Japanese.
+Where visitors leave short messages for the owner, in Thai, English, or Japanese, under any name they type.
 _Avoid_: Comments, wall, chat
 
 ## Audio

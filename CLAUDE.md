@@ -1,6 +1,6 @@
 # CLAUDE.md — jimmyreturnz portfolio
 
-Personal portfolio for jimmyreturnz: developer + rhythm-game player (osu!taiko, osu!mania 4K, TETR.IO), in a pastel **vectorheart** style with heavy but smooth animation. Mobile must feel as good as desktop.
+Personal portfolio for jimmyreturnz (Apiwat Kongsawat): **Data Scientist & Developer** first, rhythm-game player second (osu!taiko, osu!mania 4K, TETR.IO), in a pastel **vectorheart** style with heavy but smooth animation. Mobile must feel as good as desktop.
 
 ## Git
 - Commit and push straight to `main` (owner's standing instruction). No feature branches unless asked.
@@ -16,7 +16,7 @@ Read these before working:
 - **Site:** Astro + TypeScript. React islands only where state is complex (Guestbook form, Guestbook admin). Chart players and animation are plain TypeScript.
 - **Animation:** GSAP (Intro, Warp, UI motion); PixiJS for the taiko/mania players, lazy-loaded near their Showcase; CSS for idle loops. Target 60fps on a mid-range Android. Respect `prefers-reduced-motion`; offer a Lite mode toggle.
 - **API:** Hono on Cloudflare Workers (ADR 0003). Data in Cloudflare D1.
-- **Content:** Sveltia CMS at `/admin` edits Blog, Projects, Shoutouts, Timeline, Skills and Setups (Markdown/data files in the repo).
+- **Content:** Sveltia CMS at `/admin` edits Blog, Projects, Shoutouts, Timeline, Skills, Setups (Markdown/data files in the repo).
 - **Tooling:** Bun (package manager + scripts), Biome (format + lint), GitHub Actions (checks on push; daily Stats Card refresh). Cloudflare deploys `main`, preview per branch.
 - **Analytics:** Cloudflare Web Analytics only (no cookies, no banner).
 
@@ -26,13 +26,13 @@ site/             Astro app
 api/              Hono Worker (Guestbook, profile lookups)
 packages/shared/  Types shared by site and api
 assets/           vectorheart SVG kit, self-hosted fonts (move under site/public when site/ exists)
-docs/             FEATURES.md, adr/
+docs/             FEATURES.md, adr/, reviews/
 ```
 
 ## Security rules
 - No secrets in client code. API keys (osu! API, GitHub) live in GitHub Actions secrets or Worker secrets only.
-- Guestbook: approve-before-publish, Turnstile, per-visitor rate limits, 300-char limit, no links, plain text escaped on output. Profile URLs are built server-side from verified IDs — never from visitor input.
-- Work email shown via Cloudflare Email Obfuscation + copy button; no contact form.
+- Guestbook: approve-before-publish, Turnstile, per-visitor rate limits, 300-char limit, no links, plain text escaped on output. Typed names are shown as plain text; there is no verification. The only profile links are ones the owner attaches by hand while approving. Rate limits use an HMAC of the IP with a daily-rotated secret, never the raw IP, disclosed on the page.
+- Work email `apiwatkon.rtz@gmail.com` shown as a text link (Cloudflare Email Obfuscation) plus a labelled copy button; no contact form. It is also the takedown contact.
 - Security headers via Cloudflare (`_headers`): CSP, HSTS, frame-ancestors, etc.
 
 ## Audio rules
@@ -42,7 +42,9 @@ docs/             FEATURES.md, adr/
 
 ## Design assets
 - `assets/vectorheart/vectorheart.svg` — sprite of original elements; colour with CSS `color`, `--vh-ink`, `--vh-shine`. `preview.html` shows them.
-- `assets/fonts/fonts.css` — self-hosted OFL fonts (Zen Dots, Orbitron, Audiowide, Krona One, Monoton, Exo 2, Comfortaa, M PLUS Rounded 1c). Thai Guestbook font: Mali (to add).
+- `assets/fonts/fonts.css` — provisional Latin set: Zen Dots (display), Comfortaa 400/700 (body), Orbitron 700 (numbers/HUD), Monoton (combo numerals only). `assets/fonts/fonts-jp.css` — M PLUS Rounded 1c, load only where Japanese appears. Audiowide, Krona One, Exo 2 and other Orbitron weights stay on disk but aren't loaded until the final font decision. Thai Guestbook font: Mali (to add).
+- Colour rule: pastels are never text. Ink `#3b2a4d` for text, `#c23a7a` for links/buttons, `#6b5b7d` for muted text.
+- `docs/reviews/2026-11-16-design-council.md` — design review whose accepted actions are folded into FEATURES.md.
 - Inspiration: kenzync.dev (tool-card layout), hirokaze.net (theme applied to every bit of UI). Do not copy their assets.
 
 ## Skills in `.claude/skills/`
