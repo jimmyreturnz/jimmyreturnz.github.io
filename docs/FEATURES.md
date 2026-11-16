@@ -55,6 +55,7 @@ Pages (each its own URL, animated page transitions, header + BGM persist): **Pro
 - **Warp**: reuses the Intro's ripples (avatar ring bursts into ripples, pink wash, a few vectorheart arrows), ~0.8 s; avatar shrinks into the header logo.
 - **Header visualizer**: instead of bars next to the Sound button, the top bar plays the music as a faint colour visualizer behind the header; still when muted.
 - **Rolling numbers**: built (`site/src/scripts/roll.ts`; Player Card tabs, 4K/7K switch, GitHub year switch). Tiles on the TETR.IO and osu! pages still to wire (`data-roll`).
+- **Animation pass v1 built (2026-11-16)**, all in `site/src/scripts/` (motion, audio, fx, intro, warp, viz, roll) and components (Intro, Warp, Histogram, Orbit, PortfolioHeader menu, Settings volume). To see everything while your OS has "reduce motion" on, open the site with `?motion=full` (remembered; `?motion=system` undoes it) and replay the Intro with `/?intro=1`. Sounds are generated placeholders. Not built: custom cursor (parked again with the NSO-free Lobby), BGM beat pulses (no BGM yet).
 - **Click feedback**: soft squish plus 3–4 tiny hearts on buttons and tabs (no "GREAT" text pops).
 - **Page transitions**: Flip morph (nav item becomes the next page's title); fade-and-rise fallback for reduced motion and first load.
 - **Warp**: the avatar ring expands into a pink wash with hearts streaming past, then settles; the avatar becomes the header logo. ≤0.8 s, ≤3 flashes per second.
@@ -62,7 +63,8 @@ Pages (each its own URL, animated page transitions, header + BGM persist): **Pro
 - **Rolling numbers**: odometer columns (Orbitron), ~0.8 s ease-out, on first view and on every change; try this first, fall back to a count-up if it looks off.
 - **Idle loops and reveals**: Lobby only has floating hearts and breathing rings; other pages have none except a gentle header-decoration drift. Headings rise line by line, cards fade up with a small stagger, once only.
 - **Custom cursor**: cute, reimagined pink heart-arrow (own art, NSO palette), desktop only, Intro and Lobby only (CSS cursor image). Portfolio pages use the normal cursor.
-- **Lobby background**: the vectorheart theme, not the NSO stripes: animated colour gradient, moving arrows and pulsing circles (subject to the idle-loop budget, being grilled). NSO look is the Intro desktop only.
+- **Lobby background**: the vectorheart theme, not the NSO stripes: animated colour gradient, moving arrows and pulsing circles (subject to the idle-loop budget, being grilled). NSO look is the Intro desktop only: **no NSO element in the Lobby** (owner, 2026-11-16), so no title-bar windows or stripes there; the Intro's stripes, windows and stickers fade away as the Lobby appears. The cursor, if built, is our own cute heart, not NSO.
+- **Visualizers react hard**: fast attack, bass-weighted, boosted; they follow the real song (chart songs and, later, the BGM) and beat on a synthetic pulse otherwise.
 - References studied: Joffrey Spitzer (Astro + GSAP Flip), Framer "Pixel Arcade" (boot screen, scroll HUD), Codrops pixel-mask transition. Pixel art rejected (Sage Agency: undermines a professional look); stay vector.
 
 ## Animation pass: ideas queued (pages first, animation later)

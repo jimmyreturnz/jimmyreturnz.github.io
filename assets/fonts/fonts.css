@@ -40,3 +40,11 @@
   font-weight: 400;
   src: url(./monoton/monoton-latin-400-normal.woff2) format("woff2");
 }
+/* Press Start 2P (OFL, see press-start-2p/PressStart2P-OFL.txt): Intro and Lobby window title bars only. Placeholder; the owner may swap it. */
+@font-face {
+  font-family: 'Press Start 2P';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url(./press-start-2p/PressStart2P-Regular.ttf) format("truetype");
+}

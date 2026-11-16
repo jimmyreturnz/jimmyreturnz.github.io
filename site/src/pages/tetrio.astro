@@ -24,13 +24,13 @@ const { tetrio } = stats;
         <div><b>{tetrio.username}</b><small>Tetra League · {tetrio.country === 'TH' ? '🇹🇭 Thailand' : tetrio.country}</small></div>
         {tetrio.league?.rank && <span class="rankbadge" title="Tetra League rank">{tetrio.league.rank.toUpperCase()}</span>}
       </div>
-      <div class="tgrid">
-        <div class="stat"><b><Ph value={rank(tetrio.league?.globalRank)} hint="#000" /></b><small>global rank</small></div>
-        <div class="stat"><b><Ph value={rank(tetrio.league?.countryRank)} hint="#0" /></b><small>🇹🇭 Thailand rank</small></div>
-        <div class="stat"><b><Ph value={fmt(tetrio.league?.tr)} hint="00,000" /></b><small>TR</small></div>
-        <div class="stat"><b><Ph value={fmt(tetrio.level)} hint="000" /></b><small>level</small></div>
-        <div class="stat"><b><Ph value={tetrio.playTimeHours != null ? `${fmt(tetrio.playTimeHours)} h` : null} hint="000 h" /></b><small>playtime</small></div>
-        <div class="stat"><b><Ph value={tetrio.league ? `${fmt(tetrio.league.apm, 1)} / ${fmt(tetrio.league.pps, 2)}` : null} hint="APM / PPS" /></b><small>APM / PPS</small></div>
+      <div class="tgrid" data-drop>
+        <div class="stat"><b data-roll><Ph value={rank(tetrio.league?.globalRank)} hint="#000" /></b><small>global rank</small></div>
+        <div class="stat"><b data-roll><Ph value={rank(tetrio.league?.countryRank)} hint="#0" /></b><small>🇹🇭 Thailand rank</small></div>
+        <div class="stat"><b data-roll><Ph value={fmt(tetrio.league?.tr)} hint="00,000" /></b><small>TR</small></div>
+        <div class="stat"><b data-roll><Ph value={fmt(tetrio.level)} hint="000" /></b><small>level</small></div>
+        <div class="stat"><b data-roll><Ph value={tetrio.playTimeHours != null ? `${fmt(tetrio.playTimeHours)} h` : null} hint="000 h" /></b><small>playtime</small></div>
+        <div class="stat"><b data-roll><Ph value={tetrio.league ? `${fmt(tetrio.league.apm, 1)} / ${fmt(tetrio.league.pps, 2)}` : null} hint="APM / PPS" /></b><small>APM / PPS</small></div>
       </div>
       <a href={tetrio.profileUrl} target="_blank" rel="noopener noreferrer">View TETR.IO profile ↗</a>
     </div>
@@ -53,3 +53,32 @@ const { tetrio } = stats;
   @media (max-width:900px){ .tetrio{grid-template-columns:1fr} }
   @media (max-width:520px){ .tgrid{grid-template-columns:1fr 1fr} }
 </style>
+
+<style>
+  .tgrid{position:relative}
+  .tgrid .sweep{position:absolute;left:-4px;right:-4px;height:100%;top:0;background:linear-gradient(90deg,transparent,#fff,transparent);opacity:0;pointer-events:none;mix-blend-mode:overlay}
+</style>
+
+<script>
+  // Stat tiles drop in like tetrominoes, then "clear a line": a bright sweep runs across and the numbers roll up.
+  import { gsap } from 'gsap';
+  import { reduced } from '../scripts/motion';
+  import { rollIn } from '../scripts/roll';
+  import { sfx } from '../scripts/audio';
+  document.addEventListener('astro:page-load', () => {
+    const g = document.querySelector<HTMLElement>('[data-drop]');
+    if (!g) return;
+    if (reduced()) { rollIn(g); return; }
+    const tiles = [...g.querySelectorAll<HTMLElement>('.stat')];
+    const sweep = Object.assign(document.createElement('span'), { className: 'sweep' });
+    g.append(sweep);
+    gsap.set(tiles, { y: -140, opacity: 0 });
+    const tl = gsap.timeline({ delay: 0.25 });
+    tl.to(tiles, { y: 0, opacity: 1, duration: 0.55, ease: 'bounce.out', stagger: { each: 0.09, from: 'start' } })
+      .call(() => sfx.pop(), [], 0.3)
+      .call(() => rollIn(g), [], '>-0.1')
+      .fromTo(sweep, { xPercent: -100, opacity: 1 }, { xPercent: 100, opacity: 0.9, duration: 0.5, ease: 'power2.inOut' }, '>-0.05')
+      .to(tiles, { scale: 1.04, duration: 0.12, yoyo: true, repeat: 1, stagger: 0.03 }, '<')
+      .to(sweep, { opacity: 0, duration: 0.2, onComplete: () => sweep.remove() });
+  });
+</script>

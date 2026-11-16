@@ -85,9 +85,33 @@ h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.15}
 @media (max-width:820px){ .tg span{display:none} .tg{padding:0;width:var(--ctl)} .wordmark{font-size:18px} .wordmark svg{width:22px} }
 
 /* reduced motion: no idle loops */
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media (prefers-reduced-motion:reduce){:root:not([data-motion="full"]) *,:root:not([data-motion="full"]) *::before,:root:not([data-motion="full"]) *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 /* odometer digits (scripts/roll.ts) */
 .rc{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top}
 .rc-i{display:block}
 .rc-i>span{display:block;height:1.15em}
+
+/* theme switch: circular reveal (scripts/settings.ts) */
+:root[data-vt="theme"]::view-transition-old(root),:root[data-vt="theme"]::view-transition-new(root){animation:none;mix-blend-mode:normal}
+:root[data-vt="theme"]::view-transition-old(root){z-index:1}
+:root[data-vt="theme"]::view-transition-new(root){z-index:2}
+
+/* pink scrollbars */
+html{scrollbar-color:var(--pink) transparent;scrollbar-width:thin}
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-thumb{background:var(--pink);border:3px solid var(--bg);border-radius:99px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* soft pulsing focus ring */
+@keyframes focus-pulse{0%,100%{outline-offset:3px}50%{outline-offset:6px}}
+:focus-visible{animation:focus-pulse 1.4s ease-in-out infinite}
+
+/* heart loading bar (scripts/fx.ts) */
+.loadbar{position:fixed;left:0;right:0;top:0;height:5px;z-index:2000;pointer-events:none}
+.loadbar i{display:block;height:100%;background:var(--pink);transform-origin:left;border-radius:0 99px 99px 0}
+.loadbar span{position:absolute;right:6px;top:-6px;color:var(--pink)}
+
+/* a message landing on the Message Board (class added by the board when one arrives) */
+@keyframes bubble-pop{0%{transform:scale(.6) translateY(14px);opacity:0}60%{transform:scale(1.06)}100%{transform:none;opacity:1}}
+.msg-in{animation:bubble-pop .55s cubic-bezier(.3,1.5,.5,1) both}

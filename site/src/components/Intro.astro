@@ -1,0 +1,106 @@
+---
+// The Intro (docs/FEATURES.md, design-mocks/intro-storyboard.html): hold the power button → ripples → boot with a
+// glitch → desktop → the wave falls to the floor and the Lobby pops in. Shown once per browser; `/?intro=1` replays it.
+import Vh from './Vh.astro';
+import { profile } from '../data/site';
+import rawStats from '../data/stats.json';
+const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
+---
+<script is:inline>
+  // decide before first paint whether the Intro covers the Lobby
+  try {
+    if (location.search.includes('intro=1') || localStorage.getItem('jr.intro') !== 'done') document.documentElement.dataset.intro = 'on';
+  } catch (e) { document.documentElement.dataset.intro = 'on'; }
+</script>
+
+<div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Intro">
+  <div class="layer power" data-l="power">
+    <button class="pbtn" type="button" aria-label="Power on. Hold the button, or press Space or Enter.">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle class="track" cx="60" cy="60" r="52" />
+        <circle class="prog" cx="60" cy="60" r="52" transform="rotate(-90 60 60)" />
+        <circle class="face" cx="60" cy="60" r="38" />
+        <path class="glyph" d="M60 38v24M47 46a22 22 0 1 0 26 0" />
+      </svg>
+    </button>
+    <p class="hint"><span class="hold">hold to power on</span><span class="tap">tap to power on</span></p>
+    <p class="still">
+      <Vh name="vh-heart" /><b>{profile.handle}</b>
+      <button type="button" class="btn fill" data-enter>Enter</button>
+    </p>
+  </div>
+
+  <svg class="ripples" viewBox="-800 -450 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <circle r="60" /><circle r="60" /><circle r="60" /><circle r="60" /><circle r="60" />
+  </svg>
+
+  <div class="layer boot" data-l="boot" aria-hidden="true">
+    <pre class="bios"></pre>
+    <div class="logo"><Vh name="vh-heart" /><div class="lbar"><i></i></div></div>
+    <p class="login"><i>{avatar ? <img src={avatar} alt="" width="40" height="40" /> : null}</i>{profile.handle}</p>
+  </div>
+
+  <div class="layer desk" data-l="desk" aria-hidden="true">
+    <div class="stickers"></div>
+    <div class="win w1"><div class="tb">profile.exe<span>_ □ ×</span></div><div class="wb"><b>{profile.handle}</b><small>{profile.role}</small></div></div>
+    <div class="win w2"><div class="tb">player_card.exe<span>_ □ ×</span></div><div class="wb"><b>Player Card</b><small>osu! · TETR.IO · GitHub</small></div></div>
+  </div>
+
+  <div class="arrows" aria-hidden="true"><Vh name="vh-arrow" /><Vh name="vh-arrow" /><Vh name="vh-arrow" /></div>
+  <svg class="wave" preserveAspectRatio="none" aria-hidden="true"><path /></svg>
+
+  <button type="button" class="skip" data-skip>Skip</button>
+</div>
+
+<style is:global>
+  .intro{display:none;position:fixed;inset:0;z-index:900;overflow:hidden;background:#1f1e33;color:#fff8fc;font-family:var(--hud)}
+  html[data-intro="on"] .intro{display:block}
+  html[data-intro="on"] body{overflow:hidden}
+  .intro .layer{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:14px}
+  .intro .boot,.intro .desk{display:none}
+  .intro .pbtn{border-radius:50%;border:0;background:none;padding:0;cursor:pointer;width:min(34vw,150px);aspect-ratio:1;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  .intro .pbtn svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 14px #ff7baf88)}
+  .intro .track{fill:none;stroke:#ff7baf33;stroke-width:7}
+  .intro .prog{fill:none;stroke:#ff7baf;stroke-width:7;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7}
+  .intro .face{fill:#2e2c4d;stroke:#ff7baf;stroke-width:3}
+  .intro .glyph{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round}
+  .intro .hint{margin:0;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#ffd0e4}
+  .intro .hint .tap,.intro .still{display:none}
+  @media (hover:none) and (pointer:coarse){ .intro .hint .hold{display:none} .intro .hint .tap{display:inline} }
+  .intro .ripples{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .intro .ripples circle{fill:none;stroke:#ff7baf;stroke-width:6;opacity:0;transform-origin:center;transform-box:view-box}
+  .intro .ripples circle:nth-child(2n){stroke:#eeaaff}.intro .ripples circle:nth-child(3n){stroke:#bbddff}
+
+  .intro .boot{background:#0b0a14}
+  .intro .bios{margin:0;font:700 clamp(11px,2.4vw,15px)/1.7 var(--hud);color:#ffd0e4;align-self:end;justify-self:start;padding:0 clamp(16px,6vw,80px);min-height:9em;white-space:pre-wrap}
+  .intro .logo{display:grid;justify-items:center;gap:12px;align-self:start;opacity:0}
+  .intro .logo .vh{width:min(30vw,110px);color:var(--pink);--vh-ink:#1f1e33}
+  .intro .lbar{width:min(60vw,260px);height:8px;border-radius:99px;background:#3a3860;overflow:hidden}
+  .intro .lbar i{display:block;height:100%;background:#ff7baf;transform:scaleX(0);transform-origin:left}
+  .intro .login{position:absolute;margin:0;display:flex;align-items:center;gap:10px;font:700 18px var(--hud);opacity:0;background:#ffc6e3;color:#111;border:3px solid #ff66aa;border-radius:12px;padding:8px 16px}
+  .intro .login i{display:block;width:40px;height:40px;border-radius:8px;overflow:hidden;background:#ff7baf}
+  .intro .login img{width:100%;height:100%;object-fit:cover}
+  .intro .glitch{animation:intro-glitch .12s steps(2) 1}
+  @keyframes intro-glitch{0%{transform:translate(0)}25%{transform:translate(-6px,2px) skewX(6deg);clip-path:inset(10% 0 55% 0);text-shadow:3px 0 #ff3b7a,-3px 0 #3bc8ff}50%{transform:translate(5px,-2px);clip-path:inset(55% 0 8% 0);text-shadow:-3px 0 #ff3b7a,3px 0 #3bc8ff}100%{transform:none;clip-path:none;text-shadow:none}}
+
+  .intro .desk{background:repeating-linear-gradient(45deg,#bbddff 0 17px,#eeaaff 17px 34px);opacity:0}
+  .intro .stickers{position:absolute;inset:0}
+  .intro .stickers svg{position:absolute;image-rendering:pixelated}
+  .intro .win{position:absolute;width:min(40vw,300px);background:#ffc6e3;border:3px solid #ff66aa;border-radius:10px;color:#111;box-shadow:5px 5px 0 #ff66aa66;font-family:'Comfortaa',sans-serif}
+  .intro .w1{left:12%;top:24%}.intro .w2{right:12%;top:34%}
+  .intro .tb{display:flex;justify-content:space-between;font:9px 'Press Start 2P',var(--hud);background:#ff66aa;color:#fff;padding:7px 9px;border-radius:6px 6px 0 0}
+  .intro .wb{padding:16px 14px;display:grid;gap:4px}
+  .intro .wb small{color:#6b5b7d;font-weight:700}
+  .intro .arrows{position:absolute;inset:0;pointer-events:none}
+  .intro .arrows .vh{position:absolute;left:0;top:0;width:clamp(90px,16vw,200px);color:var(--pink);opacity:0}
+  .intro .arrows .vh:nth-child(2){color:var(--lav)}.intro .arrows .vh:nth-child(3){color:var(--sky)}
+  .intro .wave{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .intro .wave path{fill:none;stroke:#ff7baf;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+  .intro .skip{position:absolute;right:16px;top:16px;z-index:5;border:2px solid #ffd0e4;background:none;color:#ffd0e4;border-radius:99px;padding:6px 14px;font:700 12px var(--hud);cursor:pointer}
+  /* while the Intro runs the Lobby waits underneath; the script pops each piece in at the end */
+  html[data-intro="on"] .lobby .bubble,html[data-intro="on"] .lobby .id,html[data-intro="on"] .lobby .role,html[data-intro="on"] .lobby .about,html[data-intro="on"] .lobby .facts,html[data-intro="on"] .lobby .ctas,html[data-intro="on"] .lobby .socials,html[data-intro="on"] .lobby .player,html[data-intro="on"] .lobby .enter{opacity:0}
+</style>
+
+<script>
+  import '../scripts/intro';
+</script>

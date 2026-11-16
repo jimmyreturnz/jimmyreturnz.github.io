@@ -3,8 +3,10 @@ import Settings from './Settings.astro';
 import Vh from './Vh.astro';
 import { pages } from '../data/pages';
 const here = Astro.url.pathname.replace(/\/?$/, '/');
+const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·  ') + '  ·  ';
 ---
 <header class="top" transition:persist="site-header">
+  <canvas class="viz" aria-hidden="true"></canvas>
   <div class="bar">
     <a class="wordmark" href="/" title="Back to the Lobby"><Vh name="vh-heart" />jimmyreturnz</a>
     <div class="bgm" role="group" aria-label="Background music">
@@ -12,16 +14,46 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
       <span class="t">BGM · <em class="ph">coming soon</em></span>
       <button type="button" class="pause" aria-pressed="false" disabled>Pause</button>
     </div>
+    <div class="klights" aria-hidden="true" data-klights hidden>
+      {['S', 'D', 'F', '␣', 'J', 'K', 'L'].map((k) => <kbd data-key={k} class={k === 'S' || k === '␣' || k === 'L' ? 'k7' : undefined}>{k}</kbd>)}
+    </div>
+    <button type="button" class="chip menubtn" aria-expanded="false" aria-controls="menu" data-menu-btn><span aria-hidden="true">☰</span> Menu</button>
     <Settings />
   </div>
   <nav class="sections" aria-label="Portfolio pages">
     {pages.map((p) => <a class="chip" href={p.href} data-nav={p.href} aria-current={here === p.href ? 'page' : undefined}>{p.label}</a>)}
   </nav>
+
 </header>
+<div class="menu" id="menu" transition:persist="site-menu" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+  <button type="button" class="chip mclose" data-menu-close>Close ✕</button>
+  <ul>
+    {pages.map((p) => (
+      <li>
+        <a href={p.href} data-nav={p.href} data-tint={p.tint}>
+          <span class="mq" aria-hidden="true"><span>{row(p.label)}</span><span>{row(p.label)}</span></span>
+          <b>{p.label}</b>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
 
 <style>
   .top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);border-bottom:var(--stroke) solid var(--ink)}
   .top .bar{padding-block:10px}
+  .viz{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+  .sections{position:relative;z-index:1;max-height:60px;transition:max-height .3s,padding .3s,opacity .3s}
+  .top.slim .sections{max-height:0;padding-bottom:0;opacity:0;overflow:hidden}
+  .top.slim .bar{padding-block:5px}
+  .menubtn{height:var(--ctl);margin-left:auto}
+  .menubtn + :global(.settings){margin-left:0}
+  .klights{display:flex;gap:4px}
+  .klights[hidden]{display:none}
+  .klights kbd{display:grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border:2px solid var(--ink);border-radius:8px;background:var(--paper);font:700 11px var(--hud);color:var(--ink);transition:background .08s,transform .08s}
+  .klights kbd.on{background:var(--pink);color:var(--on-pastel);transform:translateY(2px)}
+  .klights:not(.seven) .k7{display:none}
+  @media (max-width:620px){ .klights{display:none} }
   .bgm{display:flex;align-items:center;gap:10px;height:var(--ctl);border:2px solid var(--ink);border-radius:99px;padding:0 4px 0 12px;background:var(--paper);font-size:13px;font-weight:700;min-width:0}
   .bgm :global(.eq){width:24px;color:var(--lav)}
   .t{white-space:nowrap}
@@ -32,14 +64,91 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
   .sections .chip[aria-current="page"]{background:var(--ink);color:var(--bg)}
   @media (max-width:820px){ .t{display:none} .bgm{padding-left:8px} }
   @media (max-width:440px){ .bgm{display:none} }
+
+  /* full-screen menu: circle reveal from the button, one marquee row per page, hover tints the screen */
+  .menu{position:fixed;inset:0;z-index:50;background:var(--tint,var(--bg));transition:background .35s;display:grid;align-content:center;padding:clamp(16px,4vw,48px);overflow:hidden}
+  .menu[hidden]{display:none}
+  .menu ul{list-style:none;margin:0;padding:0;display:grid;gap:clamp(6px,1.6vh,14px)}
+  .menu a{position:relative;display:block;overflow:hidden;border-top:var(--stroke) solid var(--navy);padding:clamp(6px,1.4vh,14px) 0;text-decoration:none;color:var(--navy)}
+  .menu b{position:relative;display:block;font:clamp(40px,9vw,104px)/1 var(--display);font-weight:400;transition:transform .25s}
+  .menu .mq{position:absolute;inset:0;display:flex;width:max-content;font:clamp(40px,9vw,104px)/1.4 var(--display);color:color-mix(in srgb,var(--navy) 10%,transparent);white-space:pre;animation:mq 40s linear infinite}
+  .menu li:nth-child(even) .mq{animation-direction:reverse}
+  @keyframes mq{to{transform:translateX(-50%)}}
+  .menu a:hover b,.menu a:focus-visible b{transform:translateX(14px)}
+  .mclose{position:absolute;right:clamp(16px,4vw,40px);top:16px;color:var(--navy);border-color:var(--navy)}
 </style>
 
 <script>
-  // The header persists across page changes, so refresh the current-page chip after each navigation.
+  import { gsap } from 'gsap';
+  import { reduced } from '../scripts/motion';
+  import { headerViz } from '../scripts/viz';
+  import { sfx } from '../scripts/audio';
+  const TINT: Record<string, string> = { butter: '#fff1a8', pink: '#ffb3d1', sky: '#a6d8ff', mint: '#a8f0d4', lav: '#c9b6ff' };
+
   document.addEventListener('astro:page-load', () => {
+    const top = document.querySelector<HTMLElement>('.top');
+    if (!top) return;
+    // The header persists across page changes: refresh the current-page chip each time.
     const here = location.pathname.replace(/\/?$/, '/');
     document.querySelectorAll<HTMLAnchorElement>('[data-nav]').forEach((a) => {
       if (a.dataset.nav === here) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+
+    top.classList.toggle('slim', scrollY > 140);
+    const cv = top.querySelector<HTMLCanvasElement>('.viz')!;
+    if (!cv.dataset.on) { cv.dataset.on = '1'; headerViz(cv); }
+
+    // ---- key lights on the osu! page: D F J K (4K and taiko kddk), S D F Space J K L (7K) ----
+    const kl = top.querySelector<HTMLElement>('[data-klights]')!;
+    kl.hidden = !location.pathname.startsWith('/rhythm');
+    if (!kl.dataset.on) {
+      kl.dataset.on = '1';
+      const MAP: Record<string, string> = { KeyS: 'S', KeyD: 'D', KeyF: 'F', Space: '␣', KeyJ: 'J', KeyK: 'K', KeyL: 'L' };
+      const light = (e: KeyboardEvent, on: boolean) => {
+        const k = MAP[e.code];
+        if (!k || kl.hidden || (e.target as Element).closest?.('input,textarea,select')) return;
+        kl.classList.toggle('seven', !!document.querySelector('[data-keys-btn="7k"][aria-pressed="true"]'));
+        kl.querySelector(`[data-key="${k}"]`)?.classList.toggle('on', on);
+        if (on && !e.repeat) sfx.tick();
+      };
+      addEventListener('keydown', (e) => light(e, true));
+      addEventListener('keyup', (e) => light(e, false));
+    }
+
+    if (!top.dataset.slim) { top.dataset.slim = '1'; addEventListener('scroll', () => top.classList.toggle('slim', scrollY > 140), { passive: true }); }
+
+    // ---- menu overlay ----
+    const menu = document.querySelector<HTMLElement>('.menu')!, btn = top.querySelector<HTMLButtonElement>('[data-menu-btn]')!;
+    if (btn.dataset.on) return;
+    btn.dataset.on = '1';
+    const center = () => { const r = btn.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+    const close = (focusBtn = true) => {
+      if (menu.hidden) return;
+      const { x, y } = center();
+      btn.setAttribute('aria-expanded', 'false');
+      if (reduced()) menu.hidden = true;
+      else gsap.to(menu, { clipPath: `circle(0px at ${x}px ${y}px)`, duration: 0.45, ease: 'power3.inOut', onComplete: () => { menu.hidden = true; } });
+      if (focusBtn) btn.focus();
+    };
+    const open = () => {
+      const { x, y } = center(), R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      menu.hidden = false; menu.style.removeProperty('--tint'); btn.setAttribute('aria-expanded', 'true');
+      if (!reduced()) { sfx.swish(); gsap.fromTo(menu, { clipPath: `circle(0px at ${x}px ${y}px)` }, { clipPath: `circle(${R}px at ${x}px ${y}px)`, duration: 0.55, ease: 'power3.inOut', clearProps: 'clipPath' }); }
+      menu.querySelector<HTMLElement>('a')?.focus();
+    };
+    btn.addEventListener('click', open);
+    menu.querySelector('[data-menu-close]')!.addEventListener('click', () => close());
+    menu.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+      if (e.key !== 'Tab') return;
+      const f = [...menu.querySelectorAll<HTMLElement>('a,button')], first = f[0]!, last = f[f.length - 1]!; // keep focus inside
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    menu.querySelectorAll<HTMLAnchorElement>('a[data-tint]').forEach((a) => {
+      const tint = () => menu.style.setProperty('--tint', TINT[a.dataset.tint!] ?? '');
+      a.addEventListener('pointerenter', tint); a.addEventListener('focus', tint);
+      a.addEventListener('click', () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); });
     });
   });
 </script>

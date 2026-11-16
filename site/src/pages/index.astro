@@ -6,6 +6,9 @@ import PlayerCard from '../components/PlayerCard.astro';
 import Socials from '../components/Socials.astro';
 import Vh from '../components/Vh.astro';
 import Ph from '../components/Ph.astro';
+import Intro from '../components/Intro.astro';
+import Histogram from '../components/Histogram.astro';
+import Orbit from '../components/Orbit.astro';
 import { profile } from '../data/site';
 import rawStats from '../data/stats.json';
 import type { Stats } from '../../scripts/fetch-stats';
@@ -13,6 +16,7 @@ const stats = rawStats as unknown as Stats;
 const avatar = stats.osu.avatar;
 ---
 <Base title="Jimmy · Data Scientist & Developer">
+  <Intro />
   <div class="lobby">
     <div class="sky" aria-hidden="true">
       <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
@@ -20,6 +24,8 @@ const avatar = stats.osu.avatar;
       <Vh name="vh-rings" class="r2" />
       <Vh name="vh-heart" class="h1" /><Vh name="vh-heart-outline" class="h2" /><Vh name="vh-sparkle" class="s1" /><Vh name="vh-sparkle" class="s2" />
     </div>
+
+    <Histogram />
 
     <div class="bar">
       <a class="wordmark" href="/"><Vh name="vh-heart" />jimmyreturnz</a>
@@ -34,6 +40,7 @@ const avatar = stats.osu.avatar;
           <div class="avatar">
             {avatar ? <img src={avatar} alt="Jimmy’s avatar" width="128" height="128" /> : <Vh name="vh-heart" />}
             <Vh name="vh-heart" class="pin" />
+            <Orbit />
           </div>
           <div>
             <p class="hello" id="hi">Hello, I am</p>
@@ -62,7 +69,7 @@ const avatar = stats.osu.avatar;
     </main>
 
     <div class="enter">
-      <a class="enter-btn" href="/projects/"><Vh name="vh-heart-target" />ENTER</a>
+      <a class="enter-btn" href="/projects/" data-warp><Vh name="vh-heart-target" />ENTER</a>
       <small>step into the Portfolio</small>
     </div>
   </div>
@@ -85,6 +92,14 @@ const avatar = stats.osu.avatar;
   .sky :global(.h2){right:6%;top:56%;width:38px;color:var(--pink);opacity:.8}
   .sky :global(.s1){left:6%;top:44%;width:20px;color:var(--butter)}
   .sky :global(.s2){right:40%;top:6%;width:16px;color:var(--sky)}
+
+  /* idle loops: a slow colour drift (cheap, transform only) and pulsing rings. No arrows in the Lobby for now. */
+  .sky::before{content:'';position:absolute;inset:-25%;background:conic-gradient(from 0deg at 50% 50%,var(--pink),var(--lav),var(--sky),var(--mint),var(--pink));opacity:.16;filter:blur(60px);animation:lobby-drift 40s linear infinite}
+  @keyframes lobby-drift{to{transform:rotate(360deg)}}
+  .sky :global(.r1){animation:ring-pulse 6s ease-in-out infinite}
+  .sky :global(.r2){animation:ring-pulse 7.5s ease-in-out -3s infinite}
+  @keyframes ring-pulse{0%,100%{transform:scale(1);opacity:.45}50%{transform:scale(1.08);opacity:.7}}
+  :global(:root[data-theme="dark"]) .sky::before{opacity:.08}
 
   .hero{position:relative;z-index:2;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:center;
         max-width:1180px;margin:0 auto;padding:12px clamp(16px,4vw,40px) 28px}

@@ -1,0 +1,76 @@
+---
+// Orbiting icons: hover, focus or tap the Lobby avatar and six glyph-only icons spring out and circle it.
+// The marks are our own simple drawings (no brand artwork): osu!, TETR.IO, Python, Claude, SQL, ML.
+const items = [
+  { id: 'osu', label: 'osu!', href: '/rhythm/' },
+  { id: 'tetrio', label: 'TETR.IO', href: '/tetrio/' },
+  { id: 'python', label: 'Python', href: '/about/#skills' },
+  { id: 'claude', label: 'Claude', href: '/about/#skills' },
+  { id: 'sql', label: 'SQL', href: '/about/#skills' },
+  { id: 'ml', label: 'Machine learning', href: '/about/#skills' },
+];
+---
+<div class="orbit" data-orbit>
+  {items.map((i) => (
+    <a class="orb" href={i.href} aria-label={i.label} data-orb tabindex="-1">
+      <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
+        {i.id === 'osu' && <><circle cx="12" cy="12" r="10" fill="none" stroke="#ff66aa" stroke-opacity=".45" stroke-width="2" /><circle cx="12" cy="12" r="6.2" fill="none" stroke="#ff66aa" stroke-width="3.2" /><circle cx="12" cy="12" r="2" fill="#ff66aa" /></>}
+        {i.id === 'tetrio' && <g fill="#a86cf0"><rect x="1" y="3" width="6.6" height="6.6" rx="1.4" /><rect x="8.7" y="3" width="6.6" height="6.6" rx="1.4" /><rect x="16.4" y="3" width="6.6" height="6.6" rx="1.4" /><rect x="8.7" y="10.7" width="6.6" height="6.6" rx="1.4" /></g>}
+        {i.id === 'python' && <><path fill="#3776ab" d="M12 2C8 2 7 3.6 7 5.5V8h5v1H5.5C3.5 9 2 10.4 2 13c0 2.5 1.5 4 3.5 4H7v-2.6C7 12.8 8.5 12 10 12h4c1.5 0 2.5-1 2.5-2.5v-4C16.5 3.6 15 2 12 2z" /><path fill="#ffd43b" d="M12 22c4 0 5-1.6 5-3.5V16h-5v-1h6.5c2 0 3.5-1.400 3.5-4 0-2.500-1.500-4-3.500-4H17v2.600c0 1.600-1.500 2.400-3 2.400h-4C8.500 12 7.500 13 7.500 14.500v4C7.500 20.400 9 22 12 22z" /></>}
+        {i.id === 'claude' && <g stroke="#d97757" stroke-width="3" stroke-linecap="round">{[0, 1, 2, 3, 4, 5, 6, 7].map((k) => <line x1="12" y1="12" x2={12 + Math.cos((k * Math.PI) / 4) * (k % 2 ? 7.5 : 10)} y2={12 + Math.sin((k * Math.PI) / 4) * (k % 2 ? 7.5 : 10)} />)}</g>}
+        {i.id === 'sql' && <g fill="none" stroke="#4f8cff" stroke-width="2.4" stroke-linecap="round"><ellipse cx="12" cy="6" rx="8" ry="3" /><path d="M4 6v12c0 1.700 3.600 3 8 3s8-1.300 8-3V6M4 12c0 1.700 3.600 3 8 3s8-1.300 8-3" /></g>}
+        {i.id === 'ml' && <><g stroke="#ff7baf" stroke-width="1.400" opacity=".8"><line x1="5" y1="6" x2="12" y2="4" /><line x1="5" y1="6" x2="12" y2="12" /><line x1="5" y1="18" x2="12" y2="12" /><line x1="5" y1="18" x2="12" y2="20" /><line x1="12" y1="4" x2="19" y2="12" /><line x1="12" y1="12" x2="19" y2="12" /><line x1="12" y1="20" x2="19" y2="12" /></g><g fill="#ff7baf"><circle cx="5" cy="6" r="2.200" /><circle cx="5" cy="18" r="2.200" /><circle cx="12" cy="4" r="2.200" /><circle cx="12" cy="12" r="2.200" /><circle cx="12" cy="20" r="2.200" /><circle cx="19" cy="12" r="2.600" /></g></>}
+      </svg>
+      <span class="tip">{i.label}</span>
+    </a>
+  ))}
+</div>
+
+<style>
+  .orbit{position:absolute;inset:0;pointer-events:none}
+  .orb{position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;display:grid;place-items:center;visibility:hidden;opacity:0;pointer-events:auto;text-decoration:none;
+       filter:drop-shadow(0 2px 3px color-mix(in srgb,var(--ink) 35%,transparent))}
+  .tip{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:2px;white-space:nowrap;font:700 11px var(--hud);color:var(--ink);background:var(--paper);
+       border:2px solid var(--ink);border-radius:99px;padding:2px 8px;opacity:0;pointer-events:none;transition:opacity .15s}
+  .orb:hover .tip,.orb:focus-visible .tip{opacity:1}
+  .orb:hover,.orb:focus-visible{z-index:5}
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { reduced } from '../scripts/motion';
+
+  document.addEventListener('astro:page-load', () => {
+    const avatar = document.querySelector<HTMLElement>('.lobby .avatar');
+    const orbs = [...document.querySelectorAll<HTMLElement>('[data-orb]')];
+    if (!avatar || !orbs.length) return;
+    avatar.tabIndex = 0;
+    avatar.setAttribute('aria-label', 'Show what I work with');
+    const R = () => avatar.offsetWidth / 2 + 34;
+    const st = orbs.map(() => ({ p: 0 }));
+    let angle = -90, hover = false, open = false;
+
+    const place = () => orbs.forEach((o, i) => {
+      const a = ((angle + (360 / orbs.length) * i) * Math.PI) / 180, p = st[i]!.p;
+      gsap.set(o, { x: Math.cos(a) * R() * p, y: Math.sin(a) * R() * p, scale: 0.3 + 0.7 * p, opacity: p, visibility: p > 0.01 ? 'visible' : 'hidden' });
+    });
+    const toggle = (on: boolean) => {
+      if (on === open) return;
+      open = on;
+      orbs.forEach((o) => { o.tabIndex = on ? 0 : -1; });
+      avatar.setAttribute('aria-expanded', String(on));
+      gsap.to(st, { p: on ? 1 : 0, duration: reduced() ? 0 : on ? 0.6 : 0.3, ease: on ? 'back.out(1.6)' : 'power2.in', stagger: reduced() ? 0 : on ? 0.06 : 0, onUpdate: place });
+    };
+    const tick = (_t: number, dt: number) => { if (open && !hover && !reduced()) { angle += (dt / 1000) * (360 / 14); place(); } };
+    gsap.ticker.add(tick);
+    document.addEventListener('astro:before-swap', () => gsap.ticker.remove(tick), { once: true });
+
+    avatar.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') toggle(true); });
+    avatar.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') toggle(false); });
+    avatar.addEventListener('click', (e) => { if ((e as PointerEvent).pointerType !== 'mouse' && !(e.target as Element).closest('[data-orb]')) toggle(!open); });
+    avatar.addEventListener('focusin', () => toggle(true));
+    avatar.addEventListener('focusout', (e) => { if (!avatar.contains(e.relatedTarget as Node)) toggle(false); });
+    avatar.addEventListener('keydown', (e) => { if (e.key === 'Escape') { toggle(false); avatar.focus(); } });
+    orbs.forEach((o) => { o.addEventListener('pointerenter', () => { hover = true; }); o.addEventListener('pointerleave', () => { hover = false; }); });
+  });
+</script>

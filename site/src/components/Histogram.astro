@@ -1,0 +1,26 @@
+---
+// The Lobby's floor: ~48 rounded pink bars along the bottom of the screen that dance to the music (scripts/viz.ts).
+const N = 48;
+---
+<svg class="floor" viewBox={`0 0 ${N * 20} 120`} preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="hist-g" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="var(--pink)" stop-opacity=".75" /><stop offset="1" stop-color="var(--lav)" stop-opacity=".1" />
+    </linearGradient>
+  </defs>
+  {Array.from({ length: N }, (_, i) => <rect x={i * 20 + 3} y="0" width="14" height="120" rx="7" fill="url(#hist-g)" style="transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(.04)" />)}
+</svg>
+
+<style>
+  .floor{position:absolute;left:0;right:0;bottom:0;width:100%;height:clamp(70px,14vh,130px);z-index:1;pointer-events:none}
+</style>
+
+<script>
+  import { floorHistogram } from '../scripts/viz';
+  let stop = () => {};
+  document.addEventListener('astro:page-load', () => {
+    stop();
+    const s = document.querySelector<SVGSVGElement>('svg.floor');
+    if (s) stop = floorHistogram(s);
+  });
+</script>
