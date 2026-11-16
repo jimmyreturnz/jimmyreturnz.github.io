@@ -1,0 +1,83 @@
+---
+// Chart Showcase shell. Playback (autoplay preview, Play, calibration) arrives with the song + .osu files.
+import Vh from './Vh.astro';
+import Ph from './Ph.astro';
+interface Stat { label: string; value: string | null; hint: string }
+interface Props {
+  mode: 'taiko' | 'mania'; artist: string; title: string; mapper: string; beatmapUrl: string; keys: string; stats: Stat[];
+}
+const { mode, artist, title, mapper, beatmapUrl, keys, stats } = Astro.props;
+const lanes = mode === 'mania' ? 4 : 1;
+---
+<div class:list={['player card', `p-${mode}`]}>
+  <div class="info">
+    <p class="label">{mode === 'taiko' ? 'osu!taiko' : 'osu!mania 4K'} · my map</p>
+    <h3><span lang={/[^\x00-\x7F]/.test(artist) ? 'ja' : undefined}>{artist}</span> – {title}</h3>
+    <p class="credit">Music: {artist} – {title} · Mapped by {mapper}</p>
+    <div class="stats">
+      {stats.map((s) => <div class="stat"><b><Ph value={s.value} hint={s.hint} /></b><small>{s.label}</small></div>)}
+    </div>
+    <div class="controls">
+      <button class="btn fill" type="button" disabled>▶ Preview</button>
+      <button class="btn" type="button" disabled>Play</button>
+      <a class="btn" href={beatmapUrl} target="_blank" rel="noopener noreferrer">Play on osu! ↗</a>
+    </div>
+    <p class="soon">🔇 Muted by default. Song + chart playback coming soon · keys <kbd>{keys}</kbd></p>
+  </div>
+
+  <div class="stage" aria-hidden="true">
+    {mode === 'taiko' ? (
+      <div class="taiko">
+        <div class="drum"><span></span></div>
+        <div class="lane">
+          <i class="n don" style="left:18%"></i><i class="n kat" style="left:30%"></i><i class="n don big" style="left:46%"></i>
+          <i class="n kat" style="left:60%"></i><i class="n don" style="left:70%"></i><i class="n kat big" style="left:84%"></i>
+        </div>
+      </div>
+    ) : (
+      <div class="mania">
+        {Array.from({ length: lanes }, (_, i) => (
+          <div class={`col c${i}`}>
+            {[[12, 0], [38, 1], [64, 0], [80, 1]].filter((_, k) => (k + i) % 2 === 0).map(([top, hold]) =>
+              <i class:list={['note', hold && 'hold']} style={`top:${(top! + i * 7) % 82}%`}></i>)}
+            <span class="key"></span>
+          </div>
+        ))}
+      </div>
+    )}
+    <Vh name="vh-heart-target" class="badge" />
+  </div>
+</div>
+
+<style>
+  .player{display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+  .info{padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+  h3{font-size:clamp(20px,2.6vw,28px);margin:0}
+  .credit{margin:0;font-size:13px;color:var(--muted);font-weight:700}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat{border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk);min-width:0}
+  .stat b{display:block;font:700 18px/1.2 var(--hud);overflow-wrap:anywhere}
+  .stat small{font-size:12px;color:var(--muted);font-weight:700}
+  .controls{display:flex;flex-wrap:wrap;gap:10px}
+  .soon{margin:0;font-size:13px;color:var(--muted);font-weight:700}
+  kbd{font:700 12px var(--hud);border:2px solid var(--ink);border-radius:6px;padding:0 5px}
+  .stage{position:relative;border-left:var(--stroke) solid var(--ink);background:var(--navy);min-height:280px;overflow:hidden}
+  .stage :global(.badge){position:absolute;right:12px;top:12px;width:34px;color:var(--pink)}
+  /* taiko */
+  .taiko{position:absolute;inset:0;display:flex;align-items:center}
+  .drum{flex:none;width:96px;height:96px;margin-left:16px;border-radius:50%;border:4px solid #fff8fc;background:#2a2944;display:grid;place-items:center;z-index:1}
+  .drum span{width:56px;height:56px;border-radius:50%;border:3px dashed var(--pink)}
+  .lane{position:relative;flex:1;height:88px;margin-left:-20px;background:#2a2944;border-block:3px solid #fff8fc}
+  .n{position:absolute;top:50%;width:44px;height:44px;margin-top:-22px;border-radius:50%;border:3px solid #fff8fc}
+  .n.big{width:60px;height:60px;margin-top:-30px}
+  .don{background:var(--pink)} .kat{background:var(--sky)}
+  /* mania */
+  .mania{position:absolute;inset:0 18% 0;display:grid;grid-template-columns:repeat(4,1fr);border-inline:3px solid #fff8fc}
+  .col{position:relative;border-left:1px solid #ffffff22}
+  .note{position:absolute;left:8%;right:8%;height:16px;border-radius:6px;border:2px solid #1f1e33}
+  .note.hold{height:64px}
+  .c0 .note,.c3 .note{background:var(--sky)} .c1 .note,.c2 .note{background:var(--pink)}
+  .key{position:absolute;left:6%;right:6%;bottom:12px;height:20px;border-radius:8px;border:3px solid #fff8fc;background:#2a2944}
+  @media (max-width:520px){ .stat b{font-size:14px} .stats{gap:6px} }
+  @media (max-width:820px){ .player{grid-template-columns:1fr} .stage{border-left:0;border-top:var(--stroke) solid var(--ink);min-height:220px} }
+</style>

@@ -1,0 +1,117 @@
+---
+import { github } from '../data/site';
+import rawStats from '../data/stats.json';
+import type { Stats } from '../../scripts/fetch-stats';
+const stats = rawStats as unknown as Stats;
+import Ph from './Ph.astro';
+import Icon from './Icon.astro';
+
+const fmt = (n: number | null | undefined, d = 0) => (n == null ? null : n.toLocaleString('en-US', { maximumFractionDigits: d }));
+const rank = (n: number | null | undefined) => (n == null ? null : `#${n.toLocaleString('en-US')}`);
+const { osu, tetrio } = stats;
+const mania = osu.mania;
+const maniaRank = mania?.fourK ?? mania;
+
+type Tile = { label: string; value: string | null; hint: string };
+const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avatar: string | null; href: string; tiles: Tile[] }[] = [
+  { id: 'github', label: 'GitHub', icon: 'github', avatar: null, href: github.url, tiles: [
+    { label: 'public repos', value: fmt(github.publicRepos), hint: '0' },
+    { label: 'followers', value: fmt(github.followers), hint: '0' },
+    { label: 'commits this year', value: fmt(github.commitsThisYear), hint: '000' },
+  ] },
+  { id: 'taiko', label: 'osu!taiko', icon: 'osu', avatar: osu.avatar, href: `${osu.profileUrl}/taiko`, tiles: [
+    { label: 'global rank', value: rank(osu.taiko?.globalRank), hint: '#00,000' },
+    { label: '🇹🇭 Thailand rank', value: rank(osu.taiko?.countryRank), hint: '#000' },
+    { label: 'pp', value: fmt(osu.taiko?.pp), hint: '0,000' },
+  ] },
+  { id: 'mania', label: 'osu!mania 4K', icon: 'osu', avatar: osu.avatar, href: `${osu.profileUrl}/mania`, tiles: [
+    { label: 'global rank (4K)', value: rank(maniaRank?.globalRank), hint: '#00,000' },
+    { label: '🇹🇭 Thailand rank (4K)', value: rank(maniaRank?.countryRank), hint: '#000' },
+    { label: 'pp (4K)', value: fmt(maniaRank?.pp), hint: '0,000' },
+  ] },
+  { id: 'tetrio', label: 'TETR.IO', icon: 'tetrio', avatar: tetrio.avatar, href: tetrio.profileUrl, tiles: [
+    { label: 'global rank', value: rank(tetrio.league?.globalRank), hint: '#000' },
+    { label: '🇹🇭 Thailand rank', value: rank(tetrio.league?.countryRank), hint: '#0' },
+    { label: 'TR', value: fmt(tetrio.league?.tr), hint: '00,000' },
+    { label: 'level', value: fmt(tetrio.level), hint: '000' },
+    { label: 'playtime', value: tetrio.playTimeHours != null ? `${fmt(tetrio.playTimeHours)} h` : null, hint: '000 h' },
+    { label: 'rank', value: tetrio.league?.rank ? tetrio.league.rank.toUpperCase() : null, hint: 'S' },
+  ] },
+];
+---
+<section class="card player" aria-labelledby="pc-title" data-tabs>
+  <header><strong id="pc-title">Player Card</strong></header>
+  <div class="tabs" role="tablist" aria-label="Platforms">
+    {tabs.map((t, i) => (
+      <button class="chip" role="tab" id={`t-${t.id}`} aria-controls={`pc-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+        <Icon name={t.icon} size={14} />{t.label}
+      </button>
+    ))}
+  </div>
+
+  {tabs.map((t, i) => (
+    <div class="panel" role="tabpanel" id={`pc-${t.id}`} aria-labelledby={`t-${t.id}`} hidden={i !== 0}>
+      {t.avatar && (
+        <div class="who">
+          <img src={t.avatar} alt={`${t.label} profile picture`} width="44" height="44" loading="lazy" decoding="async" />
+          <span><b>jimmyreturnz</b><small>{t.label}</small></span>
+        </div>
+      )}
+      <div class:list={['stats', t.tiles.length > 3 && 'six']}>
+        {t.tiles.map((x) => <div class="stat"><b><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}
+      </div>
+      {t.id === 'github' && (
+        <div class="langs">
+          <div class="label">Top languages {github.languagesAreSample && <em class="ph">sample</em>}</div>
+          <div class="langbar">{github.topLanguages.map((l, k) => <i style={`width:${l.share}%`} class={['bg-sky','bg-pink','bg-mint','bg-butter'][k % 4]} />)}</div>
+          <div class="legend">{github.topLanguages.map((l, k) => <span><i class={['bg-sky','bg-pink','bg-mint','bg-butter'][k % 4]} />{l.name}</span>)}</div>
+        </div>
+      )}
+      <footer><a href={t.href} target="_blank" rel="noopener noreferrer">View {t.label} profile ↗</a></footer>
+    </div>
+  ))}
+</section>
+
+<style>
+  .player{padding:0;overflow:hidden}
+  header{padding:12px 16px;border-bottom:var(--stroke) solid var(--ink);background:var(--lav);color:var(--on-pastel)}
+  header strong{font:15px var(--display)}
+  .tabs{display:flex;gap:6px;padding:12px 16px 0;flex-wrap:wrap}
+  .tabs .chip{font-size:12px;padding:4px 10px}
+  .who{display:flex;align-items:center;gap:10px;padding:12px 16px 0}
+  .who img{width:44px;height:44px;border-radius:12px;border:2px solid var(--ink);object-fit:cover}
+  .who b{display:block;font:14px var(--display)} .who small{color:var(--muted);font-weight:700;font-size:12px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 16px}
+  .stat{border:2px solid var(--ink);border-radius:12px;padding:9px 10px;background:var(--sunk);min-width:0}
+  .stat b{display:block;font:700 clamp(16px,2vw,22px)/1.15 var(--hud);overflow-wrap:anywhere}
+  .stat small{font-size:12px;color:var(--muted);font-weight:700}
+  .langs{padding:0 16px 10px}
+  .langbar{display:flex;height:12px;border:2px solid var(--ink);border-radius:99px;overflow:hidden;margin:6px 0}
+  .langbar i{display:block;height:100%}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);font-weight:700}
+  .legend i{display:inline-block;width:10px;height:10px;border:2px solid var(--ink);border-radius:3px;margin-right:4px;vertical-align:-1px}
+  footer{padding:0 16px 14px;font-size:13px;text-align:right}
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (t: HTMLButtonElement, focus = false) => {
+      tabs.forEach((x) => {
+        const on = x === t;
+        x.setAttribute('aria-selected', String(on));
+        x.tabIndex = on ? 0 : -1;
+        const panel = root.querySelector<HTMLElement>(`#${x.getAttribute('aria-controls')}`);
+        if (panel) panel.hidden = !on;
+      });
+      if (focus) t.focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t));
+      t.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (d) { e.preventDefault(); select(tabs[(i + d + tabs.length) % tabs.length]!, true); }
+      });
+    });
+  });
+</script>

@@ -1,0 +1,32 @@
+---
+import Icon from './Icon.astro';
+import { profile } from '../data/site';
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+const items = [
+  { name: 'github', label: 'GitHub', href: profile.links.github },
+  { name: 'linkedin', label: 'LinkedIn', href: profile.links.linkedin },
+  { name: 'instagram', label: 'Instagram', href: profile.links.instagram },
+  { name: 'discord', label: 'Discord (@jimmyreturnz)', href: profile.links.discord },
+  { name: 'facebook', label: 'Facebook', href: profile.links.facebook },
+  { name: 'email', label: 'Email', href: `mailto:${profile.email}` },
+] as const;
+---
+<ul class:list={['socials', compact && 'compact']} aria-label="Find me on">
+  {items.map((i) => (
+    <li>
+      {i.href
+        ? <a class="soc" href={i.href} target={i.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener noreferrer" aria-label={i.label} title={i.label}><Icon name={i.name} size={20} /></a>
+        : <span class="soc off" role="img" aria-label={`${i.label} (link coming soon)`} title={`${i.label}: link coming soon`}><Icon name={i.name} size={20} /></span>}
+    </li>
+  ))}
+</ul>
+
+<style>
+  .socials{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+  .soc{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;border:2px solid var(--ink);background:var(--paper);
+       color:var(--ink);box-shadow:3px 3px 0 var(--shadow-c);--icon-cut:var(--paper)}
+  a.soc:hover{background:var(--butter);color:var(--on-pastel);--icon-cut:var(--butter)}
+  .soc.off{opacity:.4;box-shadow:none}
+  .compact .soc{width:38px;height:38px;border-radius:12px}
+</style>

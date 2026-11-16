@@ -18,14 +18,15 @@ Read these before working:
 - **API:** Hono on Cloudflare Workers (ADR 0003). Data in Cloudflare D1.
 - **Content:** Sveltia CMS at `/admin` edits Blog, Projects, Shoutouts, Timeline, Skills, Setups (Markdown/data files in the repo).
 - **Tooling:** Bun (package manager + scripts), Biome (format + lint), GitHub Actions (checks on push; daily Stats Card refresh). Cloudflare deploys `main`, preview per branch.
+- **Current state:** pages only (Lobby at `/`, Portfolio at `/portfolio/`). No Intro/Warp/player animation yet; the owner asked for pages first. Light theme is default; dark uses `#1f1e33`. Ink is navy `#1f1e33` for now (plum `#3b2a4d` is the alternative, one token in `site/src/styles/global.css`).
 - **Analytics:** Cloudflare Web Analytics only (no cookies, no banner).
 
 ## Planned layout
 ```
-site/             Astro app
-api/              Hono Worker (Guestbook, profile lookups)
-packages/shared/  Types shared by site and api
-assets/           vectorheart SVG kit, self-hosted fonts (move under site/public when site/ exists)
+site/             Astro app (see site/README.md). Content in site/src/data/site.ts; Stats Card data in site/src/data/stats.json
+api/              Hono Worker (Guestbook) — not built yet
+packages/shared/  Types shared by site and api — not built yet
+assets/           served at the site root (Astro publicDir): fonts, vectorheart kit, stats avatars, later audio/ and charts/
 docs/             FEATURES.md, adr/, reviews/
 ```
 
@@ -45,7 +46,7 @@ docs/             FEATURES.md, adr/, reviews/
 - `assets/fonts/fonts.css` — provisional Latin set: Zen Dots (display), Comfortaa 400/700 (body), Orbitron 700 (numbers/HUD), Monoton (combo numerals only). `assets/fonts/fonts-jp.css` — M PLUS Rounded 1c, load only where Japanese appears. Audiowide, Krona One, Exo 2 and other Orbitron weights stay on disk but aren't loaded until the final font decision. Thai Guestbook font: Mali (to add).
 - Colour rule: pastels are never text. Ink `#3b2a4d` for text, `#c23a7a` for links/buttons, `#6b5b7d` for muted text. Any dark blue/navy is always `#1f1e33` (owner's favourite), including the night-theme base.
 - `docs/reviews/2026-11-16-design-council.md` — design review whose accepted actions are folded into FEATURES.md.
-- Inspiration: kenzync.dev (tool-card layout), hirokaze.net (theme applied to every bit of UI). Do not copy their assets.
+- Inspiration: kenzync.dev (tool-card layout). Apply the theme to every bit of UI. Do not copy other sites' assets.
 
 ## Skills in `.claude/skills/`
 ui-ux-pro-max, storyboard, web-performance, gsap-*, 60fps-animation, pixijs-2d, sveltia-cms, grill-with-docs (+ grilling, domain-modeling), graphify, unslop. Run `/unslop` on any prose visitors will read (bio, project write-ups, blog drafts) before committing it. Provenance in `SOURCES.md`. Once there is real code, run `/graphify .` and keep `graphify-out/GRAPH_REPORT.md` current.

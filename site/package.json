@@ -1,0 +1,23 @@
+{
+  "name": "jimmyreturnz-site",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "stats": "bun scripts/fetch-stats.ts",
+    "build": "bun scripts/fetch-stats.ts && astro build",
+    "build:offline": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^7.4.12",
+    "gsap": "^3.15.1",
+    "simple-icons": "^16.38.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/node": "^26.6.6",
+    "typescript": "6"
+  }
+}

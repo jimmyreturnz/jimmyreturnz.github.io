@@ -1,0 +1,71 @@
+/* Design tokens + base styles. Colour rule (docs/FEATURES.md): pastels are fills, never text. */
+:root{
+  --pink:#ffb3d1; --lav:#c9b6ff; --mint:#a8f0d4; --sky:#a6d8ff; --butter:#fff1a8;
+  --navy:#1f1e33;
+  --on-pastel:#1f1e33;          /* text placed on a pastel fill, both themes */
+
+  /* light theme (default) */
+  --bg:#fff8fc; --paper:#ffffff; --sunk:#fff8fc;
+  --ink:#1f1e33;                /* text + outlines. Plum alternative: #3b2a4d */
+  --accent:#c23a7a; --muted:#6b5b7d; --dash:#c9b6ff;
+  --shadow-c:var(--ink);
+  --vh-ink:var(--ink); --vh-shine:#fff;
+
+  --stroke:3px; --radius:16px; --ctl:36px; /* one height for every header control */
+  --display:'Zen Dots',system-ui,sans-serif;
+  --body:'Comfortaa',system-ui,sans-serif;
+  --hud:'Orbitron',system-ui,sans-serif;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#1f1e33; --paper:#2a2944; --sunk:#25243c;
+  --ink:#fff8fc; --accent:#ff8fc0; --muted:#c9bfd9; --dash:#4a4870;
+  --shadow-c:#ff8fc0;
+  --vh-ink:#1f1e33; --vh-shine:#fff;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:120px}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--accent);font-weight:700;text-underline-offset:3px}
+button{font:inherit;color:inherit}
+img,svg{max-width:100%}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:10px}
+svg.vh{display:block;overflow:visible}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.15}
+
+/* placeholder text: striped, so it's obvious what still needs filling in */
+.ph{background:repeating-linear-gradient(-35deg,transparent 0 8px,color-mix(in srgb,var(--ink) 8%,transparent) 8px 16px);
+    border-radius:6px;padding:0 5px;color:var(--muted);font-style:normal;font-weight:700}
+
+/* shared components */
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+.card{background:var(--paper);border:var(--stroke) solid var(--ink);border-radius:var(--radius);box-shadow:4px 4px 0 var(--shadow-c)}
+.chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;line-height:1;border:2px solid var(--ink);border-radius:99px;padding:0 14px;font-size:13px;font-weight:700;
+      background:var(--paper);color:var(--ink);text-decoration:none;white-space:nowrap;cursor:pointer}
+.chip.on,.chip[aria-pressed="true"],.chip[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:var(--stroke) solid var(--ink);border-radius:99px;padding:10px 18px;
+     background:var(--paper);color:var(--ink);font-weight:700;text-decoration:none;box-shadow:3px 3px 0 var(--shadow-c);cursor:pointer}
+.btn.fill{background:var(--butter);color:var(--on-pastel)}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed;box-shadow:none}
+.label{font:700 11px var(--hud);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.pastel{color:var(--on-pastel)}
+.bg-pink{background:var(--pink)}.bg-lav{background:var(--lav)}.bg-mint{background:var(--mint)}.bg-sky{background:var(--sky)}.bg-butter{background:var(--butter)}
+
+/* top bar */
+.bar{position:relative;z-index:5;display:flex;align-items:center;gap:12px;padding:12px clamp(16px,4vw,40px)}
+.wordmark{font:22px/1 var(--display);color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.wordmark svg{width:26px;color:var(--pink)}
+.settings{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tg{display:flex;align-items:center;justify-content:center;gap:6px;height:var(--ctl);min-width:var(--ctl);border:2px solid var(--ink);background:var(--paper);border-radius:99px;padding:0 14px 0 10px;font-size:13px;font-weight:700;line-height:1;cursor:pointer}
+.tg i{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);background:var(--paper)}
+.tg[aria-pressed="true"]{background:var(--butter);color:var(--on-pastel);border-color:var(--on-pastel)}
+.tg[aria-pressed="true"] i{background:var(--accent);border-color:var(--on-pastel)}
+@media (max-width:820px){ .tg span{display:none} .tg{padding:0;width:var(--ctl)} .wordmark{font-size:18px} .wordmark svg{width:22px} }
+
+/* Lite mode / reduced motion: no idle loops */
+:root[data-lite="true"] *, :root[data-lite="true"] *::before, :root[data-lite="true"] *::after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

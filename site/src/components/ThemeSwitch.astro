@@ -1,0 +1,32 @@
+---
+// Placeholder light/dark switch in the pastel-pink vibe.
+// TODO: replace with the owner's chosen uiverse design (RiccardoRapelli/jolly-chicken-91), recoloured pink.
+---
+<button class="theme-switch" type="button" role="switch" aria-checked="false" data-theme-switch>
+  <span class="sr-only">Dark theme</span>
+  <span class="track" aria-hidden="true">
+    <span class="cloud c1"></span><span class="cloud c2"></span>
+    <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>
+    <span class="knob"><span class="crater"></span></span>
+  </span>
+</button>
+
+<style>
+  .theme-switch{border:0;background:none;padding:0;cursor:pointer;flex:none}
+  .track{position:relative;display:block;width:68px;height:var(--ctl);border-radius:99px;overflow:hidden;
+    border:2px solid var(--ink);background:linear-gradient(180deg,#ffd6e8,#ffb3d1);transition:background .4s}
+  .knob{position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;
+    background:#fff1a8;border:2px solid #1f1e33;box-shadow:0 0 0 4px #ffffff66;transition:transform .4s cubic-bezier(.5,1.6,.5,1),background .4s}
+  .crater{position:absolute;inset:0;border-radius:50%;opacity:0;transition:opacity .3s;
+    background:radial-gradient(circle at 35% 35%,#c9b6ff 0 2.5px,transparent 3px),radial-gradient(circle at 62% 62%,#c9b6ff 0 2px,transparent 2.5px)}
+  .cloud{position:absolute;height:8px;border-radius:99px;background:#fff;transition:transform .4s,opacity .3s}
+  .c1{width:18px;right:8px;top:9px}.c2{width:12px;right:16px;top:19px}
+  .star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .4s}
+  .s1{left:12px;top:8px}.s2{left:20px;top:18px}.s3{left:30px;top:10px}
+  [aria-checked="true"] .track{background:linear-gradient(180deg,#2a2944,#1f1e33)}
+  [aria-checked="true"] .knob{transform:translateX(32px);background:#fff8fc}
+  [aria-checked="true"] .crater{opacity:1}
+  [aria-checked="true"] .cloud{opacity:0;transform:translateX(10px)}
+  [aria-checked="true"] .star{opacity:1;transform:none}
+  :global(:root[data-theme="dark"]) .track{border-color:#ff8fc0}
+</style>

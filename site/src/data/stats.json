@@ -1,0 +1,34 @@
+{
+  "fetchedAt": "2026-11-16T09:55:00.572Z",
+  "osu": {
+    "fetchedAt": null,
+    "username": "jimmyreturnz",
+    "userId": 11306153,
+    "profileUrl": "https://osu.ppy.sh/users/11306153",
+    "avatar": "/stats/osu-avatar.jpg",
+    "country": null,
+    "taiko": null,
+    "mania": null
+  },
+  "tetrio": {
+    "fetchedAt": "2026-11-16T09:55:00.175Z",
+    "username": "jimmyreturnz",
+    "profileUrl": "https://ch.tetr.io/u/jimmyreturnz",
+    "avatar": "/stats/tetrio-avatar.jpg",
+    "country": "TH",
+    "level": 3165,
+    "playTimeHours": 1896,
+    "gamesPlayed": 16423,
+    "gamesWon": 8508,
+    "league": {
+      "rank": "u",
+      "bestRank": "u",
+      "tr": 22287.816699821866,
+      "globalRank": 594,
+      "countryRank": 5,
+      "apm": 114.22,
+      "pps": 2.67,
+      "vs": 225.49
+    }
+  }
+}

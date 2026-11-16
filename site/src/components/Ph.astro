@@ -1,0 +1,7 @@
+---
+// Shows a value, or a striped placeholder when the value isn't known yet.
+interface Props { value: string | number | null | undefined; hint: string }
+const { value, hint } = Astro.props;
+const shown = typeof value === 'number' ? value.toLocaleString('en-US') : value;
+---
+{shown != null && shown !== '' ? <>{shown}</> : <em class="ph">[{hint}]</em>}

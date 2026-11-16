@@ -1,0 +1,14 @@
+---
+// One vectorheart shape from the sprite, with its own viewBox so CSS width alone sizes it.
+import sprite from '../../../assets/vectorheart/vectorheart.svg?raw';
+
+const viewBoxes = Object.fromEntries(
+  [...sprite.matchAll(/<symbol id="([^"]+)" viewBox="([^"]+)"/g)].map((m) => [m[1], m[2]]),
+);
+interface Props { name: string; class?: string; style?: string; label?: string }
+const { name, class: cls = '', style, label } = Astro.props;
+const viewBox = viewBoxes[name];
+if (!viewBox) throw new Error(`Unknown vectorheart symbol: ${name}`);
+---
+<svg class:list={['vh', cls]} viewBox={viewBox} style={style} role={label ? 'img' : undefined}
+     aria-label={label} aria-hidden={label ? undefined : 'true'}><use href={`#${name}`} /></svg>

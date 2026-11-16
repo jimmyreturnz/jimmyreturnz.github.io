@@ -1,0 +1,244 @@
+---
+import Base from '../../layouts/Base.astro';
+import PortfolioHeader from '../../components/PortfolioHeader.astro';
+import Showcase from '../../components/Showcase.astro';
+import ChartPlayer from '../../components/ChartPlayer.astro';
+import Socials from '../../components/Socials.astro';
+import Vh from '../../components/Vh.astro';
+import Ph from '../../components/Ph.astro';
+import { profile, projects, skills, charts, setups, timeline, shoutouts } from '../../data/site';
+import rawStats from '../../data/stats.json';
+import type { Stats } from '../../../scripts/fetch-stats';
+const stats = rawStats as unknown as Stats;
+
+const fmt = (n: number | null | undefined, d = 0) => (n == null ? null : n.toLocaleString('en-US', { maximumFractionDigits: d }));
+const rank = (n: number | null | undefined) => (n == null ? null : `#${n.toLocaleString('en-US')}`);
+const { osu, tetrio } = stats;
+const m4 = osu.mania?.fourK ?? osu.mania;
+const tags = ['All', ...new Set(projects.flatMap((p) => p.tags))];
+---
+<Base title="Portfolio · jimmyreturnz">
+  <PortfolioHeader />
+
+  <main class="wrap">
+    <Showcase id="projects" title="Projects" lead="ML and data work, plus things I build for fun. Pinned ones first." tint="butter">
+      <div class="filters" role="group" aria-label="Filter projects">
+        {tags.map((t, i) => <button class="chip" type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-filter={t}>{t}</button>)}
+      </div>
+      <div class="projects">
+        {projects.map((p) => (
+          <article class="card proj" data-tags={p.tags.join(' ')}>
+            <div class={`cover bg-${p.cover}`}>
+              {p.pinned && <span class="pin">★ PINNED</span>}
+              <Vh name={p.icon} />
+            </div>
+            <div class="body">
+              <div class="tags">{p.tags.map((t) => <span class="chip">{t}</span>)}</div>
+              <h3>{p.title}</h3>
+              <div class="outcome"><b><Ph value={p.outcome.value} hint="−30%" /></b><span><Ph value={p.outcome.text} hint="what improved, for whom" /></span></div>
+              <p class="meta"><Ph value={p.stack} hint="stack" /> · Role: <Ph value={p.role} hint="your role" /></p>
+              <p class="links">
+                {p.link ? <a href={p.link.href} target="_blank" rel="noopener noreferrer">{p.link.label}</a> : <span class="meta">case study coming</span>}
+                {p.note && <span class="meta">{p.note}</span>}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </Showcase>
+
+    <Showcase id="skills" title="Skills" lead="Grouped, and each one will link to where I used it." motif="vh-dots" tint="mint">
+      <div class="grid3">
+        {skills.map((g) => (
+          <div class="card pad"><h3>{g.group}</h3><div class="chips">{g.items.map((s) => <span class="chip">{s}</span>)}</div></div>
+        ))}
+      </div>
+    </Showcase>
+
+    <Showcase id="taiko" title="osu!taiko" lead="My own map. Watch it play, then try it yourself." motif="vh-target" tint="mint">
+      <ChartPlayer mode="taiko" {...charts.taiko} stats={[
+        { label: 'global rank', value: rank(osu.taiko?.globalRank), hint: '#00,000' },
+        { label: '🇹🇭 Thailand', value: rank(osu.taiko?.countryRank), hint: '#000' },
+        { label: 'pp', value: fmt(osu.taiko?.pp), hint: '0,000' },
+      ]} />
+    </Showcase>
+
+    <Showcase id="mania" title="osu!mania 4K" lead="Quaoar, 4K. Dense, so the preview plays it for you first." motif="vh-chevrons" tint="pink">
+      <ChartPlayer mode="mania" {...charts.mania} stats={[
+        { label: 'global rank (4K)', value: rank(m4?.globalRank), hint: '#00,000' },
+        { label: '🇹🇭 Thailand (4K)', value: rank(m4?.countryRank), hint: '#000' },
+        { label: 'pp (4K)', value: fmt(m4?.pp), hint: '0,000' },
+      ]} />
+    </Showcase>
+
+    <Showcase id="tetrio" title="TETR.IO" lead="Stacking since 2021." motif="vh-plus" tint="sky">
+      <div class="tetrio">
+        <div class="card video" aria-label="Gameplay video (coming soon)">
+          <div class="poster">
+            <Vh name="vh-triangles" class="tri" />
+            <p><b>Gameplay loop</b><br /><span>video coming soon · plays muted, only while on screen</span></p>
+          </div>
+        </div>
+        <div class="card pad tstats">
+          <div class="tid">
+            {tetrio.avatar && <img src={tetrio.avatar} alt="TETR.IO profile picture" width="56" height="56" loading="lazy" decoding="async" />}
+            <div><b>{tetrio.username}</b><small>Tetra League · {tetrio.country === 'TH' ? '🇹🇭 Thailand' : tetrio.country}</small></div>
+            {tetrio.league?.rank && <span class="rankbadge" title="Tetra League rank">{tetrio.league.rank.toUpperCase()}</span>}
+          </div>
+          <div class="tgrid">
+            <div class="stat"><b><Ph value={rank(tetrio.league?.globalRank)} hint="#000" /></b><small>global rank</small></div>
+            <div class="stat"><b><Ph value={rank(tetrio.league?.countryRank)} hint="#0" /></b><small>🇹🇭 Thailand rank</small></div>
+            <div class="stat"><b><Ph value={fmt(tetrio.league?.tr)} hint="00,000" /></b><small>TR</small></div>
+            <div class="stat"><b><Ph value={fmt(tetrio.level)} hint="000" /></b><small>level</small></div>
+            <div class="stat"><b><Ph value={tetrio.playTimeHours != null ? `${fmt(tetrio.playTimeHours)} h` : null} hint="000 h" /></b><small>playtime</small></div>
+            <div class="stat"><b><Ph value={tetrio.league ? `${fmt(tetrio.league.apm, 1)} / ${fmt(tetrio.league.pps, 2)}` : null} hint="APM / PPS" /></b><small>APM / PPS</small></div>
+          </div>
+          <a href={tetrio.profileUrl} target="_blank" rel="noopener noreferrer">View TETR.IO profile ↗</a>
+        </div>
+      </div>
+    </Showcase>
+
+    <Showcase id="setups" title="Setups" lead="Gear and settings, for the curious." motif="vh-eq" tint="lav">
+      <div class="grid3">
+        {setups.map((g) => (
+          <div class="card pad"><h3>{g.group}</h3>
+            <dl>{g.items.map((i) => <><dt>{i.label}</dt><dd><Ph value={i.value} hint="…" /></dd></>)}</dl>
+          </div>
+        ))}
+      </div>
+    </Showcase>
+
+    <Showcase id="timeline" title="Timeline" lead="The short version." motif="vh-arrow-thin" tint="sky">
+      <ol class="timeline">
+        {timeline.map((t) => (
+          <li class="card pad"><span class="when"><Ph value={t.when} hint="year" /></span><b>{t.what}</b><span class="meta"><Ph value={t.where} hint="where" /></span></li>
+        ))}
+      </ol>
+    </Showcase>
+
+    <Showcase id="shoutouts" title="Shoutouts" lead="Friends and people I look up to." motif="vh-sparkle" tint="butter">
+      {shoutouts.length ? (
+        <div class="grid3">{shoutouts.map((s) => <div class="card pad"><b>{s.name}</b>{s.quote && <p>“{s.quote}”</p>}</div>)}</div>
+      ) : (
+        <div class="card pad empty"><Vh name="vh-heart-outline" class="ei" /><p>The first shoutouts are on their way.</p></div>
+      )}
+    </Showcase>
+
+    <Showcase id="guestbook" title="Guestbook" lead="Leave a short message in Thai, English or Japanese. I read every one before it appears." motif="vh-heart" tint="pink">
+      <div class="guest">
+        <div class="card pad empty"><Vh name="vh-heart-target" class="ei" /><p>No messages yet. Be the first!</p></div>
+        <form class="card pad gform" aria-describedby="gb-note" onsubmit="return false">
+          <label>Name<input name="name" maxlength="40" autocomplete="nickname" disabled /></label>
+          <label>Message <small>(max 300)</small><textarea name="message" maxlength="300" rows="4" disabled></textarea></label>
+          <button class="btn fill" type="submit" disabled>Send ♥</button>
+          <p id="gb-note" class="meta">Opening soon. Messages show after I approve them. To limit spam, I keep a one-way scrambled fingerprint of your IP for a day, never the address itself.</p>
+        </form>
+      </div>
+    </Showcase>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap fgrid">
+      <div>
+        <a class="wordmark" href="/"><Vh name="vh-heart" />jimmyreturnz</a>
+        <p class="meta">{profile.role} · {profile.location}</p>
+      </div>
+      <div>
+        <p class="label">Find me</p>
+        <Socials compact />
+        <p class="mail">Work email: <a href={`mailto:${profile.email}`}>{profile.email}</a>
+          <button class="chip copy" type="button" data-copy={profile.email}>Copy</button><span class="sr-only" aria-live="polite" data-copied></span></p>
+      </div>
+      <div>
+        <p class="label">Music credits</p>
+        <p class="meta">{charts.taiko.artist} – {charts.taiko.title}<br /><span lang="ja">{charts.mania.artist}</span> – {charts.mania.title}<br />Both mapped by {charts.taiko.mapper}. Rights holders: email me and I’ll remove a track the same day.</p>
+      </div>
+    </div>
+    <p class="wrap tiny">© {new Date().getFullYear()} jimmyreturnz · <a href="/">Back to the Lobby</a></p>
+  </footer>
+</Base>
+
+<style>
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .projects{display:grid;gap:22px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+  .proj{display:flex;flex-direction:column;overflow:hidden}
+  .proj[hidden]{display:none}
+  .cover{position:relative;aspect-ratio:16/9;border-bottom:var(--stroke) solid var(--ink);display:grid;place-items:center}
+  .cover :global(svg){width:42%;color:#fff}
+  .pin{position:absolute;left:10px;top:10px;font:700 11px var(--hud);letter-spacing:.1em;background:var(--navy);color:var(--butter);border-radius:99px;padding:4px 10px}
+  .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tags .chip{font-size:11px;padding:2px 9px;cursor:default}
+  h3{font-size:19px;margin:2px 0 0}
+  .outcome{display:flex;gap:10px;align-items:baseline;border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk)}
+  .outcome b{font:700 22px/1 var(--hud);color:var(--accent);white-space:nowrap}
+  .outcome span{font-size:14px}
+  .meta{margin:0;font-size:13px;color:var(--muted);font-weight:700}
+  .links{margin:auto 0 0;display:flex;gap:14px;align-items:center;font-size:14px}
+
+  .grid3{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}
+  .pad{padding:16px 18px}
+  .pad h3{font-size:16px;margin:0 0 10px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips .chip{cursor:default}
+  dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+  dt{color:var(--muted);font-weight:700} dd{margin:0}
+
+  .tetrio{display:grid;grid-template-columns:1.3fr 1fr;gap:20px}
+  .video{overflow:hidden}
+  .poster{height:100%;min-height:260px;background:var(--navy);display:grid;place-items:center;text-align:center;color:#fff8fc;padding:20px}
+  .poster :global(.tri){width:140px;color:var(--sky);margin:0 auto 12px}
+  .poster span{font-size:13px;opacity:.8}
+  .tstats{display:flex;flex-direction:column;gap:12px}
+  .tid{display:flex;align-items:center;gap:12px}
+  .tid img{width:56px;height:56px;border-radius:14px;border:2px solid var(--ink);object-fit:cover}
+  .tid b{display:block;font:16px var(--display)} .tid small{color:var(--muted);font-weight:700}
+  .rankbadge{margin-left:auto;font:700 22px var(--hud);width:52px;height:52px;display:grid;place-items:center;border-radius:14px;
+             border:var(--stroke) solid var(--ink);background:var(--lav);color:var(--on-pastel)}
+  .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat{border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk);min-width:0}
+  .stat b{display:block;font:700 17px/1.2 var(--hud);overflow-wrap:anywhere}
+  .stat small{font-size:12px;color:var(--muted);font-weight:700}
+
+  .timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:t}
+  .timeline li{display:flex;flex-direction:column;gap:4px}
+  .when{font:700 13px var(--hud);color:var(--accent)}
+  .empty{display:flex;align-items:center;gap:14px}
+  .empty p{margin:0;font-weight:700;color:var(--muted)}
+  .empty :global(.ei){width:44px;color:var(--pink)}
+  .guest{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .gform{display:flex;flex-direction:column;gap:12px}
+  .gform label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px}
+  .gform input,.gform textarea{font:inherit;border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk);color:var(--ink)}
+  .gform [disabled]{opacity:.6}
+
+  .foot{margin-top:40px;border-top:var(--stroke) solid var(--ink);background:var(--paper);padding:32px 0 18px}
+  .fgrid{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:24px}
+  .foot .label{margin:0 0 10px}
+  .mail{font-size:14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 0}
+  .copy{font-size:12px;padding:2px 10px}
+  .tiny{font-size:12px;color:var(--muted);margin:24px auto 0}
+
+  @media (max-width:900px){
+    .tetrio,.guest,.fgrid{grid-template-columns:1fr}
+    .timeline{grid-template-columns:1fr 1fr}
+  }
+</style>
+
+<script>
+  // Project filters
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+  const cards = [...document.querySelectorAll<HTMLElement>('.proj')];
+  buttons.forEach((b) => b.addEventListener('click', () => {
+    const f = b.dataset.filter!;
+    buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    cards.forEach((c) => { c.hidden = f !== 'All' && !c.dataset.tags!.split(' ').includes(f); });
+  }));
+  // Copy work email
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+    const live = document.querySelector<HTMLElement>('[data-copied]');
+    try { await navigator.clipboard.writeText(b.dataset.copy!); b.textContent = 'Copied!'; if (live) live.textContent = 'Email copied'; }
+    catch { b.textContent = 'Select & copy'; }
+    setTimeout(() => (b.textContent = 'Copy'), 1800);
+  }));
+</script>
