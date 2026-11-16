@@ -4,10 +4,10 @@ import Showcase from '../components/Showcase.astro';
 import Vh from '../components/Vh.astro';
 import { shoutouts } from '../data/site';
 ---
-<Page title="Community" description="Shoutouts and a Guestbook for friends, fellow players and visitors.">
+<Page title="Community" description="Shoutouts and a Message Board for friends, fellow players and visitors.">
   <header class="page-hero">
     <h1>Community</h1>
-    <p>The people who make this fun, and a spot for you to say hi.</p>
+    <p>Ayyyy, welcome to this page xD</p>
   </header>
 
   <Showcase id="shoutouts" title="Shoutouts" lead="Friends and people I look up to." motif="vh-sparkle" tint="butter">
@@ -18,7 +18,7 @@ import { shoutouts } from '../data/site';
     )}
   </Showcase>
 
-  <Showcase id="guestbook" title="Guestbook" lead="Leave a short message in Thai, English or Japanese. I read every one before it appears." motif="vh-heart" tint="pink">
+  <Showcase id="guestbook" title="Message Board" lead="You may leave a short messages here :D" motif="vh-heart" tint="pink">
     <div class="guest">
       <div class="card pad empty"><Vh name="vh-heart-target" /><p>No messages yet. Be the first!</p></div>
       <form class="card pad gform" aria-describedby="gb-note" onsubmit="return false">

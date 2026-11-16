@@ -3,14 +3,18 @@
 // so it's a plain "in" badge; email is a hand-drawn envelope.
 import { siGithub, siInstagram, siFacebook, siOsu, siDiscord } from 'simple-icons';
 
-type Name = 'github' | 'linkedin' | 'instagram' | 'facebook' | 'email' | 'osu' | 'discord' | 'tetrio';
+type Name = 'github' | 'linkedin' | 'instagram' | 'facebook' | 'email' | 'osu' | 'osu-taiko' | 'osu-mania' | 'discord' | 'tetrio';
 interface Props { name: Name; size?: number; class?: string }
 const { name, size = 20, class: cls } = Astro.props;
 const brand: Partial<Record<Name, string>> = {
   github: siGithub.path, instagram: siInstagram.path, facebook: siFacebook.path, osu: siOsu.path, discord: siDiscord.path,
 };
 const path = brand[name];
+const mode = name === 'osu-taiko' || name === 'osu-mania'; // osu! mode logos: white PNGs in assets/icons, tinted via mask
 ---
+{mode ? (
+  <span class:list={['icon', cls]} style={`display:inline-block;width:${size}px;height:${size}px;background:currentColor;-webkit-mask:url(/icons/${name}.png) center/contain no-repeat;mask:url(/icons/${name}.png) center/contain no-repeat`} aria-hidden="true"></span>
+) : (
 <svg class:list={['icon', cls]} width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
   {path && <path d={path} />}
   {name === 'linkedin' && (
@@ -22,7 +26,11 @@ const path = brand[name];
   {name === 'email' && (
     <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M3 5.5h18v13H3zM3.5 6l8.5 7 8.5-7" />
   )}
-  {name === 'tetrio' && (
-    <path d="M3 9h6V3h6v6h6v6h-6v6H9v-6H3z" />
+  {name === 'tetrio' && ( // the T tetromino
+    <>
+      <rect x="1" y="4" width="6.4" height="6.4" rx="1.3" /><rect x="8.8" y="4" width="6.4" height="6.4" rx="1.3" /><rect x="16.6" y="4" width="6.4" height="6.4" rx="1.3" />
+      <rect x="8.8" y="11.8" width="6.4" height="6.4" rx="1.3" />
+    </>
   )}
 </svg>
+)}

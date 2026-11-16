@@ -12,9 +12,9 @@
   --vh-ink:var(--ink); --vh-shine:#fff;
 
   --stroke:3px; --radius:16px; --ctl:36px; /* one height for every header control */
-  --display:'Zen Dots',system-ui,sans-serif;
-  --body:'Comfortaa',system-ui,sans-serif;
-  --hud:'Orbitron',system-ui,sans-serif;
+  --display:'Zen Dots','M PLUS Rounded 1c Heavy','M PLUS Rounded 1c',system-ui,sans-serif;
+  --body:'Comfortaa','M PLUS Rounded 1c',system-ui,sans-serif;
+  --hud:'Orbitron','M PLUS Rounded 1c',system-ui,sans-serif;
   color-scheme:light;
 }
 :root[data-theme="dark"]{
@@ -44,10 +44,12 @@ h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.15}
 /* shared components */
 .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
 .card{background:var(--paper);border:var(--stroke) solid var(--ink);border-radius:var(--radius);box-shadow:4px 4px 0 var(--shadow-c)}
-.chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;line-height:1;border:2px solid var(--ink);border-radius:99px;padding:0 14px;font-size:13px;font-weight:700;
+/* Comfortaa's glyphs sit ~1.5px above the middle of their line box; chips and buttons push the text down by half of this so it looks centred. */
+:root{--nudge:3px}
+.chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;line-height:1;border:2px solid var(--ink);border-radius:99px;padding:var(--nudge) 14px 0;font-size:13px;font-weight:700;
       background:var(--paper);color:var(--ink);text-decoration:none;white-space:nowrap;cursor:pointer}
 .chip.on,.chip[aria-pressed="true"],.chip[aria-selected="true"]{background:var(--ink);color:var(--bg)}
-.btn{display:inline-flex;align-items:center;gap:8px;border:var(--stroke) solid var(--ink);border-radius:99px;padding:10px 18px;
+.btn{display:inline-flex;align-items:center;gap:8px;border:var(--stroke) solid var(--ink);border-radius:99px;padding:calc(10px + var(--nudge) / 2) 18px calc(10px - var(--nudge) / 2);
      background:var(--paper);color:var(--ink);font-weight:700;text-decoration:none;box-shadow:3px 3px 0 var(--shadow-c);cursor:pointer}
 .btn.fill{background:var(--butter);color:var(--on-pastel)}
 .btn[disabled],.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed;box-shadow:none}

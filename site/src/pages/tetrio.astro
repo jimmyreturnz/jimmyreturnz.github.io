@@ -20,7 +20,7 @@ const { tetrio } = stats;
     </div>
     <div class="card pad tstats">
       <div class="tid">
-        {tetrio.avatar && <img src={tetrio.avatar} alt="TETR.IO profile picture" width="56" height="56" loading="lazy" decoding="async" />}
+        {tetrio.avatar && <img src={tetrio.avatar} alt="TETR.IO avatar" width="56" height="56" decoding="async" />}
         <div><b>{tetrio.username}</b><small>Tetra League · {tetrio.country === 'TH' ? '🇹🇭 Thailand' : tetrio.country}</small></div>
         {tetrio.league?.rank && <span class="rankbadge" title="Tetra League rank">{tetrio.league.rank.toUpperCase()}</span>}
       </div>

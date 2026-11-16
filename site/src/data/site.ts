@@ -17,10 +17,10 @@ export const profile = {
   email: 'apiwatkon.rtz@gmail.com',
   links: {
     github: 'https://github.com/jimmyreturnz',
-    linkedin: null as string | null,
+    linkedin: 'https://www.linkedin.com/in/apiwat-kongsawat-a57805227' as string | null,
     instagram: 'https://www.instagram.com/jimmyreturnz/' as string | null,
     discord: 'https://discord.com/users/240829609879273472' as string | null, // @jimmyreturnz
-    facebook: null as string | null,
+    facebook: 'https://www.facebook.com/jimmyreturnz' as string | null,
     /** Paste a SoundCloud playlist or track URL to show the embedded player. */
     soundcloud: null as string | null,
   },
@@ -85,6 +85,8 @@ export type Chart = {
   keyMode?: '4k' | '7k';
   artist: string; artistLatin: string; title: string; album: string | null;
   mapper: string; ownMap: boolean; permission: string | null;
+  /** where to hear/buy the song, when it is not the artist's main site */
+  songUrl?: string;
   beatmapUrl: string; difficulty: string; stars: number; bpm: number; lengthSec: number;
   keys: string; scrollSpeed?: number;
   /** base name in assets/audio/ (expects .m4a and/or .opus) */
@@ -98,26 +100,29 @@ export const charts: Record<'taiko' | 'mania4k' | 'mania7k', Chart> = {
     id: 'circles-of-death', mode: 'taiko',
     artist: 'Camellia', artistLatin: 'Camellia', title: 'Circles of Death', album: null,
     mapper: 'jimmyreturnz', ownMap: true, permission: null,
+    songUrl: 'https://cametek.bandcamp.com/track/circles-of-death',
     beatmapUrl: 'https://osu.ppy.sh/beatmapsets/2404655#taiko/5216517',
     difficulty: 'Planet of Death', stars: 9.57, bpm: 200, lengthSec: 204,
-    keys: 'D F J K', audio: 'circles-of-death', osu: 'circles-of-death-taiko.osu',
+    keys: 'D F J K', audio: 'Camellia-Circles_of_Death', osu: 'circles-of-death-taiko.osu',
   },
   mania4k: {
     id: 'quaoar', mode: 'mania', keyMode: '4k',
     artist: 'かめりあ', artistLatin: 'Camellia', title: 'Quaoar', album: null,
     mapper: 'jimmyreturnz', ownMap: true, permission: null,
+    songUrl: 'https://www.youtube.com/watch?v=yjQmZBvi3WE',
     // Beatmapset 1203155 has [4K] To the star (2857557), [4K] Insane (3269223) and [18K] komi im sorry (3579522).
     beatmapUrl: 'https://osu.ppy.sh/beatmapsets/1203155#mania/2857557',
     difficulty: '[4K] To the star', stars: 5.43, bpm: 174, lengthSec: 275,
-    keys: 'D F J K', scrollSpeed: maniaScrollSpeed['4k'], audio: 'quaoar', osu: 'quaoar-4k.osu',
+    keys: 'D F J K', scrollSpeed: maniaScrollSpeed['4k'], audio: 'Camellia-Quaoar', osu: 'quaoar-4k.osu',
   },
   mania7k: {
     id: 'under-construction', mode: 'mania', keyMode: '7k',
     artist: 'Camellia', artistLatin: 'Camellia', title: '// Under Construction //', album: 'Blackmagik Blazing',
     mapper: 'LostCool', ownMap: false, permission: 'used with permission',
+    songUrl: 'https://cametek.bandcamp.com/track/under-construxion',
     beatmapUrl: 'https://osu.ppy.sh/beatmapsets/1122675#mania/2346118',
     difficulty: '[7K] incompleteness', stars: 11.41, bpm: 157.5, lengthSec: 280,
-    keys: 'S D F Space J K L', scrollSpeed: maniaScrollSpeed['7k'], audio: 'under-construction', osu: 'under-construction-7k.osu',
+    keys: 'S D F Space J K L', scrollSpeed: maniaScrollSpeed['7k'], audio: 'Camellia-Under_Construction', osu: 'under-construction-7k.osu',
   },
 };
 

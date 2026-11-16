@@ -16,12 +16,22 @@ type Rank = number | null;
 export type OsuMode = {
   globalRank: Rank; countryRank: Rank; pp: number | null; accuracy: number | null;
   playCount: number | null; playTimeHours: number | null; level: number | null;
+  /** best global rank ever (osu! only keeps this per mode, so mania's covers 4K and 7K together) */
+  peakRank: Rank;
   fourK?: OsuVariant;
   sevenK?: OsuVariant;
 };
 export type OsuVariant = { globalRank: Rank; countryRank: Rank; pp: number | null };
+/** One calendar year of the GitHub contribution graph. levels = one digit 0-4 per day, counts = comma list per day, from = first day. */
+export type GhYear = { total: number; from: string; levels: string; counts: string };
+export type Github = {
+  fetchedAt: string | null; publicRepos: number | null; followers: number | null;
+  /** by year; the public contribution graph, so public activity only */
+  years: Record<string, GhYear>;
+};
 export type Stats = {
   fetchedAt: string | null;
+  github: Github;
   osu: { fetchedAt: string | null; username: string; userId: number; profileUrl: string; avatar: string | null;
          country: string | null; taiko: OsuMode | null; mania: OsuMode | null };
   tetrio: { fetchedAt: string | null; username: string; profileUrl: string; avatar: string | null; country: string | null;
@@ -32,6 +42,7 @@ export type Stats = {
 
 const empty: Stats = {
   fetchedAt: null,
+  github: { fetchedAt: null, publicRepos: null, followers: null, years: {} },
   osu: { fetchedAt: null, username: 'jimmyreturnz', userId: OSU_USER_ID, profileUrl: `https://osu.ppy.sh/users/${OSU_USER_ID}`,
          avatar: null, country: null, taiko: null, mania: null },
   tetrio: { fetchedAt: null, username: TETRIO_USER, profileUrl: `https://ch.tetr.io/u/${TETRIO_USER}`, avatar: null, country: null,
@@ -87,7 +98,7 @@ async function fetchTetrio(prev: Stats['tetrio']): Promise<Stats['tetrio']> {
 }
 
 /** Map an osu! `statistics` object (same shape from the API and from the profile page). */
-function osuMode(s: any, mode: 'taiko' | 'mania'): OsuMode {
+function osuMode(s: any, mode: 'taiko' | 'mania', peak?: number | null): OsuMode {
   s = s ?? {};
   const out: OsuMode = {
     globalRank: s.global_rank ?? null, countryRank: s.country_rank ?? null,
@@ -96,6 +107,7 @@ function osuMode(s: any, mode: 'taiko' | 'mania'): OsuMode {
     playCount: s.play_count ?? null,
     playTimeHours: typeof s.play_time === 'number' ? Math.round(s.play_time / 3600) : null,
     level: s.level?.current ?? null,
+    peakRank: peak ?? null,
   };
   if (mode === 'mania') {
     const v = (k: string): OsuVariant | undefined => {
@@ -136,7 +148,38 @@ async function fetchOsu(prev: Stats['osu']): Promise<Stats['osu']> {
   const t = await get('taiko');
   const m = await get('mania');
   return { ...prev, fetchedAt: new Date().toISOString(), avatar, username: t.username ?? prev.username,
-           country: t.country_code ?? prev.country, taiko: osuMode(t.statistics, 'taiko'), mania: osuMode(m.statistics, 'mania') };
+           country: t.country_code ?? prev.country, taiko: osuMode(t.statistics, 'taiko', t.rank_highest?.rank), mania: osuMode(m.statistics, 'mania', m.rank_highest?.rank) };
+}
+
+const GITHUB_USER = 'jimmyreturnz';
+
+const pack = (days: { date: string; level: number; count: number }[]) => ({
+  from: days[0]!.date, levels: days.map((d) => d.level).join(''), counts: days.map((d) => d.count).join(','),
+});
+
+/** Public data only (owner's rule): the public contribution graph (HTML fragment: <td data-date data-level>, counts in <tool-tip for=id>). */
+async function ghYearPublic(year: number): Promise<GhYear> {
+  const res = await fetch(`https://github.com/users/${GITHUB_USER}/contributions?from=${year}-01-01&to=${year}-12-31`, { headers: { 'User-Agent': UA, Accept: 'text/html' } });
+  if (!res.ok) throw new Error(`contributions ${year} → HTTP ${res.status}`);
+  const html = await res.text();
+  const tips = new Map([...html.matchAll(/<tool-tip[^>]*\sfor="([^"]+)"[^>]*>([^<]*)<\/tool-tip>/g)].map((m) => [m[1]!, m[2]!]));
+  const days = [...html.matchAll(/<td\s[^>]*>/g)].map((m) => m[0]).filter((t) => t.includes('data-date='))
+    .map((t) => ({ date: /data-date="([^"]+)"/.exec(t)![1]!, level: Number(/data-level="(\d)"/.exec(t)?.[1] ?? 0), id: /\sid="([^"]+)"/.exec(t)?.[1] ?? '' }))
+    .filter((d) => d.date.startsWith(String(year))).sort((a, b) => a.date.localeCompare(b.date))
+    .map((d) => ({ date: d.date, level: d.level, count: Number(/^(\d+)/.exec(tips.get(d.id) ?? '')?.[1] ?? 0) }));
+  if (!days.length) throw new Error(`contributions ${year}: no days parsed`);
+  return { total: days.reduce((a, d) => a + d.count, 0), ...pack(days) };
+}
+
+async function fetchGithub(prev: Github): Promise<Github> {
+  const u = await getJson(`https://api.github.com/users/${GITHUB_USER}`);
+  const first = new Date(u.created_at ?? Date.now()).getUTCFullYear(), now = new Date().getUTCFullYear();
+  const years: Record<string, GhYear> = { ...prev.years };
+  for (let y = first; y <= now; y++) {
+    try { years[y] = await ghYearPublic(y); }
+    catch (e) { console.warn(`  GitHub ${y}: ${(e as Error).message}`); }
+  }
+  return { fetchedAt: new Date().toISOString(), publicRepos: u.public_repos ?? null, followers: u.followers ?? null, years };
 }
 
 async function main() {
@@ -145,6 +188,8 @@ async function main() {
   const next: Stats = { ...prev };
   try { next.tetrio = await fetchTetrio(prev.tetrio); console.log('  TETR.IO: ok'); }
   catch (e) { console.warn(`  TETR.IO failed, keeping last known: ${(e as Error).message}`); }
+  try { next.github = await fetchGithub(prev.github ?? empty.github); console.log('  GitHub: ok'); }
+  catch (e) { console.warn(`  GitHub failed, keeping last known: ${(e as Error).message}`); }
   try { next.osu = await fetchOsu(prev.osu); console.log('  osu!: ok'); }
   catch (e) { console.warn(`  osu! failed, keeping last known: ${(e as Error).message}`); }
   next.fetchedAt = new Date().toISOString();

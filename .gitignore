@@ -1,1 +1,8 @@
 graphify-out/cache/
+
+# TETR.IO replays: never commit (opponent names, owner rule)
+*.ttrm
+*.ttr
+# osu! beatmaps: never commit (owner rule)
+*.osu
+*.osz

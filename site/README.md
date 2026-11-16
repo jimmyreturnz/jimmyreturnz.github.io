@@ -23,9 +23,9 @@ bun run build:offline  # builds with the last saved stats (no network)
 Drop files here when ready; the players will pick them up:
 - `assets/audio/bgm.m4a` + `bgm.opus`: BGM
 - Chart songs (any of `.m4a`, `.opus`, `.mp3`; the player switches on by itself when one exists):
-  - `assets/audio/quaoar.*` (4K)
-  - `assets/audio/under-construction.*` (7K)
-  - `assets/audio/circles-of-death.*` (taiko)
-- Beatmap files: `assets/charts/quaoar-4k.osu`, `assets/charts/under-construction-7k.osu`, `assets/charts/circles-of-death-taiko.osu`
+  - `assets/audio/Camellia-Quaoar.*` (4K)
+  - `assets/audio/Camellia-Under_Construction.*` (7K)
+  - `assets/audio/Camellia-Circles_of_Death.*` (taiko)
+- Audio naming: `Artist-SongName.ext`, `_` for spaces. Beatmap `.osu` files stay out of the repo (gitignored); note rendering will need another route.
 - Test seeking with `bun run build && bun run preview` (it supports range requests); a bare `python -m http.server` doesn't, so the slider jumps back to 0 there.
 - `assets/audio/hitsounds/`: taiko don/kat hitsounds

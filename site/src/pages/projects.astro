@@ -46,7 +46,7 @@ const tags = ['All', ...new Set(projects.flatMap((p) => p.tags))];
   .pin{position:absolute;left:10px;top:10px;font:700 11px var(--hud);letter-spacing:.1em;background:var(--navy);color:var(--butter);border-radius:99px;padding:4px 10px}
   .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
   .tags{display:flex;gap:6px;flex-wrap:wrap}
-  .tags .chip{font-size:11px;min-height:24px;padding:0 9px;cursor:default}
+  .tags .chip{font-size:11px;min-height:24px;padding:var(--nudge) 9px 0;cursor:default}
   h2{font-size:19px;margin:2px 0 0}
   .outcome{display:flex;gap:10px;align-items:baseline;border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk)}
   .outcome b{font:700 22px/1 var(--hud);color:var(--accent);white-space:nowrap}

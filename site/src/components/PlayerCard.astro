@@ -6,26 +6,42 @@ import Icon from './Icon.astro';
 import KeySwitch from './KeySwitch.astro';
 
 const { osu, tetrio } = stats;
+const gh = stats.github;
+// GitHub contribution graph per year (fetched at build): one square a day, weeks as columns, Sunday on top.
+const dayLabel = (n: number, d: Date) => `${n} contribution${n === 1 ? '' : 's'} on ${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })}`;
+const years = Object.entries(gh.years ?? {}).filter(([, y]) => y.total > 0).sort((a, b) => Number(b[0]) - Number(a[0]))
+  .map(([year, y]) => {
+    const counts = y.counts.split(',').map(Number);
+    return { year, total: y.total, startRow: new Date(`${y.from}T00:00:00Z`).getUTCDay() + 1,
+             days: y.levels.split('').map((l, i) => ({ level: Number(l), title: dayLabel(counts[i] ?? 0, new Date(Date.parse(y.from) + i * 864e5)) })) };
+  });
+const cur = years[0];
 const variantTiles = (v: { globalRank: number | null; countryRank: number | null; pp: number | null } | undefined, k: string): Tile[] => [
   { label: `global rank (${k})`, value: rank(v?.globalRank), hint: '#00,000' },
+  { label: 'peak rank', value: rank(osu.mania?.peakRank), hint: '#000' },
   { label: `🇹🇭 Thailand (${k})`, value: rank(v?.countryRank), hint: '#000' },
   { label: `pp (${k})`, value: fmt(v?.pp), hint: '0,000' },
+  { label: 'playtime', value: osu.mania?.playTimeHours != null ? `${fmt(osu.mania.playTimeHours)} h` : null, hint: '000 h' },
+  { label: 'accuracy', value: osu.mania?.accuracy != null ? `${fmt(osu.mania.accuracy, 2)}%` : null, hint: '00.00%' },
 ];
 
-type Tile = { label: string; value: string | null; hint: string };
+type Tile = { label: string; value: string | null; hint: string; ghTotal?: boolean };
 type Variant = { id: string; label: string; tiles: Tile[] };
-const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avatar: string | null; href: string; tiles: Tile[]; variants?: Variant[] }[] = [
+const tabs: { id: string; label: string; icon: 'github' | 'osu-taiko' | 'osu-mania' | 'tetrio'; avatar: string | null; href: string; tiles: Tile[]; variants?: Variant[] }[] = [
   { id: 'github', label: 'GitHub', icon: 'github', avatar: null, href: github.url, tiles: [
-    { label: 'public repos', value: fmt(github.publicRepos), hint: '0' },
-    { label: 'followers', value: fmt(github.followers), hint: '0' },
-    { label: 'commits this year', value: fmt(github.commitsThisYear), hint: '000' },
+    { label: 'public repos', value: fmt(gh.publicRepos ?? github.publicRepos), hint: '0' },
+    { label: 'followers', value: fmt(gh.followers ?? github.followers), hint: '0' },
+    { label: 'contributions', value: cur ? fmt(cur.total) : null, hint: '000', ghTotal: true },
   ] },
-  { id: 'taiko', label: 'osu!taiko', icon: 'osu', avatar: osu.avatar, href: `${osu.profileUrl}/taiko`, tiles: [
+  { id: 'taiko', label: 'osu!taiko', icon: 'osu-taiko', avatar: osu.avatar, href: `${osu.profileUrl}/taiko`, tiles: [
     { label: 'global rank', value: rank(osu.taiko?.globalRank), hint: '#00,000' },
+    { label: 'peak rank', value: rank(osu.taiko?.peakRank), hint: '#000' },
     { label: '🇹🇭 Thailand rank', value: rank(osu.taiko?.countryRank), hint: '#000' },
     { label: 'pp', value: fmt(osu.taiko?.pp), hint: '0,000' },
+    { label: 'playtime', value: osu.taiko?.playTimeHours != null ? `${fmt(osu.taiko.playTimeHours)} h` : null, hint: '000 h' },
+    { label: 'accuracy', value: osu.taiko?.accuracy != null ? `${fmt(osu.taiko.accuracy, 2)}%` : null, hint: '00.00%' },
   ] },
-  { id: 'mania', label: 'osu!mania', icon: 'osu', avatar: osu.avatar, href: `${osu.profileUrl}/mania`, tiles: [], variants: [
+  { id: 'mania', label: 'osu!mania', icon: 'osu-mania', avatar: osu.avatar, href: `${osu.profileUrl}/mania`, tiles: [], variants: [
     { id: '4k', label: '4K', tiles: variantTiles(osu.mania?.fourK, '4K') },
     { id: '7k', label: '7K', tiles: variantTiles(osu.mania?.sevenK, '7K') },
   ] },
@@ -44,17 +60,18 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
   <div class="tabs" role="tablist" aria-label="Platforms">
     {tabs.map((t, i) => (
       <button class="chip" role="tab" id={`t-${t.id}`} aria-controls={`pc-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
-        <Icon name={t.icon} size={14} />{t.label}
+        <Icon name={t.icon} size={19} />{t.label}
       </button>
     ))}
   </div>
 
+  <div class="panels">
   {tabs.map((t, i) => (
     <div class="panel" role="tabpanel" id={`pc-${t.id}`} aria-labelledby={`t-${t.id}`} hidden={i !== 0}>
       <div data-keys>
         {t.avatar && (
           <div class="who">
-            <img src={t.avatar} alt={`${t.label} profile picture`} width="44" height="44" loading="lazy" decoding="async" />
+            <img src={t.avatar} alt={`${t.label} avatar`} width="76" height="76" loading="lazy" decoding="async" />
             <span><b>jimmyreturnz</b><small>{t.label}</small></span>
             {t.variants && <KeySwitch options={t.variants.map((v) => ({ id: v.id, label: v.label }))} label="osu!mania key mode" />}
           </div>
@@ -65,8 +82,25 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
                 {v.tiles.map((x) => <div class="stat"><b><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}
               </div>
             ))
-          : <div class="stats">{t.tiles.map((x) => <div class="stat"><b><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}</div>}
+          : <div class="stats">{t.tiles.map((x) => <div class="stat"><b data-gh-total={x.ghTotal ? '' : undefined}><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}</div>}
       </div>
+      {t.id === 'github' && cur && (
+        <div class="heat" data-heat>
+          <div class="heat-head">
+            <div class="label"><span data-heat-total>{fmt(cur.total)}</span> contributions</div>
+            <div class="years" role="group" aria-label="Year">
+              {years.map((y, k) => <button class="chip" type="button" data-year={y.year} aria-pressed={k === 0 ? 'true' : 'false'}>{y.year}</button>)}
+            </div>
+          </div>
+          {years.map((y, k) => (
+            <div class="hm" role="img" data-year={y.year} data-total={y.total} hidden={k !== 0}
+                 aria-label={`GitHub contribution heatmap for ${y.year}, ${y.total} contributions`}>
+              {y.days.map((d, i) => <i class={`l${d.level}`} style={i === 0 && y.startRow > 1 ? `grid-row-start:${y.startRow}` : undefined} title={d.title} />)}
+            </div>
+          ))}
+          <div class="hm-legend" aria-hidden="true">less <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> more</div>
+        </div>
+      )}
       {t.id === 'github' && (
         <div class="langs">
           <div class="label">Top languages {github.languagesAreSample && <em class="ph">sample</em>}</div>
@@ -77,6 +111,7 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
       <footer><a href={t.href} target="_blank" rel="noopener noreferrer">View {t.label} profile ↗</a></footer>
     </div>
   ))}
+  </div>
 </section>
 
 <style>
@@ -84,16 +119,38 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
   header{padding:12px 16px;border-bottom:var(--stroke) solid var(--ink);background:var(--lav);color:var(--on-pastel)}
   header strong{font:15px var(--display)}
   .tabs{display:flex;gap:6px;padding:12px 16px 0;flex-wrap:wrap}
-  .tabs .chip{font-size:12px;padding:4px 10px}
-  .who{display:flex;align-items:center;gap:10px;padding:12px 16px 0}
-  .who img{width:44px;height:44px;border-radius:12px;border:2px solid var(--ink);object-fit:cover}
-  .who b{display:block;font:14px var(--display)} .who small{color:var(--muted);font-weight:700;font-size:12px}
+  .tabs .chip{font-size:12px;padding:calc(4px + var(--nudge) / 2) 10px calc(4px - var(--nudge) / 2)}
+  .who{display:flex;align-items:center;gap:14px;padding:14px 16px 0}
+  .who img{width:76px;height:76px;border-radius:20px;border:var(--stroke) solid var(--ink);object-fit:cover;box-shadow:3px 3px 0 var(--pink)}
+  .who b{display:block;font:17px var(--display)} .who small{color:var(--muted);font-weight:700;font-size:13px}
   .who :global(.keys){margin-left:auto}
   .stats[hidden]{display:none}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 16px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:10px;padding:12px 16px}
   .stat{border:2px solid var(--ink);border-radius:12px;padding:9px 10px;background:var(--sunk);min-width:0}
   .stat b{display:block;font:700 clamp(16px,2vw,22px)/1.15 var(--hud);overflow-wrap:anywhere}
   .stat small{font-size:12px;color:var(--muted);font-weight:700}
+  /* every panel sits in the same grid cell, so the card is always as tall as the tallest tab and never jumps */
+  .panels{display:grid}
+  .panel{grid-area:1/1;display:flex;flex-direction:column;min-width:0}
+  .panel[hidden]{display:flex;visibility:hidden}
+  .panel footer{margin-top:auto}
+  .heat{padding:0 16px 10px}
+  .heat-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;margin-bottom:16px}
+  .heat-head .label{margin:0}
+  .years{display:flex;gap:4px}
+  .years .chip{font-size:11px;padding:calc(1px + var(--nudge) / 2) 8px calc(1px - var(--nudge) / 2);min-height:22px}
+  .years .chip[aria-pressed="true"]{background:var(--pink);color:var(--on-pastel)}
+  .hm[hidden]{display:none}
+  .hm{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);grid-auto-columns:1fr;gap:2px;margin:6px 0 4px}
+  .hm i,.hm-legend i{display:block;aspect-ratio:1;border-radius:2px;min-width:0}
+  /* pink gradient: the more contributions, the deeper the pink */
+  .l0{background:color-mix(in srgb,var(--ink) 9%,var(--paper))} /* plain fills, no outlines: every square reads the same size */
+  .l1{background:color-mix(in srgb,var(--pink) 25%,var(--paper))}
+  .l2{background:color-mix(in srgb,var(--pink) 50%,var(--paper))}
+  .l3{background:color-mix(in srgb,var(--pink) 75%,var(--paper))}
+  .l4{background:var(--pink)}
+  .hm-legend{display:flex;align-items:center;justify-content:flex-end;gap:3px;font-size:11px;color:var(--muted);font-weight:700}
+  .hm-legend i{width:10px;height:10px}
   .langs{padding:0 16px 10px}
   .langbar{display:flex;height:12px;border:2px solid var(--ink);border-radius:99px;overflow:hidden;margin:6px 0}
   .langbar i{display:block;height:100%}
@@ -101,6 +158,21 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu' | 'tetrio'; avat
   .legend i{display:inline-block;width:10px;height:10px;border:2px solid var(--ink);border-radius:3px;margin-right:4px;vertical-align:-1px}
   footer{padding:0 16px 14px;font-size:13px;text-align:right}
 </style>
+
+<script>
+  // Year switch for the GitHub heatmap: shows that year's grid and updates the numbers.
+  document.addEventListener('astro:page-load', () => document.querySelectorAll<HTMLElement>('[data-heat]').forEach((heat) => {
+    const root = heat.closest<HTMLElement>('.panel')!;
+    heat.querySelectorAll<HTMLButtonElement>('.years [data-year]').forEach((b) => b.addEventListener('click', () => {
+      heat.querySelectorAll<HTMLButtonElement>('.years [data-year]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      heat.querySelectorAll<HTMLElement>('.hm').forEach((g) => { g.hidden = g.dataset.year !== b.dataset.year; });
+      const g = heat.querySelector<HTMLElement>(`.hm[data-year="${b.dataset.year}"]`)!, n = (v?: string) => Number(v ?? 0).toLocaleString('en-US');
+      heat.querySelector('[data-heat-total]')!.textContent = n(g.dataset.total);
+      const tile = root.querySelector('[data-gh-total]');
+      if (tile) tile.textContent = n(g.dataset.total);
+    }));
+  }));
+</script>
 
 <script>
   document.addEventListener('astro:page-load', () => document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {

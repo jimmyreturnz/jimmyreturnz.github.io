@@ -21,10 +21,10 @@ import { pages } from '../data/pages';
       <p class="label">Music credits</p>
       <ul class="meta credits">
         {[charts.taiko, charts.mania4k, charts.mania7k].map((c) => (
-          <li>{c.artistLatin} – {c.title}{c.album && <> (<i>{c.album}</i>)</>}<br /><span>chart: {c.difficulty} by {c.mapper}{c.permission && `, ${c.permission}`}</span></li>
+          <li>{c.songUrl ? <a href={c.songUrl} target="_blank" rel="noopener noreferrer">{c.artistLatin} – {c.title}</a> : <>{c.artistLatin} – {c.title}</>}{c.album && <> (<i>{c.album}</i>)</>}<br /><span>chart: {c.difficulty} by {c.mapper}{c.permission && `, ${c.permission}`}</span></li>
         ))}
       </ul>
-      <p class="meta">Songs by <a href={camelliaUrl} target="_blank" rel="noopener noreferrer">Camellia</a>, used under Camellia’s song-use guidelines, free and non-commercial. Rights holders: email me and I’ll remove a track the same day.</p>
+      <p class="meta">Songs by <a href={camelliaUrl} target="_blank" rel="noopener noreferrer">Camellia</a>, used under Camellia’s song-use guidelines.</p>
     </div>
   </div>
   <p class="wrap tiny">© {new Date().getFullYear()} jimmyreturnz · <a href="/">Back to the Lobby</a></p>

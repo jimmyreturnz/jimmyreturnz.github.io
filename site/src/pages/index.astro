@@ -28,11 +28,11 @@ const avatar = stats.osu.avatar;
 
     <main class="hero">
       <section class="who" aria-labelledby="hi">
-        <p class="bubble">Welcome in! Make yourself at home <span aria-hidden="true">♥</span></p>
+        <p class="bubble">Welcome! Have some cookies :) <span aria-hidden="true">♥</span></p>
 
         <div class="id">
           <div class="avatar">
-            {avatar ? <img src={avatar} alt="Jimmy’s profile picture" width="128" height="128" /> : <Vh name="vh-heart" />}
+            {avatar ? <img src={avatar} alt="Jimmy’s avatar" width="128" height="128" /> : <Vh name="vh-heart" />}
             <Vh name="vh-heart" class="pin" />
           </div>
           <div>
@@ -60,27 +60,6 @@ const avatar = stats.osu.avatar;
 
       <PlayerCard />
     </main>
-
-    <section class="cosy wrap" aria-label="At a glance">
-      <article class="card c-a">
-        <Vh name="vh-eq" class="ic" />
-        <h2>What I do</h2>
-        <p>Data science and ML: shipment tracking, production-scale OCR, and more.</p>
-        <a href="/projects/">Projects →</a>
-      </article>
-      <article class="card c-b">
-        <Vh name="vh-target" class="ic" />
-        <h2>Off the clock</h2>
-        <p>Mapping and playing osu!taiko and osu!mania 4K, stacking in TETR.IO, hardcore EDM on repeat.</p>
-        <a href="/rhythm/">My charts →</a>
-      </article>
-      <article class="card c-c">
-        <Vh name="vh-heart-outline" class="ic" />
-        <h2>Say hi</h2>
-        <p>Recruiter, fellow player or friend: drop me an email or sign the Guestbook.</p>
-        <a href="/community/#guestbook">Guestbook →</a>
-      </article>
-    </section>
 
     <div class="enter">
       <a class="enter-btn" href="/projects/"><Vh name="vh-heart-target" />ENTER</a>
@@ -121,7 +100,7 @@ const avatar = stats.osu.avatar;
   .avatar > :global(svg:not(.pin)){width:56%;color:#fff}
   .avatar :global(.pin){position:absolute;right:-12px;bottom:-10px;width:34px;color:var(--pink);transform:rotate(12deg)}
   .hello{margin:0;font-weight:700;color:var(--muted);font-size:15px}
-  h1{font-size:clamp(30px,5.6vw,60px);margin:0;line-height:1;overflow-wrap:anywhere}
+  h1{font-size:clamp(22px,3.5vw,42px);margin:0;line-height:1;white-space:nowrap}
   .names{margin:4px 0 0;color:var(--muted);font-weight:700;font-size:14px}
   .role{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
   .role b{font:clamp(16px,2.2vw,22px)/1.2 var(--display);background:var(--mint);color:var(--on-pastel);border:var(--stroke) solid var(--ink);
@@ -133,13 +112,6 @@ const avatar = stats.osu.avatar;
   .facts .chip{cursor:default}
   .ctas{display:flex;flex-wrap:wrap;gap:10px}
 
-  .cosy{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px;margin-bottom:28px}
-  .cosy .card{padding:18px 18px 16px;display:flex;flex-direction:column;gap:6px}
-  .cosy h2{font-size:17px;margin:0}
-  .cosy p{margin:0;color:var(--muted);font-weight:700;font-size:14px;flex:1}
-  .cosy a{font-size:14px}
-  .cosy :global(.ic){width:46px;margin-bottom:4px}
-  .c-a :global(.ic){color:var(--sky)} .c-b :global(.ic){color:var(--mint)} .c-c :global(.ic){color:var(--pink)}
 
   .enter{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 16px 30px}
   .enter-btn{display:flex;align-items:center;gap:14px;border:4px solid var(--navy);border-radius:99px;background:var(--navy);color:var(--butter);
@@ -150,12 +122,11 @@ const avatar = stats.osu.avatar;
 
   @media (max-width:900px){
     .hero{grid-template-columns:1fr;padding-top:0}
-    .cosy{grid-template-columns:1fr}
   }
   @media (max-width:520px){
     .id{flex-direction:column;align-items:flex-start;gap:14px}
     .sky :global(.h1){display:none}
-    h1{font-size:clamp(30px,10vw,44px)}
+    h1{font-size:clamp(22px,8.4vw,38px)}
     .enter{position:sticky;bottom:0;padding:14px 16px 16px;background:linear-gradient(transparent,var(--bg) 35%)}
   }
 </style>
