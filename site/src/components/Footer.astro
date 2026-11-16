@@ -1,7 +1,7 @@
 ---
 import Socials from './Socials.astro';
 import Vh from './Vh.astro';
-import { profile, charts } from '../data/site';
+import { profile, charts, camelliaUrl } from '../data/site';
 import { pages } from '../data/pages';
 ---
 <footer class="foot">
@@ -19,7 +19,12 @@ import { pages } from '../data/pages';
     </div>
     <div>
       <p class="label">Music credits</p>
-      <p class="meta">{charts.taiko.artist} – {charts.taiko.title}<br /><span lang="ja">{charts.mania.artist}</span> – {charts.mania.title}<br />Both mapped by {charts.taiko.mapper}. Rights holders: email me and I’ll remove a track the same day.</p>
+      <ul class="meta credits">
+        {[charts.taiko, charts.mania4k, charts.mania7k].map((c) => (
+          <li>{c.artistLatin} – {c.title}{c.album && <> (<i>{c.album}</i>)</>}<br /><span>chart: {c.difficulty} by {c.mapper}{c.permission && `, ${c.permission}`}</span></li>
+        ))}
+      </ul>
+      <p class="meta">Songs by <a href={camelliaUrl} target="_blank" rel="noopener noreferrer">Camellia</a>, used under Camellia’s song-use guidelines, free and non-commercial. Rights holders: email me and I’ll remove a track the same day.</p>
     </div>
   </div>
   <p class="wrap tiny">© {new Date().getFullYear()} jimmyreturnz · <a href="/">Back to the Lobby</a></p>
@@ -32,6 +37,8 @@ import { pages } from '../data/pages';
   .fnav{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:14px}
   .mail{font-size:14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 0}
   .copy{font-size:12px;min-height:26px;padding:0 10px}
+  .credits{list-style:none;padding:0;margin:0 0 8px;display:flex;flex-direction:column;gap:6px}
+  .credits span{font-weight:400}
   .tiny{font-size:12px;color:var(--muted);margin:24px auto 0}
   @media (max-width:900px){ .fgrid{grid-template-columns:1fr} }
 </style>

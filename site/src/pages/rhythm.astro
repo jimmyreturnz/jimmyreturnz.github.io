@@ -12,24 +12,24 @@ const mv = (v: { globalRank: number | null; countryRank: number | null; pp: numb
   { label: `pp (${k})`, value: fmt(v?.pp), hint: '0,000' },
 ];
 ---
-<Page title="Rhythm" description="Jimmy’s own osu!taiko and osu!mania 4K maps, playable in the browser.">
+<Page title="Rhythm" description="Jimmy’s osu!taiko and osu!mania charts (4K and 7K), with song previews in the browser.">
   <header class="page-hero">
     <h1>Rhythm</h1>
     <p>My own maps. Watch them play, then try them yourself. Chart carousel coming soon.</p>
   </header>
 
-  <Showcase id="taiko" title="osu!taiko" lead="Camellia – Circles of Death." motif="vh-target" tint="mint">
-    <ChartPlayer mode="taiko" {...charts.taiko} stats={[
+  <Showcase id="taiko" title="osu!taiko" lead="My own map: Camellia – Circles of Death." motif="vh-target" tint="mint">
+    <ChartPlayer items={[{ chart: charts.taiko, stats: [
       { label: 'global rank', value: rank(osu.taiko?.globalRank), hint: '#00,000' },
       { label: '🇹🇭 Thailand', value: rank(osu.taiko?.countryRank), hint: '#000' },
       { label: 'pp', value: fmt(osu.taiko?.pp), hint: '0,000' },
-    ]} />
+    ] }]} />
   </Showcase>
 
-  <Showcase id="mania" title="osu!mania" lead="Quaoar is my 4K map; I rank in 4K and 7K. Dense, so the preview plays it for you first." motif="vh-chevrons" tint="pink">
-    <ChartPlayer mode="mania" {...charts.mania} stats={[]} variants={[
-      { id: '4k', label: '4K', stats: mv(osu.mania?.fourK, '4K') },
-      { id: '7k', label: '7K', stats: mv(osu.mania?.sevenK, '7K') },
+  <Showcase id="mania" title="osu!mania" lead="4K: my own map, Quaoar. 7K: LostCool’s // Under Construction //, used with permission." motif="vh-chevrons" tint="pink">
+    <ChartPlayer items={[
+      { chart: charts.mania4k, label: '4K', stats: mv(osu.mania?.fourK, '4K') },
+      { chart: charts.mania7k, label: '7K', stats: mv(osu.mania?.sevenK, '7K') },
     ]} />
   </Showcase>
 

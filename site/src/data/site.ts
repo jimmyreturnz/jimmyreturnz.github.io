@@ -77,16 +77,47 @@ export const MANIA_MAX_TIME_RANGE = 11485;
 export const maniaScrollSpeed = { '4k': 29, '7k': 32 } as const;
 export const maniaScrollTimeMs = (speed: number) => Math.round(MANIA_MAX_TIME_RANGE / speed);
 
-export const charts = {
+export const camelliaUrl = 'https://cametek.jp/';
+
+export type Chart = {
+  id: string;
+  mode: 'taiko' | 'mania';
+  keyMode?: '4k' | '7k';
+  artist: string; artistLatin: string; title: string; album: string | null;
+  mapper: string; ownMap: boolean; permission: string | null;
+  beatmapUrl: string; difficulty: string; stars: number; bpm: number; lengthSec: number;
+  keys: string; scrollSpeed?: number;
+  /** base name in assets/audio/ (expects .m4a and/or .opus) */
+  audio: string;
+  /** file name in assets/charts/ */
+  osu: string;
+};
+
+export const charts: Record<'taiko' | 'mania4k' | 'mania7k', Chart> = {
   taiko: {
-    artist: 'Camellia', title: 'Circles of Death', mapper: 'jimmyreturnz',
+    id: 'circles-of-death', mode: 'taiko',
+    artist: 'Camellia', artistLatin: 'Camellia', title: 'Circles of Death', album: null,
+    mapper: 'jimmyreturnz', ownMap: true, permission: null,
     beatmapUrl: 'https://osu.ppy.sh/beatmapsets/2404655#taiko/5216517',
-    keys: 'D F J K',
+    difficulty: 'Planet of Death', stars: 9.57, bpm: 200, lengthSec: 204,
+    keys: 'D F J K', audio: 'circles-of-death', osu: 'circles-of-death-taiko.osu',
   },
-  mania: {
-    artist: 'かめりあ', title: 'Quaoar', mapper: 'jimmyreturnz',
-    beatmapUrl: 'https://osu.ppy.sh/beatmapsets/1203155#mania/3579522',
-    keys: 'D F J K',
+  mania4k: {
+    id: 'quaoar', mode: 'mania', keyMode: '4k',
+    artist: 'かめりあ', artistLatin: 'Camellia', title: 'Quaoar', album: null,
+    mapper: 'jimmyreturnz', ownMap: true, permission: null,
+    // Beatmapset 1203155 has [4K] To the star (2857557), [4K] Insane (3269223) and [18K] komi im sorry (3579522).
+    beatmapUrl: 'https://osu.ppy.sh/beatmapsets/1203155#mania/2857557',
+    difficulty: '[4K] To the star', stars: 5.43, bpm: 174, lengthSec: 275,
+    keys: 'D F J K', scrollSpeed: maniaScrollSpeed['4k'], audio: 'quaoar', osu: 'quaoar-4k.osu',
+  },
+  mania7k: {
+    id: 'under-construction', mode: 'mania', keyMode: '7k',
+    artist: 'Camellia', artistLatin: 'Camellia', title: '// Under Construction //', album: 'Blackmagik Blazing',
+    mapper: 'LostCool', ownMap: false, permission: 'used with permission',
+    beatmapUrl: 'https://osu.ppy.sh/beatmapsets/1122675#mania/2346118',
+    difficulty: '[7K] incompleteness', stars: 11.41, bpm: 157.5, lengthSec: 280,
+    keys: 'S D F Space J K L', scrollSpeed: maniaScrollSpeed['7k'], audio: 'under-construction', osu: 'under-construction-7k.osu',
   },
 };
 

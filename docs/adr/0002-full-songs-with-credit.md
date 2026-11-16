@@ -8,8 +8,10 @@ The osu!mania and osu!taiko players use the full songs rather than short clips, 
 
 ## Permissions
 
-- **かめりあ – Quaoar**: free to use as long as the use is not illegal; Camellia published the track with a download link himself: https://www.youtube.com/watch?v=yjQmZBvi3WE
-- **Camellia – Circles of Death** (osu!taiko chart, beatmapset 2404655 / difficulty 5216517): the owner considers it covered by the same Camellia permission. That permission statement names Quaoar, so this is inferred; get written confirmation when possible. Both charts are the owner's own maps; credit reads "Music: <artist> – <title> · Mapped by jimmyreturnz".
+- **かめりあ – Quaoar** (osu!mania 4K, beatmapset 1203155 / difficulty 2857557 "[4K] To the star"; the set also has [4K] Insane and [18K] komi im sorry): free to use as long as the use is not illegal; Camellia published the track with an official download link: https://www.youtube.com/watch?v=yjQmZBvi3WE
+- **Camellia – Circles of Death** (osu!taiko chart, beatmapset 2404655 / difficulty 5216517 "Planet of Death"): the owner considers it covered by the same Camellia permission. That permission statement names Quaoar, so this is inferred; get written confirmation when possible. Both charts are the owner's own maps; credit reads "Music: <artist> – <title> · Mapped by jimmyreturnz".
+- **Camellia – // Under Construction //** (osu!mania 7K, beatmapset 1122675 / difficulty 2346118 "[7K] incompleteness"): from the album *Blackmagik Blazing* (CTCD-019, Aug 2019), a first-party CTCD release. Camellia's Official Song Use Guidelines (https://cametek.jp/songuse_en.html, last updated 11 Nov 2020) allow free, non-commercial custom rhythm-game charts without asking and request credit; charts may never be sold. **Chart by LostCool, used with LostCool's permission** (owner keeps a screenshot of that permission). Credit reads "Music: Camellia – // Under Construction // (Blackmagik Blazing) · Chart: [7K] incompleteness by LostCool, used with permission".
+- Hosting a playable chart with its audio on a personal site isn't explicitly listed in the guidelines (they route unlisted uses to "Other uses → contact cametek@gmail.com"). We follow the custom-chart rule's spirit: free, no ads or sales on these pages, no audio download link, credit + link to Camellia's site on every player and in the footer. Recommended: a short heads-up email to Camellia.
 - ~~DJ SHARPNEL – THE POWER OF UNDERGROUND~~: dropped; no written permission could be found.
 
 ## Takedown

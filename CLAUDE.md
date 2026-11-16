@@ -1,6 +1,29 @@
 # CLAUDE.md — jimmyreturnz portfolio
 
-Personal portfolio for jimmyreturnz (Apiwat Kongsawat): **Data Scientist & Developer** first, rhythm-game player second (osu!taiko, osu!mania 4K, TETR.IO), in a pastel **vectorheart** style with heavy but smooth animation. Mobile must feel as good as desktop.
+Personal portfolio for jimmyreturnz (Apiwat Kongsawat): **Data Scientist & Developer** first, rhythm-game player second (osu!taiko, osu!mania 4K/7K, TETR.IO), in a pastel **vectorheart** style with heavy but smooth animation. Mobile must feel as good as desktop.
+
+## Hand-off note for the local session (from the cloud session, 2026-11-16)
+Hi! The cloud session got this far; pick up from here on the owner's PC.
+
+**Done (all on `main`):**
+- Planning: grill session → `GLOSSARY.md`, `docs/FEATURES.md`, `docs/adr/0001–0003`; design council review (`docs/reviews/2026-11-16-design-council.md`); thegeekdesigner.com teardown (`docs/reviews/2026-11-16-thegeekdesigner-teardown.md`).
+- Art: vectorheart SVG kit (`assets/vectorheart/`), self-hosted fonts (`assets/fonts/`), mockups + storyboard (`design-mocks/`).
+- Site v1 in `site/` (Astro): cosy Lobby with Player Card; Portfolio pages Projects / Rhythm / TETR.IO / About / Community with client-side page transitions; light/dark theme (placeholder switch); uiverse sound button; brand icons; SoundCloud slot (click-to-load).
+- Live stats at build time (`site/scripts/fetch-stats.ts`): TETR.IO API + osu! public profile pages (no keys) incl. mania 4K and 7K ranks and avatars.
+- Rhythm: osu!taiko card; osu!mania card with 4K/7K switch (4K Quaoar [4K] To the star, own map; 7K // Under Construction // [7K] incompleteness by LostCool, used with permission); seek slider + play/pause that switch on when the song file exists (`site/src/scripts/chart-preview.ts`).
+
+**Continue with (in rough order):**
+1. Owner drops files: songs into `assets/audio/` and `.osu` files into `assets/charts/` (names in `site/README.md`); the BGM track; TETR.IO gameplay video. Then run `cd site && bun install && bun run dev`, and test seeking with `bun run build && bun run preview`.
+2. Chart note renderer: parse the `.osu` files, draw notes on canvas/PixiJS synced to the audio clock and to the seek slider (`jr:chart-time` events); mania fall time = 11485 ms ÷ scroll speed (29 for 4K, 32 for 7K). Then Play mode, judgements, calibration (see `docs/FEATURES.md`).
+3. BGM player in the header + crossfade on `jr:feature-audio` events.
+4. Animation pass (`docs/FEATURES.md` → "Animation pass: ideas queued"): Intro (≤4 s, Skip from frame one) → Lobby, Warp (<0.8 s), full-screen menu with marquee rows, orbiting icons around the Lobby avatar, parallax, favicon.
+5. Swap in the owner's theme switch (uiverse RiccardoRapelli/jolly-chicken-91, recoloured pink). uiverse.io blocks bots and it isn't in the github.com/uiverse-io/galaxy mirror, so ask the owner to paste the code.
+6. Owner to-dos: SoundCloud link (`site/src/data/site.ts` → `links.soundcloud`), LinkedIn/Facebook links, project outcome numbers, setups/timeline details, NuageRose font, Cloudflare Pages setup + deploy hook secret, optional heads-up email to Camellia (see ADR 0002).
+7. Later: Guestbook API (Hono + D1), Sveltia CMS at `/admin`, security headers (`_headers`, allow `w.soundcloud.com`), chart carousel of the owner's maps.
+
+**Owner asked you to read these for ideas:**
+- https://reactbits.dev/ : animated React components (text, backgrounds, cursors). Our pages are plain Astro/TS; use React islands only where they earn it, or recreate the effect in GSAP.
+- https://uiverse.io/elements?search=sound : more sound/audio UI elements (the current Sound button came from there: vinodjangid07/average-jellyfish-29). If uiverse.io blocks fetching, search the github.com/uiverse-io/galaxy mirror.
 
 ## Git
 - Commit and push straight to `main` (owner's standing instruction). No feature branches unless asked.

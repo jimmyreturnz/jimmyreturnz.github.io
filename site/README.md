@@ -16,12 +16,16 @@ bun run build:offline  # builds with the last saved stats (no network)
 
 ## Stats Cards
 - **TETR.IO**: public API, works with no setup.
-- **osu!**: needs an OAuth app. On https://osu.ppy.sh/home/account/edit → OAuth → *New OAuth Application* (any name, callback URL can be blank), then set `OSU_CLIENT_ID` and `OSU_CLIENT_SECRET` as environment variables (locally, and in Cloudflare Pages → Settings → Environment variables). Without them the osu! numbers stay as placeholders; the avatar still updates.
+- **osu!**: works with no setup by reading the public profile pages (`osu.ppy.sh/users/11306153/taiko` and `/mania`), including mania 4K and 7K ranks. Optional: an OAuth app (https://osu.ppy.sh/home/account/edit → OAuth → *New OAuth Application*) with `OSU_CLIENT_ID` / `OSU_CLIENT_SECRET` set locally and in Cloudflare Pages switches it to the official API.
 - Daily refresh: `.github/workflows/daily-rebuild.yml` calls a Cloudflare Pages deploy hook (repo secret `CF_PAGES_DEPLOY_HOOK`).
 
 ## Audio and charts (coming)
 Drop files here when ready; the players will pick them up:
 - `assets/audio/bgm.m4a` + `bgm.opus`: BGM
-- `assets/audio/quaoar.m4a` / `.opus`, `assets/audio/circles-of-death.m4a` / `.opus`: chart songs
-- `assets/charts/quaoar-4k.osu`, `assets/charts/circles-of-death-taiko.osu`: the beatmap files
+- Chart songs (any of `.m4a`, `.opus`, `.mp3`; the player switches on by itself when one exists):
+  - `assets/audio/quaoar.*` (4K)
+  - `assets/audio/under-construction.*` (7K)
+  - `assets/audio/circles-of-death.*` (taiko)
+- Beatmap files: `assets/charts/quaoar-4k.osu`, `assets/charts/under-construction-7k.osu`, `assets/charts/circles-of-death-taiko.osu`
+- Test seeking with `bun run build && bun run preview` (it supports range requests); a bare `python -m http.server` doesn't, so the slider jumps back to 0 there.
 - `assets/audio/hitsounds/`: taiko don/kat hitsounds
