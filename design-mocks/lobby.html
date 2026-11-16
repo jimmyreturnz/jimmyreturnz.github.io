@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lobby Mockup</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="mock.css">
+<style>
+  .lobby{position:relative;min-height:100vh;display:flex;flex-direction:column}
+  main{position:relative;z-index:2;flex:1;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(20px,4vw,48px);
+       align-items:center;max-width:1180px;width:100%;margin:0 auto;padding:12px clamp(16px,4vw,40px) 28px}
+  /* hero */
+  .who{display:grid;grid-template-columns:auto 1fr;gap:18px 22px;align-items:center}
+  .avatar{width:clamp(96px,12vw,132px);aspect-ratio:1;border-radius:50%;border:var(--stroke) solid var(--ink);box-shadow:var(--shadow);
+          background:radial-gradient(circle at 35% 30%,#fff 0 18%,var(--pink) 19% 100%);display:grid;place-items:center;position:relative}
+  .avatar svg{width:56%;color:var(--paper)}
+  .avatar .lvl{position:absolute;right:-8px;bottom:-4px;font:700 11px var(--hud);background:var(--butter);border:2px solid var(--ink);border-radius:99px;padding:2px 8px}
+  .hello{font:700 14px var(--body);color:var(--muted);margin:0}
+  h1{font:clamp(30px,4.6vw,50px)/1.05 var(--display);margin:2px 0 0;letter-spacing:.01em}
+  .role{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:4px}
+  .role b{font:clamp(17px,2.2vw,22px)/1.2 var(--display);background:var(--mint);border:var(--stroke) solid var(--ink);border-radius:12px;padding:6px 14px;box-shadow:3px 3px 0 var(--ink)}
+  .role span{font-size:14px;color:var(--muted);font-weight:700}
+  .about{grid-column:1/-1;margin:6px 0 0;max-width:46ch;font-size:16px}
+  .facts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
+  .contact{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .contact .btn.mail{background:var(--butter)}
+  .jump{grid-column:1/-1;font-size:14px}
+
+  /* player card */
+  .player{padding:0;overflow:hidden}
+  .player header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:var(--stroke) solid var(--ink);background:var(--lav)}
+  .player header strong{font:15px var(--display)}
+  .tabs{display:flex;gap:6px;padding:12px 16px 0;flex-wrap:wrap}
+  .tabs .chip{font-size:12px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 16px}
+  .stat{border:2px solid var(--ink);border-radius:12px;padding:10px;background:var(--cream)}
+  .stat b{display:block;font:700 clamp(20px,2.4vw,26px)/1.1 var(--hud)}
+  .stat small{font-size:12px;color:var(--muted);font-weight:700}
+  .langs{padding:0 16px 14px}
+  .bar-lang{display:flex;height:12px;border:2px solid var(--ink);border-radius:99px;overflow:hidden;margin:6px 0}
+  .bar-lang i{display:block;height:100%}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);font-weight:700}
+  .legend i{display:inline-block;width:10px;height:10px;border:2px solid var(--ink);border-radius:3px;margin-right:4px;vertical-align:-1px}
+  .player footer{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:2px dashed var(--lav);font-size:13px}
+  .games{display:grid;grid-template-columns:repeat(3,1fr);border-top:var(--stroke) solid var(--ink)}
+  .game{padding:10px 12px;text-align:center;font-size:12px;font-weight:700}
+  .game + .game{border-left:2px solid var(--ink)}
+  .game b{display:block;font:700 15px var(--hud)}
+  .game.taiko{background:#e9fbf3}.game.mania{background:#ffeef5}.game.tetrio{background:#eaf5ff}
+
+  /* enter */
+  .enter{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 16px 34px}
+  .enter button{display:flex;align-items:center;gap:14px;cursor:pointer;border:4px solid var(--ink);border-radius:99px;
+     background:var(--ink);color:var(--butter);font:clamp(22px,3vw,30px)/1 var(--display);letter-spacing:.08em;padding:16px 34px 16px 20px;box-shadow:6px 6px 0 var(--pink)}
+  .enter button svg{width:46px;color:var(--pink)}
+  .enter small{color:var(--muted);font-weight:700;font-size:13px}
+
+  @media (max-width:820px){
+    main{grid-template-columns:1fr;padding-top:4px}
+    .who{grid-template-columns:auto 1fr;gap:12px 16px}
+    svg.vh.hide-sm{display:none}
+    .enter{position:sticky;bottom:0;background:linear-gradient(#fff8fc00,var(--cream) 30%);padding-top:18px;padding-bottom:18px}
+  }
+</style>
+</head>
+<body>
+<div id="sprite" hidden></div>
+<div class="lobby">
+  <div class="deco" aria-hidden="true">
+    <svg class="vh spin" style="right:-140px;top:-160px;width:460px;color:var(--lav);opacity:.7"><use href="#vh-rings"/></svg>
+    <svg class="vh hide-sm" style="right:60px;top:70px;width:70px;color:var(--pink)"><use href="#vh-target"/></svg>
+    <div class="lane" style="top:62%"><svg class="vh" style="left:8%;width:30%;color:var(--sky)"><use href="#vh-slab"/></svg><svg class="vh" style="left:44%;width:14%;color:var(--ink);top:14px;opacity:.5"><use href="#vh-chevrons"/></svg></div>
+    <div class="lane" style="top:80%"><svg class="vh" style="left:30%;width:34%;color:var(--butter)"><use href="#vh-slab"/></svg><svg class="vh" style="left:70%;width:18%;color:var(--pink)"><use href="#vh-heart-arrow"/></svg></div>
+    <svg class="vh spin" style="left:-120px;bottom:-140px;width:340px;color:var(--sky);opacity:.6"><use href="#vh-rings"/></svg>
+    <svg class="vh" style="left:44%;top:16%;width:22px;color:var(--butter)"><use href="#vh-sparkle"/></svg>
+  </div>
+
+  <div class="bar">
+    <a class="wordmark" href="#"><svg class="vh"><use href="#vh-heart"/></svg>jimmyreturnz</a>
+    <button class="gear" type="button" aria-haspopup="true" aria-expanded="false">Settings</button>
+    <div class="toggles" role="group" aria-label="Site settings">
+      <button class="tg" aria-pressed="false"><i></i><span>Sound</span></button>
+      <button class="tg" aria-pressed="false" id="nightT"><i></i><span>Night</span></button>
+      <button class="tg" aria-pressed="false"><i></i><span>Lite</span></button>
+    </div>
+  </div>
+
+  <main>
+    <section class="who" aria-label="Profile">
+      <div class="avatar"><svg class="vh"><use href="#vh-heart"/></svg><span class="lvl">LV.<em class="ph" style="color:inherit">??</em></span></div>
+      <div>
+        <p class="hello">Hi, I'm</p>
+        <h1>Jimmy</h1>
+        <div style="font-weight:700;color:var(--muted);font-size:14px">Apiwat Kongsawat · <em class="ph">[Thai name]</em></div>
+      </div>
+      <div class="role"><b>Data Scientist &amp; Developer</b><span>on my way to AI Engineer</span></div>
+      <p class="about">I build data and ML projects, including <strong>[BMW project in one line]</strong>. Off the clock I map and play osu!taiko, osu!mania 4K and TETR.IO.</p>
+      <div class="facts">
+        <span class="chip">📍 <em class="ph">[based in…]</em></span>
+        <span class="chip">TH / EN / a little JP</span>
+        <span class="chip">Open to <em class="ph">[roles]</em></span>
+      </div>
+      <div class="contact">
+        <a class="btn mail" href="#"><svg class="vh" viewBox="0 0 60 60"><use href="#vh-sparkle"/></svg>Email me</a>
+        <a class="btn" href="https://github.com/jimmyreturnz">GitHub</a>
+        <a class="btn" href="#">LinkedIn</a>
+      </div>
+      <a class="jump" href="#">Skip straight to my Projects ↓</a>
+    </section>
+
+    <section class="card player" aria-label="Player card">
+      <header><strong>Player card</strong><span class="label">updated daily</span></header>
+      <div class="tabs" role="tablist">
+        <button class="chip on" role="tab" aria-selected="true">GitHub</button>
+        <button class="chip" role="tab" aria-selected="false">osu!taiko</button>
+        <button class="chip" role="tab" aria-selected="false">osu!mania</button>
+        <button class="chip" role="tab" aria-selected="false">TETR.IO</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>8</b><small>public repos</small></div>
+        <div class="stat"><b>6</b><small>followers</small></div>
+        <div class="stat"><b class="ph">000</b><small>commits this year</small></div>
+      </div>
+      <div class="langs">
+        <div class="label">Top languages <span class="ph">sample</span></div>
+        <div class="bar-lang"><i style="width:46%;background:var(--sky)"></i><i style="width:24%;background:var(--pink)"></i><i style="width:18%;background:var(--mint)"></i><i style="width:12%;background:var(--butter)"></i></div>
+        <div class="legend"><span><i style="background:var(--sky)"></i>Python</span><span><i style="background:var(--pink)"></i>Jupyter</span><span><i style="background:var(--mint)"></i>SQL</span><span><i style="background:var(--butter)"></i>TypeScript</span></div>
+      </div>
+      <div class="games" aria-label="Game ranks (sample numbers)">
+        <div class="game taiko">osu!taiko<b class="ph">#00,000</b></div>
+        <div class="game mania">mania 4K<b class="ph">#00,000</b></div>
+        <div class="game tetrio">TETR.IO<b class="ph">S+</b></div>
+      </div>
+      <footer><span class="label">Tap a tab · opens profile</span><a href="https://github.com/jimmyreturnz">View on GitHub ↗</a></footer>
+    </section>
+  </main>
+
+  <div class="enter">
+    <button type="button"><svg class="vh beat"><use href="#vh-heart-target"/></svg>ENTER</button>
+    <small>press Enter · or tap the heart</small>
+  </div>
+</div>
+
+<div class="note">Mockup · striped text = placeholder · ink:
+  <button id="inkBtn" type="button">try navy #1f1e33</button></div>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  if (q.get('ink') === 'navy') document.documentElement.dataset.ink = 'navy';
+  const b = document.getElementById('inkBtn');
+  const sync = () => b.textContent = document.documentElement.dataset.ink === 'navy' ? 'back to plum #3b2a4d' : 'try navy #1f1e33';
+  b.onclick = () => { const r = document.documentElement; r.dataset.ink = r.dataset.ink === 'navy' ? '' : 'navy'; sync(); };
+  sync();
+  document.querySelectorAll('.tg').forEach(t => t.onclick = () => t.setAttribute('aria-pressed', t.getAttribute('aria-pressed') !== 'true'));
+  fetch('../assets/vectorheart/vectorheart.svg').then(r => r.text()).then(t => {
+    document.getElementById('sprite').innerHTML = t;
+    document.querySelectorAll('svg.vh:not([viewBox])').forEach(svg => {
+      const sym = document.getElementById(svg.querySelector('use').getAttribute('href').slice(1));
+      svg.setAttribute('viewBox', sym.getAttribute('viewBox'));
+    });
+  });
+</script>
+</body>
+</html>
