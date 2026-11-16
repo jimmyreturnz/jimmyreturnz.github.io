@@ -6,15 +6,17 @@ const store = {
   set: (k: string, v: string) => { try { localStorage.setItem(`jr.${k}`, v); } catch { /* private mode */ } },
 };
 export const vol = { sfx: Number(store.get('vol.sfx') ?? 0.7), music: Number(store.get('vol.music') ?? 0.4) };
-let ctx: AudioContext | null = null, sfxBus: GainNode, musicBus: GainNode, analyser: AnalyserNode;
+let ctx: AudioContext | null = null, sfxBus: GainNode, musicBus: GainNode, songBus: GainNode, hitBus: GainNode, analyser: AnalyserNode;
 const muted = () => store.get('sound') !== 'true';
 
 export function unlock(): AudioContext {
   if (!ctx) {
     ctx = new AudioContext();
-    sfxBus = ctx.createGain(); musicBus = ctx.createGain(); analyser = ctx.createAnalyser();
+    sfxBus = ctx.createGain(); musicBus = ctx.createGain(); songBus = ctx.createGain(); hitBus = ctx.createGain(); analyser = ctx.createAnalyser();
     analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.45;
     sfxBus.connect(ctx.destination); musicBus.connect(ctx.destination); musicBus.connect(analyser); // the analyser only listens
+    // chart songs and their hit sounds: the visitor pressed play, so the Sound button's mute doesn't silence them; the volume sliders do
+    songBus.connect(ctx.destination); songBus.connect(analyser); hitBus.connect(ctx.destination);
     apply();
   }
   void ctx.resume();
@@ -24,6 +26,7 @@ function apply() {
   if (!ctx) return;
   const m = muted();
   sfxBus.gain.value = m ? 0 : vol.sfx; musicBus.gain.value = m ? 0 : vol.music;
+  songBus.gain.value = vol.music; hitBus.gain.value = vol.sfx;
 }
 export function setVolume(kind: 'sfx' | 'music', v: number) { vol[kind] = v; store.set(`vol.${kind}`, String(v)); apply(); }
 export function setSound(on: boolean) { store.set('sound', String(on)); apply(); document.dispatchEvent(new CustomEvent('jr:sound', { detail: on })); }
@@ -34,7 +37,21 @@ export function tap(el: HTMLAudioElement) {
   if (el.dataset.tapped) return;
   const c = unlock(); el.dataset.tapped = '1';
   const s = c.createMediaElementSource(el);
-  s.connect(c.destination); s.connect(analyser);
+  s.connect(songBus);
+}
+
+// taiko hit sounds (owner's skin samples in assets/sfx/), decoded once, played on the effects volume
+const buffers: Record<string, AudioBuffer> = {};
+export async function loadHits() {
+  const c = unlock();
+  await Promise.all(['normal', 'clap', 'finish', 'whistle'].map(async (n) => {
+    if (buffers[n]) return;
+    try { buffers[n] = await c.decodeAudioData(await (await fetch(`/sfx/taiko-normal-hit${n}.wav`)).arrayBuffer()); } catch { /* missing file: stay silent */ }
+  }));
+}
+export function hit(names: string[]) {
+  if (!ctx) return;
+  for (const n of names) { const b = buffers[n]; if (!b) continue; const s = ctx.createBufferSource(); s.buffer = b; s.connect(hitBus); s.start(); }
 }
 
 /** Is anything audible going through the analyser right now? */

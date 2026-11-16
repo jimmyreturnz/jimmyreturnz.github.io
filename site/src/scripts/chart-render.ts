@@ -1,6 +1,7 @@
 // Draws the chart's notes on a canvas, following the song clock (`jr:chart-time` from chart-preview.ts).
 // Notes come from /charts/<id>.json (made by scripts/osu-to-notes.mjs). Taiko scroll follows the redline BPM x
 // green-line SV like taikoeditor; mania falls at a constant speed (data-scroll-ms on the stage).
+import { hit, loadHits } from './audio';
 const PX = 0.5; // taiko px per scroll unit (tune)
 const COL = { don: '#ff7baf', kat: '#6fc3ff', butter: '#ffe27a', line: '#fff8fc', bg: '#2a2944' };
 
@@ -11,7 +12,7 @@ function setup(root: HTMLElement) {
   if (root.dataset.render) return;
   root.dataset.render = '1';
   const stage = root.querySelector<HTMLElement>('.stage')!;
-  let data: Data | null = null, now = 0, cv: HTMLCanvasElement | null = null;
+  let data: Data | null = null, now = 0, last = 0, cv: HTMLCanvasElement | null = null;
   const ctx = () => cv!.getContext('2d')!;
 
   const resize = () => {
@@ -41,7 +42,10 @@ function setup(root: HTMLElement) {
         const x = hitX + (posAt(b) - cur) * PX; if (x > W) break; if (x > 0 && b >= bt) { g.beginPath(); g.moveTo(x, y - laneH / 2); g.lineTo(x, y + laneH / 2); g.stroke(); }
       }
     }
-    // hit circle (drum target)
+    // hit circle (drum target), flashing in the colour of the note that was just hit
+    let flash: number[] | null = null;
+    for (let i = Math.max(0, lower(d.notes, t - 120) - 1); i < d.notes.length && d.notes[i]![0]! <= t; i++) { const n = d.notes[i]!; if (n[1]! <= 1 && t - n[0]! < 120) flash = n; }
+    if (flash) { g.fillStyle = flash[1] === 1 ? COL.kat : COL.don; g.globalAlpha = 0.7 * (1 - (t - flash[0]!) / 120); g.beginPath(); g.arc(hitX, y, laneH * 0.55, 0, 7); g.fill(); g.globalAlpha = 1; }
     g.strokeStyle = COL.line; g.lineWidth = 4; g.beginPath(); g.arc(hitX, y, laneH * 0.45, 0, 7); g.stroke();
     const maxPos = cur + W / PX, minPos = cur - 200 / PX;
     for (let i = Math.max(0, lower(d.notes, t - 4000) - 1); i < d.notes.length; i++) {
@@ -76,8 +80,10 @@ function setup(root: HTMLElement) {
       if (n[2]! > 0) { const top = yOf(n[2]!), bot = Math.min(y, hitY); g.globalAlpha = 0.8; g.fillRect(x + w * 0.15, top, w * 0.7, bot - top); g.globalAlpha = 1; }
       if (!(n[2]! > 0 && t > n[0]!)) { g.beginPath(); g.roundRect(x, y - nh, w, nh, 5); g.fill(); g.stroke(); }
     }
-    g.fillStyle = COL.bg; g.strokeStyle = COL.line; g.lineWidth = 3;
-    for (let i = 0; i < k; i++) { g.beginPath(); g.roundRect(x0 + i * cw + cw * 0.06, hitY + 4, cw * 0.88, 20, 8); g.fill(); g.stroke(); }
+    const lit = new Set<number>();
+    for (let i = Math.max(0, lower(d.notes, t - 4000) - 1); i < d.notes.length && d.notes[i]![0]! <= t; i++) { const n = d.notes[i]!; if (t - Math.max(n[0]!, n[2]! > 0 ? 0 : n[0]!) < 90 || (n[2]! > 0 && t < n[2]!)) lit.add(n[1]!); }
+    g.strokeStyle = COL.line; g.lineWidth = 3;
+    for (let i = 0; i < k; i++) { g.fillStyle = lit.has(i) ? colour(i) : COL.bg; g.beginPath(); g.roundRect(x0 + i * cw + cw * 0.06, hitY + 4, cw * 0.88, 20, 8); g.fill(); g.stroke(); }
   }
 
   const start = async () => {
@@ -87,7 +93,22 @@ function setup(root: HTMLElement) {
     stage.querySelectorAll('.taiko,.mania').forEach((e) => e.remove());
     stage.prepend(cv); resize(); new ResizeObserver(resize).observe(stage);
   };
-  root.addEventListener('jr:chart-time', (e) => { now = (e as CustomEvent<number>).detail; draw(); });
+  // autoplay: when the clock moves forward a little (playing, not a seek) the notes it passed make their hit sounds
+  const autoplay = (from: number, to: number) => {
+    if (!data || data.mode !== 'taiko') return;
+    const a = from * 1000, b = to * 1000, names: string[] = [];
+    for (let i = lower(data.notes, a + 0.0001); i < data.notes.length && data.notes[i]![0]! <= b; i++) {
+      const n = data.notes[i]!; if (n[1]! > 1) continue;
+      names.push(n[1] === 1 ? 'clap' : 'normal'); if (n[2] === 1) names.push('finish');
+    }
+    if (names.length) hit(names);
+  };
+  root.addEventListener('jr:chart-time', (e) => {
+    now = (e as CustomEvent<number>).detail;
+    const dt = now - last; if (dt > 0 && dt < 0.25) autoplay(last, now);
+    last = now; draw();
+  });
+  root.querySelector('audio')?.addEventListener('play', () => void loadHits());
   new IntersectionObserver((es, o) => { if (es.some((x) => x.isIntersecting)) { o.disconnect(); void start(); } }).observe(root);
   // stacked panels stay rendered but hidden: re-measure when a panel is shown
   new MutationObserver(resize).observe(root, { attributes: true, attributeFilter: ['hidden'] });
