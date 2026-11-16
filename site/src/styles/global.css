@@ -94,6 +94,8 @@ h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.15}
 
 /* theme switch: circular reveal (scripts/settings.ts) */
 :root[data-vt="theme"]::view-transition-old(root),:root[data-vt="theme"]::view-transition-new(root){animation:none;mix-blend-mode:normal}
+/* the persisted header/menu/Warp have their own transition names and would crossfade on their own: fold them into the one reveal */
+:root[data-vt="theme"] *{view-transition-name:none !important}
 :root[data-vt="theme"]::view-transition-old(root){z-index:1}
 :root[data-vt="theme"]::view-transition-new(root){z-index:2}
 

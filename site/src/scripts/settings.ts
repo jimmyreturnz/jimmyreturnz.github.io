@@ -28,7 +28,7 @@ document.addEventListener('click', (e) => {
     const R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
     root.dataset.vt = 'theme';
     const vt = (document as Document & { startViewTransition: (cb: () => void) => { ready: Promise<void>; finished: Promise<void> } }).startViewTransition(flip);
-    void vt.ready.then(() => root.animate({ clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${R}px at ${x}px ${y}px)`] }, { duration: 650, easing: 'ease-out', pseudoElement: '::view-transition-new(root)' }));
+    void vt.ready.then(() => root.animate({ clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${R}px at ${x}px ${y}px)`] }, { duration: 800, easing: 'ease-in-out', pseudoElement: '::view-transition-new(root)' }));
     void vt.finished.finally(() => delete root.dataset.vt);
   } else {
     const next = store.get('sound') !== 'true';
