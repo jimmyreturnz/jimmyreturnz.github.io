@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vectorheart Kit</title>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+  :root{
+    --pink:#ffb3d1; --lav:#c9b6ff; --mint:#a8f0d4; --sky:#a6d8ff; --butter:#fff1a8;
+    --ink:#3b2a4d; --cream:#fff8fc;
+    --vh-ink:var(--ink); --vh-shine:#fff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Comfortaa',system-ui,sans-serif}
+  h1,h2{font-family:'Zen Dots',sans-serif;font-weight:400;letter-spacing:.02em}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 64px}
+  svg.vh{display:block;overflow:visible}
+
+  /* ---------- poster ---------- */
+  .poster{position:relative;aspect-ratio:1/1;max-width:640px;margin:0 auto 48px;overflow:hidden;
+    border-radius:28px;border:4px solid var(--ink);
+    background:radial-gradient(circle at 80% 15%,#ffe3f0 0,transparent 45%),
+               radial-gradient(circle at 10% 90%,#e7defc 0,transparent 50%),var(--cream)}
+  .lane{position:absolute;left:-20%;width:140%;transform:rotate(-35deg);transform-origin:center}
+  .lane > *{position:absolute}
+  .drift{animation:drift 3.2s linear infinite}
+  .drift.slow{animation-duration:5s}
+  @keyframes drift{from{transform:translateX(-6%)}to{transform:translateX(6%)}}
+  .spin{animation:spin 14s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .beat{animation:beat .9s cubic-bezier(.3,1.6,.5,1) infinite}
+  @keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.14)}}
+  .twinkle{animation:twinkle 1.6s ease-in-out infinite}
+  @keyframes twinkle{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
+  .title{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) rotate(-35deg);text-align:center;
+    font-family:'Zen Dots';line-height:.95;white-space:nowrap}
+  .title b{display:block;font-weight:400;font-size:clamp(34px,9vw,64px);color:#fff;
+    -webkit-text-stroke:7px var(--ink);paint-order:stroke fill;text-shadow:5px 5px 0 var(--pink)}
+  .title small{display:inline-block;margin-top:8px;font-family:'Orbitron';font-weight:900;font-size:clamp(11px,2.4vw,16px);
+    letter-spacing:.3em;background:var(--ink);color:var(--butter);padding:6px 14px;border-radius:99px}
+
+  /* ---------- grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+  .cell{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:14px 12px 10px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;min-height:150px}
+  .cell svg{flex:1}
+  .cell svg{width:100%;max-height:80px}
+  .cell code{font-size:12px;font-family:ui-monospace,monospace;background:var(--cream);padding:2px 6px;border-radius:6px}
+
+  /* ---------- fonts ---------- */
+  .fonts{display:grid;gap:10px}
+  .font{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:14px 18px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px}
+  .font span{font-size:clamp(22px,5vw,34px);line-height:1.1}
+  .font em{font-style:normal;font-size:12px;opacity:.7;margin-left:auto}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="sprite" hidden></div>
+<div class="wrap">
+  <h1>Vectorheart kit</h1>
+  <p>Original pastel elements, recoloured with CSS <code>color</code>. Rotated -35° for the speed-line look.</p>
+
+  <!-- POSTER -->
+  <div class="poster" aria-label="Composition demo">
+    <svg class="vh spin" style="position:absolute;right:-12%;top:-12%;width:48%;color:var(--lav)"><use href="#vh-rings"/></svg>
+    <svg class="vh" style="position:absolute;right:6%;top:18%;width:16%;color:var(--pink)"><use href="#vh-target"/></svg>
+    <svg class="vh" style="position:absolute;right:26%;top:4%;width:10%;color:var(--mint)"><use href="#vh-target"/></svg>
+    <svg class="vh spin" style="position:absolute;left:-14%;bottom:-14%;width:40%;color:var(--sky)"><use href="#vh-rings"/></svg>
+
+    <div class="lane" style="top:14%;height:60px">
+      <svg class="vh drift" style="left:22%;width:32%;color:var(--sky)"><use href="#vh-arrow"/></svg>
+      <svg class="vh drift slow" style="left:58%;width:18%;color:var(--ink);top:14px"><use href="#vh-chevrons"/></svg>
+    </div>
+    <div class="lane" style="top:30%;height:60px">
+      <svg class="vh drift slow" style="left:10%;width:40%;color:var(--pink)"><use href="#vh-slab"/></svg>
+      <svg class="vh drift" style="left:56%;width:22%;color:var(--ink);top:20px"><use href="#vh-dots"/></svg>
+    </div>
+    <div class="lane" style="top:46%;height:60px">
+      <svg class="vh drift slow" style="left:6%;width:28%;color:var(--mint)"><use href="#vh-heart-arrow"/></svg>
+      <svg class="vh drift" style="left:72%;width:14%;color:var(--ink);top:16px"><use href="#vh-triangles"/></svg>
+    </div>
+    <div class="lane" style="top:62%;height:60px">
+      <svg class="vh drift" style="left:18%;width:20%;color:var(--lav);top:14px"><use href="#vh-hatch"/></svg>
+      <svg class="vh drift slow" style="left:42%;width:42%;color:var(--butter)"><use href="#vh-slab"/></svg>
+    </div>
+    <div class="lane" style="top:78%;height:60px">
+      <svg class="vh drift slow" style="left:30%;width:30%;color:var(--pink)"><use href="#vh-arrow-thin"/></svg>
+      <svg class="vh drift" style="left:64%;width:18%;color:var(--ink);top:14px"><use href="#vh-chevrons"/></svg>
+    </div>
+
+    <svg class="vh beat" style="position:absolute;left:12%;top:12%;width:14%;color:var(--pink)"><use href="#vh-heart"/></svg>
+    <svg class="vh beat" style="position:absolute;right:10%;bottom:12%;width:12%;color:var(--lav);animation-delay:.45s"><use href="#vh-heart-target"/></svg>
+    <svg class="vh twinkle" style="position:absolute;left:40%;top:8%;width:5%;color:var(--butter)"><use href="#vh-sparkle"/></svg>
+    <svg class="vh twinkle" style="position:absolute;left:8%;top:58%;width:4%;color:var(--sky);animation-delay:.5s"><use href="#vh-sparkle"/></svg>
+    <svg class="vh twinkle" style="position:absolute;right:30%;bottom:6%;width:6%;color:var(--pink);animation-delay:1s"><use href="#vh-sparkle"/></svg>
+
+    <div class="title"><b>PORTFOLIO</b><small>♥ ENTER ♥</small></div>
+  </div>
+
+  <!-- ELEMENT GRID -->
+  <h2>Elements</h2>
+  <div class="grid" id="grid"></div>
+
+  <!-- FONTS -->
+  <h2>Fonts</h2>
+  <div class="fonts">
+    <div class="font"><span style="font-family:'Zen Dots'">Quaoar 4K ♥</span><em>Zen Dots · display / logo</em></div>
+    <div class="font"><span style="font-family:'Orbitron';font-weight:900">THE POWER OF UNDERGROUND</span><em>Orbitron 500–900 · labels, HUD</em></div>
+    <div class="font"><span style="font-family:'Audiowide'">Rhythm Game Tools</span><em>Audiowide · headings</em></div>
+    <div class="font"><span style="font-family:'Krona One'">PERFECT 300</span><em>Krona One · wide accents</em></div>
+    <div class="font"><span style="font-family:'Monoton'">COMBO</span><em>Monoton · big neon numbers only</em></div>
+    <div class="font"><span style="font-family:'Exo 2';font-weight:800">Accuracy 99.12%</span><em>Exo 2 · UI text, numbers</em></div>
+    <div class="font"><span style="font-family:'Comfortaa';font-weight:700">Hi, welcome to my page!</span><em>Comfortaa · soft body text</em></div>
+    <div class="font"><span style="font-family:'M PLUS Rounded 1c';font-weight:800">かめりあ・ポートフォリオ</span><em>M PLUS Rounded 1c · Japanese</em></div>
+  </div>
+</div>
+
+<script>
+  // Inline the sprite so <use href="#id"> works everywhere (external <use> + gradients is flaky in some browsers).
+  fetch('vectorheart.svg').then(r => r.text()).then(t => {
+    document.getElementById('sprite').innerHTML = t;
+    // give each <svg class="vh"> its symbol's viewBox so width alone sizes it correctly
+    document.querySelectorAll('svg.vh:not([viewBox])').forEach(svg => {
+      const sym = document.getElementById(svg.querySelector('use').getAttribute('href').slice(1));
+      svg.setAttribute('viewBox', sym.getAttribute('viewBox'));
+    });
+    const colors = ['--pink','--lav','--mint','--sky'];
+    const grid = document.getElementById('grid');
+    [...document.querySelectorAll('#sprite symbol')].forEach((s, i) => {
+      const id = s.id, c = `var(${colors[i % colors.length]})`;
+      grid.insertAdjacentHTML('beforeend',
+        `<div class="cell"><svg class="vh" viewBox="${s.getAttribute('viewBox')}" style="color:${c}"><use href="#${id}"/></svg><code>${id}</code></div>`);
+    });
+  });
+</script>
+</body>
+</html>
