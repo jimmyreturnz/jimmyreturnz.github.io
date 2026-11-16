@@ -2,6 +2,10 @@
 
 Personal portfolio for jimmyreturnz: developer + rhythm-game player (osu!taiko, osu!mania 4K, TETR.IO), in a pastel **vectorheart** style with heavy but smooth animation. Mobile must feel as good as desktop.
 
+## Git
+- Commit and push straight to `main` (owner's standing instruction). No feature branches unless asked.
+- Commits are authored as the owner: `jimmyreturnz <101033761+jimmyreturnz@users.noreply.github.com>`, with no AI co-author or session trailers.
+
 Read these before working:
 - `GLOSSARY.md` — the project's vocabulary (Intro, Lobby, Warp, Portfolio, Showcase, BGM, Feature audio, SFX, …). Use these words exactly, in code and in conversation.
 - `docs/FEATURES.md` — what the site contains, Showcase order, parked and dropped ideas, open questions.
