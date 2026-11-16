@@ -8,11 +8,11 @@ Living list of what the site should contain. Order = rough page order.
 3. **"Enter portfolio" button** → transition animation that morphs into the portfolio page. *(animation + sound TBD)*
 
 ## Inside the portfolio
-Showcase order: Projects → osu!taiko → osu!mania → TETR.IO → Skills and Setups → Timeline → Blog → Shoutouts → Guestbook → footer (LinkedIn, GitHub, Instagram, Fastwork, Facebook, work email).
+Showcase order: Projects → osu!taiko → osu!mania → TETR.IO → Skills and Setups → Timeline → Blog → Shoutouts → Guestbook → footer (LinkedIn, GitHub, Instagram, Facebook, work email).
 
 - **Background music** at low volume. Crossfades out when any feature below plays audio, and back in when it stops.
 - **osu!mania 4K** — chart preview with song + playable chart. Chart: かめりあ – Quaoar (own map, 4K). Audio controls, **muted by default**. Layout reference: kenzync.dev tool cards.
-- **osu!taiko** — chart preview with hitsounds + playable chart. Chart: DJ SHARPNEL – THE POWER OF UNDERGROUND (own map).
+- **osu!taiko** — chart preview with hitsounds + playable chart. Chart: Camellia – Circles of Death (https://osu.ppy.sh/beatmapsets/2404655#taiko/5216517).
 - **TETR.IO** — looping gameplay video (already recorded).
 - **Projects** — GitHub repos, internship and career work, each linking out.
 - **LinkedIn** link/card.
@@ -32,7 +32,7 @@ Showcase order: Projects → osu!taiko → osu!mania → TETR.IO → Skills and 
 - Easter eggs (Konami code, typing "osu" on the Lobby).
 
 ## Dropped
-- Résumé download. Now playing (copyright risk). Achievements.
+- Résumé download. Fastwork link. Now playing (copyright risk). Achievements.
 
 ## Open questions
 - BGM and SFX tracks: owner is choosing songs with clear, low-risk licences that fit the theme.
