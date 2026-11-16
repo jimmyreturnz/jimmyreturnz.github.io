@@ -33,7 +33,7 @@ Showcase order: Projects → Skills → osu!taiko → osu!mania → TETR.IO → 
 
 ## Global requirements
 - Pastel **vectorheart** theme: kit in `assets/vectorheart/`, fonts in `assets/fonts/`.
-- **Colour rule**: pastels are fills and decoration only, never text. Text and labels use ink `#3b2a4d`; links/buttons accent `#c23a7a`; muted text `#6b5b7d`. All colours live in one token file once `site/` exists.
+- **Colour rule**: pastels are fills and decoration only, never text. Text and labels use ink `#3b2a4d`; links/buttons accent `#c23a7a`; muted text `#6b5b7d`. **Dark blue is always `#1f1e33`** (owner's favourite): use it wherever a dark blue/navy is needed, including as the base of the night theme. All colours live in one token file once `site/` exists.
 - **Fonts (provisional)**: Zen Dots (display), Comfortaa (body), Orbitron 700 (numbers/HUD), Monoton (combo numerals only). M PLUS Rounded 1c (Japanese) loads only where Japanese appears. Final choice still open.
 - **Motion budget**: 1–2 idle loops per content screen, 6–8 moving motifs in the Intro; −35° diagonals only in the Intro and Warp, content stays horizontal. Pause everything off screen and while a chart player is open. Auto Lite mode on low frame rate, plus the Lite toggle.
 - Smooth (60fps target) and **mobile-friendly**; respect `prefers-reduced-motion` (still title card instead of Intro, fade instead of Warp).

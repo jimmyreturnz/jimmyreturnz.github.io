@@ -43,7 +43,7 @@ docs/             FEATURES.md, adr/, reviews/
 ## Design assets
 - `assets/vectorheart/vectorheart.svg` — sprite of original elements; colour with CSS `color`, `--vh-ink`, `--vh-shine`. `preview.html` shows them.
 - `assets/fonts/fonts.css` — provisional Latin set: Zen Dots (display), Comfortaa 400/700 (body), Orbitron 700 (numbers/HUD), Monoton (combo numerals only). `assets/fonts/fonts-jp.css` — M PLUS Rounded 1c, load only where Japanese appears. Audiowide, Krona One, Exo 2 and other Orbitron weights stay on disk but aren't loaded until the final font decision. Thai Guestbook font: Mali (to add).
-- Colour rule: pastels are never text. Ink `#3b2a4d` for text, `#c23a7a` for links/buttons, `#6b5b7d` for muted text.
+- Colour rule: pastels are never text. Ink `#3b2a4d` for text, `#c23a7a` for links/buttons, `#6b5b7d` for muted text. Any dark blue/navy is always `#1f1e33` (owner's favourite), including the night-theme base.
 - `docs/reviews/2026-11-16-design-council.md` — design review whose accepted actions are folded into FEATURES.md.
 - Inspiration: kenzync.dev (tool-card layout), hirokaze.net (theme applied to every bit of UI). Do not copy their assets.
 
