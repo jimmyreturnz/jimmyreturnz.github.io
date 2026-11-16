@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'">
+<title>Portfolio Storyboard</title>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<style>
+  :root{
+    --pink:#ffb3d1; --lav:#c9b6ff; --mint:#a8f0d4; --sky:#a6d8ff; --butter:#fff1a8;
+    --ink:#3b2a4d; --cream:#fff8fc; --muted:#8a7a99;
+    --gap:#ff7fb0; --gap-tint:#fff0f6; --exists:#3fbf8f; --ctx:#9b8cc7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.55 'Comfortaa',system-ui,sans-serif}
+  a{color:var(--ink);text-decoration-color:var(--gap);text-underline-offset:3px}
+  h1,h2,h3{font-family:'Zen Dots',sans-serif;font-weight:400;line-height:1.2;margin:0 0 .4em}
+  h1{font-size:clamp(26px,5vw,40px)} h2{font-size:clamp(20px,3.6vw,26px);margin-top:56px} h3{font-size:17px}
+  .wrap{max-width:1240px;margin-inline:auto;padding:20px 16px 64px}
+  .crumb{font-size:13px;color:var(--muted)}
+  .pill{display:inline-block;font:700 11px 'Orbitron',sans-serif;letter-spacing:.18em;text-transform:uppercase;
+    padding:5px 12px;border-radius:99px;background:var(--ink);color:var(--butter);margin:14px 0 10px}
+  .badge{display:inline-block;font:700 11px 'Orbitron',sans-serif;letter-spacing:.08em;padding:3px 10px;border-radius:99px;vertical-align:middle;margin-left:8px}
+  .b-gap{background:var(--gap);color:#fff} .b-ok{background:var(--exists);color:#fff} .b-ctx{background:var(--ctx);color:#fff} .b-q{background:var(--butter);color:var(--ink)}
+  .links{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;margin:10px 0}
+  pre{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:18px;overflow-x:auto;font:13px/1.5 ui-monospace,Menlo,monospace;margin:0}
+  pre .g{color:var(--gap);font-weight:700} pre .e{color:var(--exists);font-weight:700} pre .c{color:var(--ctx)}
+  .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(min(100%,370px),1fr))}
+  .card{background:#fff;border:3px solid var(--ink);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+  .card.gap{background:var(--gap-tint);border-color:var(--gap)}
+  .card .file{font:12px ui-monospace,monospace;color:var(--muted);word-break:break-all}
+  .card p{margin:0}
+  .card ul{margin:0;padding-left:20px} .card li{margin:3px 0}
+  .q{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gap);margin-top:4px}
+  .check{background:var(--cream);border-radius:12px;padding:10px 12px;font-size:13px}
+  .check li{list-style:'☐  '}
+  img.static{width:100%;border:3px solid var(--ink);border-radius:16px;display:block}
+
+  /* ---- low-fi wireframes ---- */
+  .wfs{display:flex;flex-wrap:wrap;gap:28px 12px;align-items:flex-start;overflow-x:auto;padding:4px 2px 8px}
+  .wf{flex:none;border:2.5px solid var(--ink);border-radius:14px;background:#fff;padding:6px;display:grid;gap:4px;
+      font:10px/1.2 'Comfortaa',sans-serif;position:relative}
+  .wf.ph{width:150px;height:300px;border-radius:20px;padding:12px 6px 8px;grid-auto-rows:min-content}
+  .wf.dt{width:260px;height:162px}
+  .wf::after{content:attr(data-l);position:absolute;bottom:-17px;left:0;font-size:10px;color:var(--muted)}
+  .wfs{padding-bottom:22px}
+  .x{border:1.5px dashed var(--ctx);border-radius:7px;padding:4px 5px;background:#faf7ff;display:flex;align-items:center;justify-content:center;text-align:center;min-height:18px}
+  .x.p{background:#ffe6f1;border-color:var(--pink)} .x.m{background:#e4fbf2;border-color:var(--exists)}
+  .x.s{background:#e6f3ff;border-color:var(--sky)} .x.y{background:#fffbe0;border-color:#e6cf55}
+  .x.btn{background:var(--ink);color:var(--butter);border:none;font-weight:700;border-radius:99px}
+  .t1{min-height:30px}.t2{min-height:46px}.t3{min-height:70px}.t4{min-height:100px}.t5{min-height:140px}
+  .row{display:flex;gap:4px}.row>*{flex:1}
+  footer{margin-top:56px;font-size:13px;color:var(--muted);border-top:2px dashed var(--lav);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 1. Breadcrumb -->
+  <div class="crumb"><a href="../docs/FEATURES.md">docs/FEATURES.md</a> › Storyboard</div>
+
+  <!-- 2. Header -->
+  <span class="pill">Portfolio v1 · storyboard</span>
+  <h1>Every screen of jimmyreturnz.dev, in one place</h1>
+  <p><b>Purpose:</b> agree on what each screen contains and how a visitor moves between them, before any polished mockup is drawn.</p>
+  <p>Nothing here is final art. The boxes are <b>low-fi wireframes</b>: they show what goes where, not how it looks. The look comes from the
+     vectorheart kit (shown at the bottom). Every screen is still a <span class="badge b-gap">🆕 GAP</span>. Each card lists the questions to answer before its mockup is drawn.</p>
+  <div class="links">
+    <a href="../CLAUDE.md">CLAUDE.md</a><a href="../GLOSSARY.md">GLOSSARY.md</a><a href="../docs/FEATURES.md">FEATURES.md</a>
+    <a href="../docs/adr/0001-host-on-cloudflare-pages.md">ADR 0001 hosting</a><a href="../docs/adr/0002-full-songs-with-credit.md">ADR 0002 songs</a>
+    <a href="../docs/adr/0003-hono-not-elysia-for-the-api.md">ADR 0003 API</a><a href="../assets/vectorheart/preview.html">vectorheart kit</a>
+  </div>
+
+  <!-- 3. Flow -->
+  <h2>Visitor flow</h2>
+  <div class="legend"><span><span class="badge b-gap">🆕 GAP</span> needs a mockup (<b>*</b> in the diagram)</span><span><span class="badge b-ok">✓</span> exists</span><span><span class="badge b-ctx">ctx</span> context / admin</span><span><span class="badge b-q">?</span> unclear</span></div>
+<pre>
+ first visit                         returning visit
+     |                                     |
+     v                                     |
+ +--------------+   Skip (after 1s)        |
+ | <span class="g">* INTRO</span>      |-----------------+        |
+ | vectorheart  |                 v        v
+ | boot / game  |----------> +-----------------------+
+ +--------------+   ends     | <span class="g">* LOBBY</span>               |   toggles: sound / night / lite
+                             | profile, player card  |-- tap card --> osu! / TETR.IO / GitHub profile (new tab)
+                             | info,  [ ENTER <3 ]   |
+                             +-----------+-----------+
+                       click unlocks audio | <span class="g">? BGM can only start after this click</span>
+                                         v
+                             +-----------------------+
+                             | <span class="g">* WARP</span>                |   morph Lobby -> Portfolio (+ SFX)
+                             +-----------+-----------+
+                                         v
+ +----------------------------------------------------------------------------+
+ | <span class="g">* PORTFOLIO</span>   BGM fades in, low volume                                     |
+ |                                                                            |
+ | Projects > <span class="g">osu!taiko</span> > <span class="g">osu!mania 4K</span> > TETR.IO > Skills and Setups          |
+ | > Timeline > Blog --> <span class="g">* Blog post</span>                                          |
+ | > Shoutouts > <span class="g">Guestbook</span> --> submit --> "waiting for approval"              |
+ | > Footer: LinkedIn, GitHub, Instagram, Facebook, work email                |
+ |                                                                            |
+ | Feature audio (chart song, hitsounds, TETR.IO sound) => BGM crossfades out |
+ +----------------------------------------------------------------------------+
+
+ <span class="c">context: /admin (Sveltia CMS) . Guestbook approval queue . 404 page</span>
+</pre>
+
+  <!-- 4. Existing -->
+  <h2>Existing material <span class="badge b-ok">✓ 1 item</span></h2>
+  <div class="grid">
+    <div class="card">
+      <span class="file">assets/vectorheart/preview.html · static capture</span>
+      <h3>Vectorheart kit</h3>
+      <p>16 SVG elements, 8 fonts, demo poster. This is the art toolbox, not a screen. <b>Static image:</b> the live page loads its sprite with a script, which this page's security rules block. <a href="../assets/vectorheart/preview.html" target="_blank" rel="noopener noreferrer">Open live ↗</a></p>
+      <img class="static" src="../docs/vectorheart-preview.png" alt="Vectorheart kit preview: diagonal pastel poster, element grid and font specimens">
+      <ul class="check">
+        <li>Palette has enough contrast for text (ink on pastel ✓, white on pastel ✗ → only as outlined text)</li>
+        <li>Which 3 elements become the site's "signature" (repeated everywhere)?</li>
+        <li>Night-theme variants of each colour (waiting on your switch design)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 5. State gaps -->
+  <h2>Unclear states and transitions <span class="badge b-q">? unclear</span></h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Audio unlock</h3>
+      <ul>
+        <li>Browsers block sound until the visitor clicks once. The <b>Enter</b> click is the natural unlock. Is BGM off everywhere before the Warp, including the Intro?</li>
+        <li>Does the Intro have its own sound? If so, it needs a "tap to start" screen first.</li>
+        <li>Sound toggle remembered between visits?</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Crossfade rules</h3>
+      <ul>
+        <li>Fade length: ~0.8s out / 1.5s back in?</li>
+        <li>BGM pauses (resumes where it left off) or keeps playing silently?</li>
+        <li>Muted chart preview counts as Feature audio? (proposal: no, BGM stays)</li>
+        <li>TETR.IO video is muted by default, so it only ducks BGM if unmuted?</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Returning visitors and motion settings</h3>
+      <ul>
+        <li>Returning visitor lands on the Lobby or straight in the Portfolio?</li>
+        <li>"Watch Intro again" link somewhere (footer?)</li>
+        <li>Reduced motion / Lite mode: Intro replaced by a still title card, Warp by a quick fade?</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Loading</h3>
+      <ul>
+        <li>Chart players load ~3 MB on demand: what shows while loading? (proposal: vectorheart progress bar in the player)</li>
+        <li>Stats Card when a platform API is down: last known numbers + "as of" date?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 6. Gaps -->
+  <h2>Screens to produce <span class="badge b-gap">🆕 produce next</span></h2>
+  <div class="grid">
+
+    <!-- INTRO -->
+    <div class="card gap">
+      <span class="file">design-mocks/intro.html</span>
+      <h3>Intro</h3>
+      <p>Game-like first-visit animation built from vectorheart elements. Your concept is coming later.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="x t5">vectorheart animation</div>
+          <div class="x y">loading ▮▮▮▯ 72%</div>
+          <div class="x" style="justify-self:end;width:50%">Skip ▸</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-rows:1fr auto">
+          <div class="x">full-screen vectorheart animation</div>
+          <div class="row"><div class="x y">loading 72%</div><div class="x" style="flex:.4">Skip ▸</div></div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Length: 3–6s or longer? Does it double as a real loading screen?</li>
+        <li>Game-like how: a boot screen, a "song select" or a playable mini-moment (e.g. hit 4 notes to start)?</li>
+        <li>Sound in the Intro (needs a "tap to start" screen first)?</li>
+        <li>Skip: appears after 1s, top-right? Keyboard: Esc / Space?</li>
+      </ul>
+    </div>
+
+    <!-- LOBBY -->
+    <div class="card gap">
+      <span class="file">design-mocks/lobby.html</span>
+      <h3>Lobby</h3>
+      <p>Who you are, in one screen: profile, player card (osu! · TETR.IO · GitHub), short info, the <b>Enter</b> button.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="row"><div class="x" style="flex:3">jimmyreturnz</div><div class="x">🔊🌙⚡</div></div>
+          <div class="x p t2">avatar + name + tagline</div>
+          <div class="x s t3">player card<br>taiko · mania · TETR.IO · GitHub</div>
+          <div class="x t2">info: dev · player · based in…</div>
+          <div class="x btn t1">ENTER ♥</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto">
+          <div class="x" style="grid-column:1/3">jimmyreturnz · 🔊 🌙 ⚡</div>
+          <div class="x p">avatar · name · tagline · info</div>
+          <div class="x s">player card (tabs per game)</div>
+          <div class="x btn" style="grid-column:1/3">ENTER ♥</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Player card: one card with tabs per game, or 3 small cards side by side?</li>
+        <li>Which numbers per game? (proposal: rank, country rank, pp/TR, play count)</li>
+        <li>Avatar: your osu! avatar, a photo, or a vectorheart illustration?</li>
+        <li>Tagline and info lines: what do you want a stranger to know in 5 seconds?</li>
+        <li>Recruiter shortcut ("Jump to projects") visible here?</li>
+      </ul>
+    </div>
+
+    <!-- WARP -->
+    <div class="card gap">
+      <span class="file">design-mocks/warp.html</span>
+      <h3>Warp</h3>
+      <p>The morph from Lobby into Portfolio. Sound and animation are still open.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone · 3 frames" style="grid-template-rows:1fr 1fr 1fr">
+          <div class="x p">1 · ENTER pressed, heart pulses</div>
+          <div class="x s">2 · speed lines / arrows rush diagonally</div>
+          <div class="x m">3 · Portfolio slides in</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Idea A: the Enter heart grows to fill the screen, then opens like a shutter. Idea B: diagonal speed lanes (as in the kit poster) wipe across. Idea C: osu! "song select → gameplay" style zoom.</li>
+        <li>Duration: under 1.2s (recommended) so it never feels like waiting?</li>
+        <li>Same Warp every time, or a shorter one for returning visitors?</li>
+        <li>SFX: one "whoosh + chime", or silent until you pick one?</li>
+      </ul>
+    </div>
+
+    <!-- PORTFOLIO SHELL -->
+    <div class="card gap">
+      <span class="file">design-mocks/portfolio-top.html</span>
+      <h3>Portfolio: top and navigation</h3>
+      <p>Shell around all Showcases: header, section nav, BGM control, toggles.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="row"><div class="x" style="flex:3">jimmyreturnz</div><div class="x">☰</div></div>
+          <div class="x y">♪ BGM ▮▮▯ ─○──</div>
+          <div class="x p t3">Projects…</div>
+          <div class="x t2">…</div>
+          <div class="x" style="position:absolute;bottom:8px;left:6px;right:6px">chips: Projects · Taiko · Mania · …</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-columns:70px 1fr;grid-template-rows:auto 1fr">
+          <div class="x" style="grid-column:1/3">jimmyreturnz · ♪ BGM ─○── · 🔊 🌙 ⚡</div>
+          <div class="x">side nav<br>sections</div>
+          <div class="x p">Showcases scroll here</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Navigation: side rail (desktop) + bottom chips (phone), or a single top bar?</li>
+        <li>BGM control: mini player with track name + volume, or just a mute button?</li>
+        <li>One long scrolling page (recommended), or each Showcase as its own page?</li>
+        <li>Way back to the Lobby?</li>
+      </ul>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="card gap">
+      <span class="file">design-mocks/showcase-projects.html</span>
+      <h3>Showcase: Projects</h3>
+      <p>GitHub repos, internship and career work. First Showcase, so recruiters hit it straight away.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="row"><div class="x">All</div><div class="x">GitHub</div><div class="x">Work</div></div>
+          <div class="x p t3">project card: image · title · tags · links</div>
+          <div class="x p t3">project card</div>
+          <div class="x t1">more ▾</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-columns:repeat(3,1fr);grid-template-rows:auto 1fr 1fr">
+          <div class="x" style="grid-column:1/4">filter: All · GitHub · Internship · Career</div>
+          <div class="x p">card</div><div class="x p">card</div><div class="x p">card</div>
+          <div class="x p">card</div><div class="x p">card</div><div class="x p">card</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Card fields: image, title, one-line summary, tech tags, role, dates, links (repo / live / case study)?</li>
+        <li>Internship work that is private: description only, no links?</li>
+        <li>Click opens a detail page, or the card flips/expands in place?</li>
+        <li>GitHub Stats Card lives here or in the Lobby only?</li>
+        <li>Roughly how many projects at launch?</li>
+      </ul>
+    </div>
+
+    <!-- TAIKO -->
+    <div class="card gap">
+      <span class="file">design-mocks/showcase-taiko.html</span>
+      <h3>Showcase: osu!taiko</h3>
+      <p>Camellia – Circles of Death, your map. Chart preview with hitsounds + playable mode. Muted by default.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone · landscape?">
+          <div class="x y">Circles of Death · mapped by jimmyreturnz</div>
+          <div class="x s t2">scrolling note lane ● ● ◯ ●</div>
+          <div class="row"><div class="x">▶ Preview</div><div class="x btn">PLAY</div></div>
+          <div class="row t4"><div class="x p">KA<br>(edge)</div><div class="x m">DON<br>(centre)</div><div class="x p">KA</div></div>
+          <div class="x">🔇 · offset · speed</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-rows:auto 1fr auto auto">
+          <div class="x y">song info · stars · BPM · credit</div>
+          <div class="x s">note lane (drum on left, notes scroll in)</div>
+          <div class="row"><div class="x">▶ Preview</div><div class="x btn">PLAY</div><div class="x">🔇 vol</div></div>
+          <div class="x">keys: D F J K (configurable)</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Preview = auto-play (watch the chart play itself) with hitsounds?</li>
+        <li>Phone touch layout: drum split into centre (don) and rim (ka) zones like osu!lazer touch?</li>
+        <li>Results screen after play: accuracy, combo, grade? Scores saved anywhere? (proposal: no, local only)</li>
+        <li>Full song or a "start from kiai" option?</li>
+        <li>Key bindings editable?</li>
+      </ul>
+    </div>
+
+    <!-- MANIA -->
+    <div class="card gap">
+      <span class="file">design-mocks/showcase-mania.html</span>
+      <h3>Showcase: osu!mania 4K</h3>
+      <p>かめりあ – Quaoar, your 4K map. Same player shell as taiko so they feel like a pair. Layout borrows kenzync.dev's tool cards.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="x y">Quaoar 4K · mapped by jimmyreturnz</div>
+          <div class="row t5"><div class="x s">▮</div><div class="x p">▮</div><div class="x p">▮</div><div class="x s">▮</div></div>
+          <div class="row"><div class="x">▶ Preview</div><div class="x btn">PLAY</div></div>
+          <div class="x">🔇 · scroll speed · offset</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-columns:1fr 1.2fr">
+          <div class="x y">song info · stats · credit · controls · keys D F J K</div>
+          <div class="row"><div class="x s">▮</div><div class="x p">▮</div><div class="x p">▮</div><div class="x s">▮</div></div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Quaoar is very dense. Offer a lower speed or "practice section" option for visitors?</li>
+        <li>Phone: 4 tap columns at the bottom, portrait OK?</li>
+        <li>Hold notes and long notes shown exactly as the chart has them?</li>
+        <li>Skin: vectorheart notes (heart-shaped heads?) or classic bars?</li>
+      </ul>
+    </div>
+
+    <!-- TETRIO -->
+    <div class="card gap">
+      <span class="file">design-mocks/showcase-tetrio.html</span>
+      <h3>Showcase: TETR.IO</h3>
+      <p>Your recorded gameplay as a looping video, plus a TETR.IO Stats Card.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="x s t4">looping video (muted)</div>
+          <div class="x">🔇 tap for sound</div>
+          <div class="x p t2">TETR.IO card: rank · TR · APM/PPS</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-columns:1.6fr 1fr">
+          <div class="x s">looping video</div>
+          <div class="x p">Stats Card + caption</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Video length and file size? (aim: under 15s loop, ~3–5 MB, served as WebM + MP4)</li>
+        <li>Does the video have game sound worth unmuting?</li>
+        <li>Caption: what are we watching (mode, highlight, record)?</li>
+      </ul>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="card gap">
+      <span class="file">design-mocks/showcase-skills-setups.html</span>
+      <h3>Showcase: Skills and Setups</h3>
+      <p>Tech skills alongside gaming gear and settings.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="row"><div class="x p">Skills</div><div class="x">Setups</div></div>
+          <div class="x p t3">skill chips grouped: languages · frameworks · tools</div>
+          <div class="x t3">setup: keyboard · mouse/tablet · keybinds · skin</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-columns:1fr 1fr">
+          <div class="x p">Skills</div>
+          <div class="x">Setups (gear + settings per game)</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Skill levels shown (bars/stars) or just grouped chips? (proposal: chips, levels age badly)</li>
+        <li>Setup per game: taiko keys, mania keys, TETR.IO handling (ARR/DAS/SDF)?</li>
+        <li>Photos of your desk/gear?</li>
+      </ul>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="card gap">
+      <span class="file">design-mocks/showcase-timeline.html</span>
+      <h3>Showcase: Timeline</h3>
+      <p>High school, university, internship, career. Secondary, so it stays compact.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="x t1">● High school</div><div class="x t1">● University</div>
+          <div class="x p t1">● Internship</div><div class="x t1">● Career</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-rows:auto 1fr">
+          <div class="x">swipe/scroll →</div>
+          <div class="row"><div class="x">HS</div><div class="x">Uni</div><div class="x p">Intern</div><div class="x">Career</div></div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Vertical on phone, horizontal on desktop, OK?</li>
+        <li>Each stop: dates, place, one line, optional logo?</li>
+        <li>Collapsed by default ("Show my timeline ▾") since it isn't a main focus?</li>
+      </ul>
+    </div>
+
+    <!-- BLOG -->
+    <div class="card gap">
+      <span class="file">design-mocks/showcase-blog.html + blog-post.html</span>
+      <h3>Showcase: Blog + post page</h3>
+      <p>Your content board: latest posts in the Portfolio, each opening a full post page. Written in /admin.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone · list">
+          <div class="x p t3">latest post (cover, title, date)</div>
+          <div class="x t2">post</div><div class="x t2">post</div>
+          <div class="x t1">All posts →</div>
+        </div>
+        <div class="wf ph" data-l="phone · post">
+          <div class="x t1">← back</div>
+          <div class="x p t3">cover image</div>
+          <div class="x t1">title · date · tags</div>
+          <div class="x t4">body text, images</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Post types: text + images only, or also embeds (YouTube, osu! scores)?</li>
+        <li>Tags/categories (dev · osu · life)?</li>
+        <li>Comments on posts? (proposal: no, the Guestbook covers it)</li>
+      </ul>
+    </div>
+
+    <!-- SHOUTOUTS -->
+    <div class="card gap">
+      <span class="file">design-mocks/showcase-shoutouts.html</span>
+      <h3>Showcase: Shoutouts</h3>
+      <p>Friends and people you respect, each with an optional quote.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="x p t2">avatar · name · "quote…"</div>
+          <div class="x s t2">avatar · name · "quote…"</div>
+          <div class="x m t2">avatar · name</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-rows:1fr auto">
+          <div class="row"><div class="x p">card</div><div class="x s">card</div><div class="x m">card</div><div class="x y">card</div></div>
+          <div class="x">marquee of usernames ← scrolling</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>Two tiers: "Friends" and "People I look up to", or one list?</li>
+        <li>Link per person: osu! / TETR.IO / any URL you choose?</li>
+        <li>Scrolling marquee of names (like the ticker on hirokaze.net) plus cards?</li>
+        <li>Do you ask people before listing them?</li>
+      </ul>
+    </div>
+
+    <!-- GUESTBOOK -->
+    <div class="card gap">
+      <span class="file">design-mocks/showcase-guestbook.html</span>
+      <h3>Showcase: Guestbook</h3>
+      <p>Approved messages, a short form, and hover cards for osu!/TETR.IO names.</p>
+      <div class="wfs">
+        <div class="wf ph" data-l="phone">
+          <div class="x p t2">message · name [osu! ◉] · date</div>
+          <div class="x t2">message · name · date</div>
+          <div class="x y t3">form: name · osu!/TETR.IO (optional) · message 0/300 · ✓ Turnstile</div>
+          <div class="x btn">Send ♥</div>
+        </div>
+        <div class="wf dt" data-l="desktop" style="grid-template-columns:1.4fr 1fr">
+          <div class="x p">message wall (hover name → profile card)</div>
+          <div class="x y">form</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>After sending: "Thanks! It'll appear after Jimmy approves it" + a cute animation?</li>
+        <li>Wall layout: sticky notes, chat bubbles, or a list?</li>
+        <li>Hover card content: avatar, flag, global rank, mode? Tap-to-open on phones.</li>
+        <li>Font per message switches automatically for Thai / Japanese (Mali / M PLUS Rounded)?</li>
+      </ul>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="card gap">
+      <span class="file">design-mocks/footer.html</span>
+      <h3>Footer</h3>
+      <p>LinkedIn, GitHub, Instagram, Facebook, work email (hidden from bots, copy button). Music credits.</p>
+      <div class="wfs">
+        <div class="wf dt" data-l="desktop" style="grid-template-rows:auto auto auto">
+          <div class="row"><div class="x">in</div><div class="x">GH</div><div class="x">IG</div><div class="x">FB</div><div class="x y">✉ copy</div></div>
+          <div class="x">music credits · "Watch Intro again"</div>
+          <div class="x">© jimmyreturnz</div>
+        </div>
+      </div>
+      <div class="q">Questions</div>
+      <ul>
+        <li>88×31 badges (hirokaze-style) for friends' sites?</li>
+        <li>Big "Let's work together" call-to-action above the footer for recruiters?</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- 7. Adjacent -->
+  <h2>Admin and edge pages <span class="badge b-ctx">ctx</span></h2>
+  <div class="grid">
+    <div class="card"><h3>/admin: Sveltia CMS</h3><p>Ready-made editor. Not designed by us, only configured (collections for Blog, Projects, Shoutouts, Timeline, Skills and Setups).</p></div>
+    <div class="card"><h3>Guestbook approval queue</h3><p>Private page: pending messages, ⚠ impersonation flags, Approve / Delete / Ban. Function first, light styling.</p></div>
+    <div class="card"><h3>404 page</h3><p>Small and cute: "Miss!" in osu! style with a way back. Cheap win, one mockup.</p></div>
+  </div>
+
+  <!-- 8. Sequence -->
+  <h2>Proposed sequence</h2>
+  <ol>
+    <li>You review this page and answer the questions on each card (rough answers are fine; "you decide" is an answer).</li>
+    <li>I turn the answers into a polished mockup of the <b>Lobby</b> and <b>Portfolio top</b> first, in the vectorheart style, at phone and desktop size, guided by ui-ux-pro-max.</li>
+    <li>Then the two chart players (taiko, mania) as one shared player design.</li>
+    <li>Then the remaining Showcases, footer, 404.</li>
+    <li>Intro and Warp once your Intro idea and switch design arrive; motion built with GSAP and checked against 60fps-animation.</li>
+    <li>Implementation starts in Astro once the mockups are approved.</li>
+  </ol>
+
+  <!-- 9. Footer -->
+  <footer>Portfolio v1 storyboard · last updated 2026-11-16 · read with <a href="../GLOSSARY.md">GLOSSARY.md</a> and <a href="../docs/FEATURES.md">FEATURES.md</a></footer>
+</div>
+</body>
+</html>
