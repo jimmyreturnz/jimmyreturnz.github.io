@@ -26,6 +26,6 @@ Drop files here when ready; the players will pick them up:
   - `assets/audio/Camellia-Quaoar.*` (4K)
   - `assets/audio/Camellia-Under_Construction.*` (7K)
   - `assets/audio/Camellia-Circles_of_Death.*` (taiko)
-- Audio naming: `Artist-SongName.ext`, `_` for spaces. Beatmap `.osu` files stay out of the repo (gitignored); note rendering will need another route.
+- Audio naming: `Artist-SongName.ext`, `_` for spaces. Beatmap `.osu` files stay out of the repo (gitignored); notes-only JSON made by `site/scripts/osu-to-notes.mjs` lives in `assets/charts/` and is committed.
 - Test seeking with `bun run build && bun run preview` (it supports range requests); a bare `python -m http.server` doesn't, so the slider jumps back to 0 there.
 - `assets/audio/hitsounds/`: taiko don/kat hitsounds
