@@ -3,44 +3,35 @@ import SoundToggle from './SoundToggle.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
 ---
 <div class="settings" role="group" aria-label="Site settings">
-  <div class="volwrap">
-    <button class="volbtn" type="button" aria-expanded="false" aria-controls="vol-pop" title="Volume" data-vol-btn>
-      <span class="sr-only">Volume</span>
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 8v8M9 5v14M14 9v6M19 7v10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
-    </button>
-    <div class="volpop" id="vol-pop" hidden>
-      <label>Effects <input type="range" min="0" max="100" step="1" data-vol="sfx" /></label>
-      <label>Music <input type="range" min="0" max="100" step="1" data-vol="music" /></label>
+  <div class="snd">
+    <div class="vols">
+      <label title="Music volume"><span aria-hidden="true">♪</span><span class="sr-only">Music volume</span><input type="range" min="0" max="100" step="1" data-vol="music" /></label>
+      <label title="Effects volume"><span aria-hidden="true">fx</span><span class="sr-only">Effects volume</span><input type="range" min="0" max="100" step="1" data-vol="sfx" /></label>
     </div>
+    <SoundToggle />
   </div>
-  <SoundToggle />
   <ThemeSwitch />
 </div>
 
 <style>
-  .volwrap{position:relative}
-  .volbtn{width:var(--ctl);height:var(--ctl);border-radius:50%;border:2px solid var(--ink);background:var(--paper);display:grid;place-items:center;cursor:pointer;padding:0;color:var(--ink)}
-  .volpop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:200px;display:grid;gap:10px;padding:12px 14px;background:var(--paper);
-          border:var(--stroke) solid var(--ink);border-radius:var(--radius);box-shadow:4px 4px 0 var(--shadow-c)}
-  .volpop[hidden]{display:none}
-  .volpop label{display:grid;gap:4px;font:700 11px var(--hud);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-  .volpop input{width:100%;accent-color:var(--accent)}
+  /* the speaker button grows a volume bar to its left on hover or keyboard focus (and after a tap on touch) */
+  .snd{display:flex;align-items:center}
+  .vols{display:flex;align-items:center;gap:10px;height:var(--ctl);max-width:0;opacity:0;overflow:hidden;margin-right:0;padding:0;
+        border:2px solid transparent;border-radius:99px;background:var(--paper);white-space:nowrap;
+        transition:max-width .3s ease,opacity .2s ease,margin .3s ease,padding .3s ease,border-color .3s}
+  .snd:hover .vols,.snd:focus-within .vols{max-width:230px;opacity:1;margin-right:8px;padding:0 12px;border-color:var(--ink)}
+  .vols label{display:flex;align-items:center;gap:6px;font:700 11px var(--hud);color:var(--muted)}
+  .vols input{width:72px;accent-color:var(--accent);cursor:pointer}
+  @media (max-width:520px){ .vols input{width:56px} }
 </style>
 
 <script>
   import { vol, setVolume } from '../scripts/audio';
   document.addEventListener('astro:page-load', () => {
-    document.querySelectorAll<HTMLElement>('.volwrap').forEach((w) => {
-      const btn = w.querySelector<HTMLButtonElement>('[data-vol-btn]')!, pop = w.querySelector<HTMLElement>('.volpop')!;
-      btn.onclick = () => { pop.hidden = !pop.hidden; btn.setAttribute('aria-expanded', String(!pop.hidden)); };
-      w.querySelectorAll<HTMLInputElement>('[data-vol]').forEach((r) => {
-        const k = r.dataset.vol as 'sfx' | 'music';
-        r.value = String(Math.round(vol[k] * 100));
-        r.oninput = () => setVolume(k, Number(r.value) / 100);
-      });
+    document.querySelectorAll<HTMLInputElement>('[data-vol]').forEach((r) => {
+      const k = r.dataset.vol as 'sfx' | 'music';
+      r.value = String(Math.round(vol[k] * 100));
+      r.oninput = () => setVolume(k, Number(r.value) / 100);
     });
-  });
-  document.addEventListener('click', (e) => {
-    if (!(e.target as Element).closest('.volwrap')) document.querySelectorAll<HTMLElement>('.volpop').forEach((p) => { p.hidden = true; });
   });
 </script>
