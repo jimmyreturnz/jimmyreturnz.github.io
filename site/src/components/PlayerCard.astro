@@ -79,15 +79,15 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu-taiko' | 'osu-man
         {t.variants
           ? t.variants.map((v, k) => (
               <div class="stats" data-keys-panel={v.id} hidden={k !== 0}>
-                {v.tiles.map((x) => <div class="stat"><b><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}
+                {v.tiles.map((x) => <div class="stat"><b data-roll><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}
               </div>
             ))
-          : <div class="stats">{t.tiles.map((x) => <div class="stat"><b data-gh-total={x.ghTotal ? '' : undefined}><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}</div>}
+          : <div class="stats">{t.tiles.map((x) => <div class="stat"><b data-roll data-gh-total={x.ghTotal ? '' : undefined}><Ph value={x.value} hint={x.hint} /></b><small>{x.label}</small></div>)}</div>}
       </div>
       {t.id === 'github' && cur && (
         <div class="heat" data-heat>
           <div class="heat-head">
-            <div class="label"><span data-heat-total>{fmt(cur.total)}</span> contributions</div>
+            <div class="label"><span data-heat-total data-roll>{fmt(cur.total)}</span> contributions</div>
             <div class="years" role="group" aria-label="Year">
               {years.map((y, k) => <button class="chip" type="button" data-year={y.year} aria-pressed={k === 0 ? 'true' : 'false'}>{y.year}</button>)}
             </div>
@@ -160,6 +160,8 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu-taiko' | 'osu-man
 </style>
 
 <script>
+  import { rollTo, watchRolls } from '../scripts/roll';
+  document.addEventListener('astro:page-load', () => watchRolls());
   // Year switch for the GitHub heatmap: shows that year's grid and updates the numbers.
   document.addEventListener('astro:page-load', () => document.querySelectorAll<HTMLElement>('[data-heat]').forEach((heat) => {
     const root = heat.closest<HTMLElement>('.panel')!;
@@ -167,26 +169,29 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu-taiko' | 'osu-man
       heat.querySelectorAll<HTMLButtonElement>('.years [data-year]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       heat.querySelectorAll<HTMLElement>('.hm').forEach((g) => { g.hidden = g.dataset.year !== b.dataset.year; });
       const g = heat.querySelector<HTMLElement>(`.hm[data-year="${b.dataset.year}"]`)!, n = (v?: string) => Number(v ?? 0).toLocaleString('en-US');
-      heat.querySelector('[data-heat-total]')!.textContent = n(g.dataset.total);
-      const tile = root.querySelector('[data-gh-total]');
-      if (tile) tile.textContent = n(g.dataset.total);
+      rollTo(heat.querySelector<HTMLElement>('[data-heat-total]')!, n(g.dataset.total));
+      const tile = root.querySelector<HTMLElement>('[data-gh-total]');
+      if (tile) rollTo(tile, n(g.dataset.total));
     }));
   }));
 </script>
 
 <script>
+  import { rollIn } from '../scripts/roll';
   document.addEventListener('astro:page-load', () => document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
     const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-    const select = (t: HTMLButtonElement, focus = false) => {
+    const select = (t: HTMLButtonElement, focus = false, roll = true) => {
       tabs.forEach((x) => {
         const on = x === t;
         x.setAttribute('aria-selected', String(on));
         x.tabIndex = on ? 0 : -1;
         const panel = root.querySelector<HTMLElement>(`#${x.getAttribute('aria-controls')}`);
         if (panel) panel.hidden = !on;
+        if (panel && on && roll) rollIn(panel);
       });
       if (focus) t.focus();
     };
+    select(tabs.find((x) => x.getAttribute('aria-selected') === 'true') ?? tabs[0]!, false);
     tabs.forEach((t, i) => {
       t.addEventListener('click', () => select(t));
       t.addEventListener('keydown', (e) => {

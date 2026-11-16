@@ -15,12 +15,13 @@ const { options, label = 'Key mode' } = Astro.props;
 </style>
 
 <script>
+  import { rollIn } from '../scripts/roll';
   document.addEventListener('astro:page-load', () => {
     document.querySelectorAll<HTMLElement>('[data-keys]').forEach((root) => {
       const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-keys-btn]')];
       btns.forEach((b) => b.addEventListener('click', () => {
         btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-        root.querySelectorAll<HTMLElement>('[data-keys-panel]').forEach((p) => { p.hidden = p.dataset.keysPanel !== b.dataset.keysBtn; });
+        root.querySelectorAll<HTMLElement>('[data-keys-panel]').forEach((p) => { p.hidden = p.dataset.keysPanel !== b.dataset.keysBtn; if (!p.hidden) rollIn(p); });
       }));
     });
   });

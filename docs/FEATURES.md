@@ -52,6 +52,9 @@ Pages (each its own URL, animated page transitions, header + BGM persist): **Pro
 - **Lobby idle loops**: slow gradient drift (cheap CSS) and pulsing circles; no moving arrows in the Lobby for now (the arrows live in the power-button sequence). Orbiting icons have transparent backgrounds.
 - **Menu overlay**: circle reveal from the menu button, one marquee row per page, tinted by the hovered row. Accepted for now.
 - **Intro timing and input** (owner, 2026-11-16): total 3–5 s (storyboard `design-mocks/intro-storyboard.html`, ~4.8 s). Mouse: hold the power button 0.7 s with a circular progress stripe, then it explodes into ripples; phone: one tap; keyboard: hold Space/Enter; screen readers get a plain button. Orbiting icons: glyph only, no background tile. Polish bundle accepted: heart loading bar, "Miss!" 404, pink scrollbars, pulsing focus ring, Message Board submit/arrive animations.
+- **Warp**: reuses the Intro's ripples (avatar ring bursts into ripples, pink wash, a few vectorheart arrows), ~0.8 s; avatar shrinks into the header logo.
+- **Header visualizer**: instead of bars next to the Sound button, the top bar plays the music as a faint colour visualizer behind the header; still when muted.
+- **Rolling numbers**: built (`site/src/scripts/roll.ts`; Player Card tabs, 4K/7K switch, GitHub year switch). Tiles on the TETR.IO and osu! pages still to wire (`data-roll`).
 - **Click feedback**: soft squish plus 3–4 tiny hearts on buttons and tabs (no "GREAT" text pops).
 - **Page transitions**: Flip morph (nav item becomes the next page's title); fade-and-rise fallback for reduced motion and first load.
 - **Warp**: the avatar ring expands into a pink wash with hearts streaming past, then settles; the avatar becomes the header logo. ≤0.8 s, ≤3 flashes per second.
