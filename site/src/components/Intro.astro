@@ -20,7 +20,7 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
         <circle class="track" cx="60" cy="60" r="52" />
         <circle class="prog" cx="60" cy="60" r="52" transform="rotate(-90 60 60)" />
         <circle class="face" cx="60" cy="60" r="38" />
-        <path class="glyph" d="M60 38v24M47 46a22 22 0 1 0 26 0" />
+        <path class="glyph" d="M60 36v24M47 44a22 22 0 1 0 26 0" />
       </svg>
     </button>
     <p class="hint"><span class="hold">hold to power on</span><span class="tap">tap to power on</span></p>
@@ -59,12 +59,14 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
   .intro .layer{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:14px}
   .intro .boot,.intro .desk{display:none}
   .intro .pbtn{border-radius:50%;border:0;background:none;padding:0;cursor:pointer;width:min(34vw,150px);aspect-ratio:1;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-  .intro .pbtn svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 14px #ff7baf88)}
+  .intro .pbtn svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 calc(14px + var(--hold,0) * 34px) color-mix(in srgb,#ff7baf calc(55% + var(--hold,0) * 45%),transparent))}
+  .intro::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:4;background:radial-gradient(circle at 50% 50%,transparent calc(75% - var(--hold,0) * 45%),#ff7baf calc(130% - var(--hold,0) * 30%));opacity:calc(var(--hold,0) * .55)}
+  .intro .spark{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border-radius:50%;background:#ffd0e4;box-shadow:0 0 10px #ff7baf;pointer-events:none}
   .intro .track{fill:none;stroke:#ff7baf33;stroke-width:7}
   .intro .prog{fill:none;stroke:#ff7baf;stroke-width:7;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7}
   .intro .face{fill:#2e2c4d;stroke:#ff7baf;stroke-width:3}
   .intro .glyph{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round}
-  .intro .hint{margin:0;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#ffd0e4}
+  .intro .hint{position:absolute;left:0;right:0;text-align:center;top:calc(50% + min(17vw,75px) + 22px);margin:0;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#ffd0e4}
   .intro .hint .tap,.intro .still{display:none}
   @media (hover:none) and (pointer:coarse){ .intro .hint .hold{display:none} .intro .hint .tap{display:inline} }
   .intro .ripples{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}

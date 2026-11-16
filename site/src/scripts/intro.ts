@@ -82,16 +82,33 @@ function run(el: HTMLElement) {
     const s = sticker(n, 5); s.style.left = `${6 + ((i * 37) % 86)}%`; s.style.top = `${8 + ((i * 53) % 78)}%`; sticks.append(s);
   });
 
+  // holding builds up: glow grows, the button shakes harder, sparks rush in from the edges, a pink vignette closes in
+  let sparkTimer = 0, shake: ((t: number, dt: number) => void) | null = null;
+  const buildUp = () => {
+    const mk = () => {
+      const a = Math.random() * Math.PI * 2, r = Math.max(W(), H()) * 0.6, d = document.createElement('i');
+      d.className = 'spark'; power.append(d);
+      gsap.fromTo(d, { x: Math.cos(a) * r, y: Math.sin(a) * r, scale: 1 + Math.random(), opacity: 0 }, { x: 0, y: 0, scale: 0.2, opacity: 1, duration: 0.55, ease: 'power2.in', onComplete: () => d.remove() });
+    };
+    sparkTimer = window.setInterval(() => { mk(); mk(); }, 55);
+    shake = () => { const p = tween?.progress() ?? 0, a = p * p * 5; gsap.set(btn, { x: (Math.random() - 0.5) * a, y: (Math.random() - 0.5) * a }); el.style.setProperty('--hold', String(p)); };
+    gsap.ticker.add(shake);
+  };
+  const clearBuildUp = () => {
+    clearInterval(sparkTimer); if (shake) gsap.ticker.remove(shake); shake = null;
+    gsap.to(btn, { x: 0, y: 0, duration: 0.15 }); gsap.to(el, { '--hold': 0, duration: 0.25 });
+  };
   const cancelHold = () => {
     if (started) return;
-    tween?.kill(); stopHum();
+    tween?.kill(); stopHum(); clearBuildUp();
     gsap.to(ring, { strokeDashoffset: 326.7, duration: 0.25 }); gsap.to(btn, { scale: 1, duration: 0.2 });
   };
   const startHold = (dur: number) => {
     if (started) return;
     held = true; unlock(); setSound(true); stopHum(); stopHum = sfx.hum();
-    tween = gsap.to(ring, { strokeDashoffset: 0, duration: dur, ease: 'none', onComplete: go });
-    gsap.to(btn, { scale: 1.08, duration: dur });
+    tween = gsap.to(ring, { strokeDashoffset: 0, duration: dur, ease: 'none', onComplete: () => { clearBuildUp(); go(); } });
+    gsap.to(btn, { scale: 1.12, duration: dur, ease: 'power2.in' });
+    buildUp();
   };
   btn.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse') startHold(0.7); else { held = true; unlock(); setSound(true); } });
   btn.addEventListener('pointerup', (e) => {
