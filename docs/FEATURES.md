@@ -8,6 +8,8 @@ Living list of what the site should contain. Order = rough page order.
 3. **"Enter portfolio" button** → transition animation that morphs into the portfolio page. *(animation + sound TBD)*
 
 ## Inside the portfolio
+Showcase order: Projects → osu!taiko → osu!mania → TETR.IO → Skills and Setups → Timeline → Blog → Shoutouts → Guestbook → footer (LinkedIn, GitHub, Instagram, Fastwork, Facebook, work email).
+
 - **Background music** at low volume. Crossfades out when any feature below plays audio, and back in when it stops.
 - **osu!mania 4K** — chart preview with song + playable chart. Chart: かめりあ – Quaoar (own map, 4K). Audio controls, **muted by default**. Layout reference: kenzync.dev tool cards.
 - **osu!taiko** — chart preview with hitsounds + playable chart. Chart: DJ SHARPNEL – THE POWER OF UNDERGROUND (own map).
@@ -15,12 +17,22 @@ Living list of what the site should contain. Order = rough page order.
 - **Projects** — GitHub repos, internship and career work, each linking out.
 - **LinkedIn** link/card.
 - **Shoutouts** — friends' usernames and people I respect, with optional avatar, link and a short quote/message each. Editable as content (not hard-coded) so entries can be added any time.
+- **Skills and Setups** — tech skills plus gaming gear and settings.
+- **Timeline** — high school, university, internship, career only; secondary, not a main focus.
+- **Stats Cards** — osu!, TETR.IO, GitHub; refreshed daily. Compact player card in the Lobby (TBD after mockup); each links to the matching profile.
+- **Guestbook** — TH / EN / JP with cute fonts. Approve-before-publish. Optional osu!/TETR.IO username with hover profile card + click-through.
+- **Night theme** — switch design coming from owner.
 - **Content board / blog** — write, edit, add images like a blogger (Sveltia CMS). Features to be requested later.
 
 ## Global requirements
 - Pastel **vectorheart** theme — element kit in `assets/vectorheart/`, fonts in `assets/fonts/`.
 - Heavy animation, but smooth (60fps target) and **mobile-friendly**; respect `prefers-reduced-motion`.
 
+## Parked ideas (not building)
+- Easter eggs (Konami code, typing "osu" on the Lobby).
+
+## Dropped
+- Résumé download. Now playing (copyright risk). Achievements.
+
 ## Open questions
-- Song licensing: full tracks vs short preview clips for Quaoar / THE POWER OF UNDERGROUND.
 - NuageRose font (Gumroad, free) — owner to download and add to `assets/fonts/nuagerose/` with its license.
