@@ -62,7 +62,7 @@ function run(el: HTMLElement) {
   const btn = q<HTMLButtonElement>('.pbtn'), ring = q<SVGCircleElement>('.prog'), power = q('[data-l="power"]'), boot = q('[data-l="boot"]'), desk = q('[data-l="desk"]');
   const bios = q('.bios'), logo = q('.logo'), bar = q('.lbar i'), login = q('.login'), wins = [...el.querySelectorAll<HTMLElement>('.win')];
   const arrows = [...el.querySelectorAll<SVGElement>('.arrows .vh')], path = q<SVGPathElement>('.wave path');
-  const rip = [...el.querySelectorAll<SVGCircleElement>('.ripples circle')], skip = q('[data-skip]');
+  const rip = [...el.querySelectorAll<SVGCircleElement>('.ripples circle')], flash = q('.flash'), skip = q('[data-skip]');
   const W = () => innerWidth, H = () => innerHeight;
   let started = false, held = false, tween: gsap.core.Tween | null = null, stopHum = () => {}, tl: gsap.core.Timeline | null = null;
   const lobbyEls = gsap.utils.toArray<HTMLElement>(LOBBY);
@@ -136,15 +136,13 @@ function run(el: HTMLElement) {
     tl = gsap.timeline({ onComplete: () => { finish(el); gsap.set(lobbyEls, { clearProps: 'all' }); } });
     tl.timeScale(INTRO_SPEED); // the whole Intro runs at this speed (0.5 = about 10 seconds)
 
-    // 1 · swirl: a Balatro-style paint swirl in the theme colours opens from the centre, spins up, then dissolves into the boot screen
-    const sw = q('.swirl') as HTMLCanvasElement, paint = swirl(sw);
+    // 1 · ripples
     tl.call(() => sfx.boom(), [], 0)
       .to(btn, { scale: 1.5, opacity: 0, duration: 0.25, ease: 'power2.out' }, 0)
       .to(q('.hint'), { opacity: 0, duration: 0.2 }, 0)
-      .fromTo(sw, { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.5, ease: 'power3.out' }, 0)
-      .to(sw, { opacity: 0, duration: 0.35 }, 0.85)
-      .set(sw, { display: 'none' }, 1.2)
-      .eventCallback('onUpdate', () => paint(tl!.time()));
+      .fromTo(el, { x: 0 }, { x: 5, duration: 0.04, repeat: 3, yoyo: true, clearProps: 'x' }, 0)
+      .fromTo(rip, { scale: 0.2, opacity: 1 }, { scale: 22, opacity: 0, duration: 1.2, stagger: 0.07, ease: 'power3.out' }, 0)
+      .fromTo(flash, { scale: 0, opacity: 0.95 }, { scale: 1, opacity: 0, duration: 0.5, ease: 'power2.out' }, 0);
 
     // 2 · boot with a glitch
     tl.set(power, { display: 'none' }, 0.7).set(boot, { display: 'grid' }, 0.7)
@@ -238,35 +236,3 @@ document.addEventListener('astro:page-load', () => {
   else if (document.querySelector('.lobby')) lobbyIn(0.05);
 });
 
-// Balatro-style swirl (after reactbits.dev/c/backgrounds/balatro): returns draw(time); a no-op where WebGL is missing
-function swirl(cv: HTMLCanvasElement): (t: number) => void {
-  const gl = cv.getContext('webgl'); if (!gl) return () => {};
-  const mk = (type: number, src: string) => { const sh = gl.createShader(type)!; gl.shaderSource(sh, src); gl.compileShader(sh); return sh; };
-  const pr = gl.createProgram()!;
-  gl.attachShader(pr, mk(gl.VERTEX_SHADER, 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'));
-  gl.attachShader(pr, mk(gl.FRAGMENT_SHADER, `precision highp float;uniform float t;uniform vec2 res;
-const vec3 c1=vec3(1.,.48,.69),c2=vec3(.72,.61,1.),c3=vec3(.12,.118,.2);
-void main(){
-  vec2 px=floor(gl_FragCoord.xy/4.)*4.;
-  vec2 uv=(px-.5*res)/length(res);
-  float l=length(uv),spin=.5+t*.4,ease=min(1.,t*.9);
-  float a=atan(uv.y,uv.x)+spin*.2+302.2-ease*20.*(.25*l+.75);
-  vec2 mid=(res/length(res))/2.;
-  uv=vec2(l*cos(a)+mid.x,l*sin(a)+mid.y)-mid;uv*=30.;
-  float sp=t*2.;vec2 u2=vec2(uv.x+uv.y);
-  for(int i=0;i<5;i++){u2+=sin(max(uv.x,uv.y))+uv;uv+=.5*vec2(cos(5.1123314+.353*u2.y+sp*.131121),sin(u2.x-.113*sp));uv-=cos(uv.x+uv.y)-sin(uv.x*.711-uv.y);}
-  float cm=.25*3.5+.5*.25+1.2,pr=min(2.,max(0.,length(uv)*.035*cm));
-  float p1=max(0.,1.-cm*abs(1.-pr)),p2=max(0.,1.-cm*abs(pr)),p3=1.-min(1.,p1+p2);
-  float light=.1*max(p1*5.-4.,0.)+.3*max(p2*5.-4.,0.);
-  vec3 col=(.3/3.5)*c1+(1.-.3/3.5)*(c1*p1+c2*p2+c3*p3)+light;
-  gl_FragColor=vec4(col,1.);}`));
-  gl.linkProgram(pr); gl.useProgram(pr);
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-  const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  const ut = gl.getUniformLocation(pr, 't'), ur = gl.getUniformLocation(pr, 'res');
-  return (t: number) => {
-    const w = Math.round(cv.clientWidth * 0.5) || 640, h = Math.round(cv.clientHeight * 0.5) || 360;
-    if (cv.width !== w) { cv.width = w; cv.height = h; gl.viewport(0, 0, w, h); }
-    gl.uniform1f(ut, t); gl.uniform2f(ur, w * 2, h * 2); gl.drawArrays(gl.TRIANGLES, 0, 3);
-  };
-}

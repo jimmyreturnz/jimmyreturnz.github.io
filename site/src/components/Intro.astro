@@ -31,7 +31,7 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
     </p>
   </div>
 
-  <canvas class="swirl" aria-hidden="true"></canvas>
+  <i class="flash" aria-hidden="true"></i>
   <svg class="ripples" viewBox="-800 -450 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <circle r="60" /><circle r="60" /><circle r="60" /><circle r="60" /><circle r="60" />
   </svg>
@@ -76,7 +76,7 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
   .intro .hint{position:absolute;left:0;right:0;text-align:center;top:calc(50% + min(17vw,75px) + 22px);margin:0;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#ffd0e4}
   .intro .hint .tap,.intro .still{display:none}
   @media (hover:none) and (pointer:coarse){ .intro .hint .hold{display:none} .intro .hint .tap{display:inline} }
-  .intro .swirl{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;image-rendering:pixelated}
+  .intro .flash{position:absolute;left:50%;top:50%;width:140vmax;height:140vmax;margin:-70vmax;border-radius:50%;background:radial-gradient(circle,#fff 0,#ffd0e4 18%,#ff7baf55 38%,transparent 62%);opacity:0;transform:scale(0);pointer-events:none}
   .intro .ripples{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   .intro .ripples circle{fill:none;stroke:#ff7baf;stroke-width:14;opacity:0;transform-origin:center;transform-box:view-box}
   .intro .ripples circle:nth-child(2n){stroke:#eeaaff}.intro .ripples circle:nth-child(3n){stroke:#bbddff}
