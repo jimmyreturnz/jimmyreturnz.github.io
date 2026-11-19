@@ -31,6 +31,7 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
     </p>
   </div>
 
+  <canvas class="swirl" aria-hidden="true"></canvas>
   <svg class="ripples" viewBox="-800 -450 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <circle r="60" /><circle r="60" /><circle r="60" /><circle r="60" /><circle r="60" />
   </svg>
@@ -75,8 +76,9 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
   .intro .hint{position:absolute;left:0;right:0;text-align:center;top:calc(50% + min(17vw,75px) + 22px);margin:0;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#ffd0e4}
   .intro .hint .tap,.intro .still{display:none}
   @media (hover:none) and (pointer:coarse){ .intro .hint .hold{display:none} .intro .hint .tap{display:inline} }
+  .intro .swirl{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;image-rendering:pixelated}
   .intro .ripples{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-  .intro .ripples circle{fill:none;stroke:#ff7baf;stroke-width:6;opacity:0;transform-origin:center;transform-box:view-box}
+  .intro .ripples circle{fill:none;stroke:#ff7baf;stroke-width:14;opacity:0;transform-origin:center;transform-box:view-box}
   .intro .ripples circle:nth-child(2n){stroke:#eeaaff}.intro .ripples circle:nth-child(3n){stroke:#bbddff}
 
   .intro .boot{background:#0b0a14}
@@ -101,13 +103,15 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
   .intro .wb small{color:#6b5b7d;font-weight:700}
   .intro .arrows{position:absolute;inset:0;pointer-events:none}
   .intro .arrows .vh{position:absolute;left:0;top:0;width:clamp(90px,16vw,200px);color:var(--pink);opacity:0}
+  .intro .flock{position:absolute;left:0;top:0;width:0;height:0;opacity:0}
+  .intro .flock svg{max-width:none;max-height:none;overflow:visible;filter:drop-shadow(0 5px 0 #c23a7a) drop-shadow(0 0 8px #ff7baf99)}
   .intro .arrows .chev{position:absolute;left:0;top:0;opacity:0;overflow:visible}
   .intro .arrows .vh:nth-child(2){color:var(--lav)}.intro .arrows .vh:nth-child(3){color:var(--sky)}
   .intro .wave{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   .intro .wave path{fill:none;stroke:#ff7baf;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:0}
   .intro .skip{position:absolute;right:16px;top:16px;z-index:5;border:2px solid #ffd0e4;background:none;color:#ffd0e4;border-radius:99px;padding:6px 14px;font:700 12px var(--hud);cursor:pointer}
   /* while the Intro runs the Lobby waits underneath; the script pops each piece in at the end */
-  html[data-intro="on"] .lobby .bubble,html[data-intro="on"] .lobby .id,html[data-intro="on"] .lobby .role,html[data-intro="on"] .lobby .about,html[data-intro="on"] .lobby .facts,html[data-intro="on"] .lobby .ctas,html[data-intro="on"] .lobby .socials,html[data-intro="on"] .lobby .player,html[data-intro="on"] .lobby .enter{opacity:0}
+  html[data-intro="on"] .lobby .bar,html[data-intro="on"] .lobby .sky .h1,html[data-intro="on"] .lobby .sky .h2,html[data-intro="on"] .lobby .sky .s1,html[data-intro="on"] .lobby .sky .s2,html[data-intro="on"] .lobby .bubble,html[data-intro="on"] .lobby .id,html[data-intro="on"] .lobby .role,html[data-intro="on"] .lobby .about,html[data-intro="on"] .lobby .facts,html[data-intro="on"] .lobby .ctas,html[data-intro="on"] .lobby .socials,html[data-intro="on"] .lobby .player,html[data-intro="on"] .lobby .enter{opacity:0}
 </style>
 
 <script>

@@ -7,7 +7,7 @@ import { rollIn } from './roll';
 import { sfx, unlock, setSound } from './audio';
 
 const root = document.documentElement;
-const LOBBY = ['.bubble', '.id', '.role', '.about', '.facts', '.ctas', '.socials', '.player', '.enter'].map((s) => `.lobby ${s}`).join(',');
+const LOBBY = ['.bar', '.sky .h1', '.sky .h2', '.sky .s1', '.sky .s2', '.bubble', '.id', '.role', '.about', '.facts', '.ctas', '.socials', '.player', '.enter'].map((s) => `.lobby ${s}`).join(',');
 const BIOS = [
   'x3NiGMaZ BIOS v1.0',
   'CPU: heart @ 3.0GHz   MEM: 1337 MB ok ♥',
@@ -48,7 +48,7 @@ export function lobbyIn(delay = 0) {
   if (reduced()) { gsap.set(els, { clearProps: 'all' }); return; }
   // the Player Card numbers count up as it arrives (stacked tab panels aren't seen by scroll observers)
   gsap.delayedCall(delay + 0.45, () => { const pc = document.querySelector<HTMLElement>('.lobby .player'); if (pc) rollIn(pc); });
-  gsap.fromTo(els, { y: 24, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.6, delay, stagger: 0.06, ease: 'back.out(1.4)', clearProps: 'all' });
+  gsap.fromTo(els, { y: 24, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.6, delay, stagger: 0.06, ease: 'back.out(1.4)', clearProps: root.dataset.intro ? '' : 'all' });
 }
 
 function finish(el: HTMLElement) {
@@ -136,12 +136,15 @@ function run(el: HTMLElement) {
     tl = gsap.timeline({ onComplete: () => { finish(el); gsap.set(lobbyEls, { clearProps: 'all' }); } });
     tl.timeScale(INTRO_SPEED); // the whole Intro runs at this speed (0.5 = about 10 seconds)
 
-    // 1 · ripples
+    // 1 · swirl: a Balatro-style paint swirl in the theme colours opens from the centre, spins up, then dissolves into the boot screen
+    const sw = q('.swirl') as HTMLCanvasElement, paint = swirl(sw);
     tl.call(() => sfx.boom(), [], 0)
       .to(btn, { scale: 1.5, opacity: 0, duration: 0.25, ease: 'power2.out' }, 0)
       .to(q('.hint'), { opacity: 0, duration: 0.2 }, 0)
-      .fromTo(el, { x: 0 }, { x: 5, duration: 0.04, repeat: 3, yoyo: true, clearProps: 'x' }, 0)
-      .fromTo(rip, { scale: 0.2, opacity: 0.9 }, { scale: 18, opacity: 0, duration: 1, stagger: 0.08, ease: 'power2.out' }, 0);
+      .fromTo(sw, { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.5, ease: 'power3.out' }, 0)
+      .to(sw, { opacity: 0, duration: 0.35 }, 0.85)
+      .set(sw, { display: 'none' }, 1.2)
+      .eventCallback('onUpdate', () => paint(tl!.time()));
 
     // 2 · boot with a glitch
     tl.set(power, { display: 'none' }, 0.7).set(boot, { display: 'grid' }, 0.7)
@@ -165,19 +168,23 @@ function run(el: HTMLElement) {
     const ang = Math.atan2(-(h + 180), w + 260) * (180 / Math.PI);
     arrows.forEach((a, i) => tl!.fromTo(a, { x: -220, y: h + 40 - i * 90, rotation: ang, opacity: 1 }, { x: w + 40, y: -140 - i * 90 + (h * 0.15), duration: 0.85, ease: 'power2.inOut' }, 2.7 + i * 0.13));
 
-    // a swarm of small chevrons streams from the bottom-left to the top-right (the owner's draft), with two flowing ribbons crossing it
-    const layer = q('.arrows'), svgNS = 'http://www.w3.org/2000/svg', slope = Math.atan2(-h, w) * (180 / Math.PI), cols = ['#1f1e33', '#ff7baf', '#6fc3ff', '#b79cff'];
-    for (let i = 0; i < 34; i++) {
-      const big = i % 9 === 0, sz = big ? 64 : 22 + Math.random() * 20, c = document.createElementNS(svgNS, 'svg');
-      c.setAttribute('viewBox', '0 0 28 28'); c.setAttribute('width', String(sz)); c.setAttribute('height', String(sz)); c.classList.add('chev');
-      c.innerHTML = `<polyline points="6,4 20,14 6,24" fill="none" stroke="${cols[i % 4]}" stroke-width="${big ? 3 : 3.4}" stroke-linecap="round" stroke-linejoin="round"/>`;
-      layer.append(c);
-      const x0 = -40 + Math.random() * w * 0.22, y0 = h * (0.62 + Math.random() * 0.4), run = w * (0.9 + Math.random() * 0.4);
-      const t0 = 2.7 + Math.random() * 0.8, dur = 0.9 + Math.random() * 0.7;
-      tl.fromTo(c, { x: x0, y: y0, rotation: slope }, { x: x0 + run, y: y0 - run * (h / w) * (0.9 + Math.random() * 0.25), duration: dur, ease: 'power2.in' }, t0)
-        .fromTo(c, { opacity: 0 }, { opacity: 1, duration: 0.15 }, t0)
-        .to(c, { opacity: 0, duration: 0.2 }, t0 + dur - 0.2);
-    }
+    // two flocks of thick white arrows travel together, bottom-left to top-right (the owner's draft); inside a flock they keep formation
+    const layer = q('.arrows'), svgNS = 'http://www.w3.org/2000/svg', slope = Math.atan2(-h, w) * (180 / Math.PI);
+    const mkFlock = (rows: number, cols: number, size: number) => {
+      const f = document.createElement('div'); f.className = 'flock';
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+        const a = document.createElementNS(svgNS, 'svg'); a.setAttribute('viewBox', '0 0 28 28'); a.setAttribute('width', String(size)); a.setAttribute('height', String(size));
+        a.innerHTML = '<polyline points="7,4 21,14 7,24" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>';
+        a.style.cssText = `position:absolute;width:${size}px;height:${size}px;left:${c * size * 0.95 + (r % 2) * size * 0.45}px;top:${(r - (rows - 1) / 2) * size * 0.95}px`;
+        f.append(a);
+      }
+      layer.append(f); return f;
+    };
+    [[mkFlock(3, 3, Math.max(70, w * 0.05)), 2.7, 1.0], [mkFlock(2, 3, Math.max(100, w * 0.075)), 3.15, 0.9]].forEach(([f, t0, dur]) => {
+      const x0 = -w * 0.35, y0 = h * 1.05, k = (h * 1.5) / (w * 1.5);
+      tl!.fromTo(f as HTMLElement, { x: x0, y: y0, rotation: slope, opacity: 0 }, { x: x0 + w * 1.7, y: y0 - w * 1.7 * k, duration: dur as number, ease: 'power1.inOut' }, t0 as number)
+        .fromTo(f as HTMLElement, { opacity: 0 }, { opacity: 1, duration: 0.12 }, t0 as number).to(f as HTMLElement, { opacity: 0, duration: 0.15 }, (t0 as number) + (dur as number) - 0.15);
+    });
     const ribbons = [['#6fc3ff', 0], ['#b79cff', 1.6]].map(([col, off]) => {
       const pth = document.createElementNS(svgNS, 'path'); pth.setAttribute('fill', 'none'); pth.style.stroke = col as string;
        pth.style.opacity = '0'; path.parentNode!.insertBefore(pth, path);
@@ -230,3 +237,36 @@ document.addEventListener('astro:page-load', () => {
   if (el && root.dataset.intro === 'on') run(el);
   else if (document.querySelector('.lobby')) lobbyIn(0.05);
 });
+
+// Balatro-style swirl (after reactbits.dev/c/backgrounds/balatro): returns draw(time); a no-op where WebGL is missing
+function swirl(cv: HTMLCanvasElement): (t: number) => void {
+  const gl = cv.getContext('webgl'); if (!gl) return () => {};
+  const mk = (type: number, src: string) => { const sh = gl.createShader(type)!; gl.shaderSource(sh, src); gl.compileShader(sh); return sh; };
+  const pr = gl.createProgram()!;
+  gl.attachShader(pr, mk(gl.VERTEX_SHADER, 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'));
+  gl.attachShader(pr, mk(gl.FRAGMENT_SHADER, `precision highp float;uniform float t;uniform vec2 res;
+const vec3 c1=vec3(1.,.48,.69),c2=vec3(.72,.61,1.),c3=vec3(.12,.118,.2);
+void main(){
+  vec2 px=floor(gl_FragCoord.xy/4.)*4.;
+  vec2 uv=(px-.5*res)/length(res);
+  float l=length(uv),spin=.5+t*.4,ease=min(1.,t*.9);
+  float a=atan(uv.y,uv.x)+spin*.2+302.2-ease*20.*(.25*l+.75);
+  vec2 mid=(res/length(res))/2.;
+  uv=vec2(l*cos(a)+mid.x,l*sin(a)+mid.y)-mid;uv*=30.;
+  float sp=t*2.;vec2 u2=vec2(uv.x+uv.y);
+  for(int i=0;i<5;i++){u2+=sin(max(uv.x,uv.y))+uv;uv+=.5*vec2(cos(5.1123314+.353*u2.y+sp*.131121),sin(u2.x-.113*sp));uv-=cos(uv.x+uv.y)-sin(uv.x*.711-uv.y);}
+  float cm=.25*3.5+.5*.25+1.2,pr=min(2.,max(0.,length(uv)*.035*cm));
+  float p1=max(0.,1.-cm*abs(1.-pr)),p2=max(0.,1.-cm*abs(pr)),p3=1.-min(1.,p1+p2);
+  float light=.1*max(p1*5.-4.,0.)+.3*max(p2*5.-4.,0.);
+  vec3 col=(.3/3.5)*c1+(1.-.3/3.5)*(c1*p1+c2*p2+c3*p3)+light;
+  gl_FragColor=vec4(col,1.);}`));
+  gl.linkProgram(pr); gl.useProgram(pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const ut = gl.getUniformLocation(pr, 't'), ur = gl.getUniformLocation(pr, 'res');
+  return (t: number) => {
+    const w = Math.round(cv.clientWidth * 0.5) || 640, h = Math.round(cv.clientHeight * 0.5) || 360;
+    if (cv.width !== w) { cv.width = w; cv.height = h; gl.viewport(0, 0, w, h); }
+    gl.uniform1f(ut, t); gl.uniform2f(ur, w * 2, h * 2); gl.drawArrays(gl.TRIANGLES, 0, 3);
+  };
+}
