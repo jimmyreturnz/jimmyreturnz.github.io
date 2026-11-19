@@ -44,14 +44,7 @@ Read these before working:
 - **Current state:** Lobby at `/`; Portfolio pages `/projects/`, `/rhythm/`, `/tetrio/`, `/about/`, `/community/` (Astro ClientRouter: client-side page transitions, header persists; scripts must init on `astro:page-load`). No Intro/Warp/player animation yet; the owner asked for pages first. Light theme is default; dark uses `#1f1e33`. Ink is navy `#1f1e33` for now (plum `#3b2a4d` is the alternative, one token in `site/src/styles/global.css`).
 - **Analytics:** Cloudflare Web Analytics only (no cookies, no banner).
 
-## Planned layout
-```
-site/             Astro app (see site/README.md). Content in site/src/data/site.ts; Stats Card data in site/src/data/stats.json
-api/              Hono Worker (Message Board) — not built yet
-packages/shared/  Types shared by site and api — not built yet
-assets/           served at the site root (Astro publicDir): fonts, vectorheart kit, stats avatars, later audio/ and charts/
-docs/             FEATURES.md, adr/, reviews/
-```
+Not built yet: `api/` (Hono Worker) and `packages/shared/`. `assets/` is the Astro publicDir (served at the site root).
 
 ## Security rules
 - No secrets in client code. API keys (osu! API, GitHub) live in GitHub Actions secrets or Worker secrets only.
