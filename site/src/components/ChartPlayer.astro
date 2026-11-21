@@ -22,7 +22,7 @@ const laneColour = (lanes: number, i: number) =>
   {multi && (
     <div class="cp-head">
       <span class="label">Key mode</span>
-      <KeySwitch options={items.map((it) => ({ id: it.chart.id, label: it.label ?? it.chart.id }))} label="osu!mania key mode" />
+      <KeySwitch options={items.map((it) => ({ id: it.chart.id, label: it.label ?? it.chart.id, note: it.chart.keyMode === '7k' ? 'Thanks LostCool for the permission' : undefined }))} label="osu!mania key mode" />
     </div>
   )}
 
@@ -57,7 +57,7 @@ const laneColour = (lanes: number, i: number) =>
             <output class="time" data-time>0:00 / {mmss(c.lengthSec)}</output>
           </div>
           {hasAudio
-            ? <audio preload="none" data-audio>{sources.map((s) => <source src={s.src} type={s.type} />)}</audio>
+            ? <audio preload="none" data-audio data-lufs={c.lufs}>{sources.map((s) => <source src={s.src} type={s.type} />)}</audio>
             : <p class="soon">Song coming soon. The slider will scrub through it.</p>}
 
           <div class="controls">

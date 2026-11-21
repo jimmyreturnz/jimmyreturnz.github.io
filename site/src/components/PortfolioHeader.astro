@@ -10,13 +10,10 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   <canvas class="viz" aria-hidden="true"></canvas>
   <div class="bar">
     <a class="wordmark" href="/" title="Back to the Lobby"><Vh name="vh-heart" />jimmyreturnz</a>
-    <div class="bgm" role="group" aria-label="Background music" data-bgm-src={bgm.file} data-bgm-name={`${bgm.artist} - ${bgm.title}`} title={`Arr. ${bgm.arranger}`}>
+    <div class="bgm" role="group" aria-label="Background music" data-bgm-src={bgm.file} data-bgm-lufs={bgm.lufs} data-bgm-name={`${bgm.artist} - ${bgm.title}`} title={`Arr. ${bgm.arranger}`}>
       <Vh name="vh-eq" class="eq" />
       <span class="t" data-bgm-title>BGM</span>
       <button type="button" class="pause" aria-pressed="false" data-bgm-toggle>Pause</button>
-    </div>
-    <div class="klights" aria-hidden="true" data-klights hidden>
-      {['S', 'D', 'F', '␣', 'J', 'K', 'L'].map((k) => <kbd data-key={k} class={k === 'S' || k === '␣' || k === 'L' ? 'k7' : undefined}>{k}</kbd>)}
     </div>
     <button type="button" class="chip menubtn" aria-expanded="false" aria-controls="menu" data-menu-btn><span aria-hidden="true">☰</span> Menu</button>
     <Settings />
@@ -49,17 +46,16 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   .top.slim .bar{padding-block:5px}
   .menubtn{height:var(--ctl);margin-left:auto}
   .menubtn + :global(.settings){margin-left:0}
-  .klights{display:flex;gap:4px}
-  .klights[hidden]{display:none}
-  .klights kbd{display:grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border:2px solid var(--ink);border-radius:8px;background:var(--paper);font:700 11px var(--hud);color:var(--ink);transition:background .08s,transform .08s}
-  .klights kbd.on{background:var(--pink);color:var(--on-pastel);transform:translateY(2px)}
-  .klights:not(.seven) .k7{display:none}
-  @media (max-width:620px){ .klights{display:none} }
   .bgm{display:flex;align-items:center;gap:10px;height:var(--ctl);border:2px solid var(--ink);border-radius:99px;padding:0 4px 0 12px;background:var(--paper);font-size:13px;font-weight:700;min-width:0}
   .bgm :global(.eq){width:24px;color:var(--lav)}
   .t{white-space:nowrap}
   .pause{height:26px;border:2px solid var(--ink);border-radius:99px;background:var(--butter);color:var(--on-pastel);padding:0 12px;font-size:12px;font-weight:700;line-height:1}
-  .t{overflow:hidden;text-overflow:ellipsis;max-width:min(34ch,28vw)}
+  .t{overflow:hidden;max-width:min(26ch,24vw);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  /* the title scrolls sideways: the text is there twice, so sliding by half its width loops without a jump */
+  .t :global(.mq){display:inline-flex;gap:3ch;animation:bgmscroll 14s linear infinite;will-change:transform}
+  .t:hover :global(.mq){animation-play-state:paused}
+  @keyframes bgmscroll{to{transform:translateX(calc(-50% - 1.5ch))}}
+  @media (prefers-reduced-motion:reduce){ .t :global(.mq){animation:none} }
   .sections{display:flex;gap:6px;overflow-x:auto;padding:0 clamp(16px,4vw,40px) 10px;scrollbar-width:none}
   .sections::-webkit-scrollbar{display:none}
   .sections .chip{flex:0 0 auto;min-width:108px;display:inline-flex;align-items:center;justify-content:center;text-align:center}
@@ -99,23 +95,6 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
     top.classList.toggle('slim', scrollY > 140);
     const cv = top.querySelector<HTMLCanvasElement>('.viz')!;
     if (!cv.dataset.on) { cv.dataset.on = '1'; headerViz(cv); }
-
-    // ---- key lights on the osu! page: D F J K (4K and taiko kddk), S D F Space J K L (7K) ----
-    const kl = top.querySelector<HTMLElement>('[data-klights]')!;
-    kl.hidden = !location.pathname.startsWith('/rhythm');
-    if (!kl.dataset.on) {
-      kl.dataset.on = '1';
-      const MAP: Record<string, string> = { KeyS: 'S', KeyD: 'D', KeyF: 'F', Space: '␣', KeyJ: 'J', KeyK: 'K', KeyL: 'L' };
-      const light = (e: KeyboardEvent, on: boolean) => {
-        const k = MAP[e.code];
-        if (!k || kl.hidden || (e.target as Element).closest?.('input,textarea,select')) return;
-        kl.classList.toggle('seven', !!document.querySelector('[data-keys-btn="7k"][aria-pressed="true"]'));
-        kl.querySelector(`[data-key="${k}"]`)?.classList.toggle('on', on);
-        if (on && !e.repeat) sfx.tick();
-      };
-      addEventListener('keydown', (e) => light(e, true));
-      addEventListener('keyup', (e) => light(e, false));
-    }
 
     if (!top.dataset.slim) { top.dataset.slim = '1'; addEventListener('scroll', () => top.classList.toggle('slim', scrollY > 140), { passive: true }); }
 

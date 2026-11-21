@@ -1,4 +1,4 @@
-import { tap } from './audio';
+import { tap, normGain, SONG_LUFS } from './audio';
 // Song preview + seek slider for chart players.
 // - Nothing loads until the visitor presses play (audio is preload="none").
 // - Only one chart plays at a time; switching 4K/7K or leaving the page pauses it.
@@ -46,6 +46,7 @@ function setup(root: HTMLElement) {
     render(audio.currentTime);
   });
   audio.addEventListener('play', () => {
+    audio.volume = normGain(Number(audio.dataset.lufs), SONG_LUFS); // these songs are mastered very loud
     tap(audio); // the visualizers listen to the song
     pp.setAttribute('aria-pressed', 'true');
     pp.querySelector('.sr-only')!.textContent = 'Pause preview';

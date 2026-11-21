@@ -74,7 +74,7 @@ export const camelliaUrl = 'https://cametek.jp/';
 
 /** Background music (Portfolio header). Title format: original artist - song title. Arranger is credited separately. */
 export const bgm = {
-  file: '/audio/ZUN-Pure_Furies.m4a',
+  file: '/audio/ZUN-Pure_Furies.m4a', lufs: -14.2,
   artist: 'ZUN', title: 'Pure Furies ~ Whereabouts of the Heart', game: 'Touhou 15: Legacy of Lunatic Kingdom',
   arranger: 'Nnwt', arrangementUrl: 'https://www.youtube.com/watch?v=dSnTgNsFi1I',
   /** Nnwt's description offers the MP3/MIDI/PDF for download and says to change it freely; keep that link if anyone asks. */
@@ -93,6 +93,8 @@ export type Chart = {
   keys: string; scrollSpeed?: number;
   /** base name in assets/audio/ (expects .m4a and/or .opus) */
   audio: string;
+  /** integrated loudness of the song file in LUFS (measured with ffmpeg ebur128); the player turns it down to the site's target */
+  lufs: number;
   /** file name in assets/charts/ */
   osu: string;
 };
@@ -105,7 +107,7 @@ export const charts: Record<'taiko' | 'mania4k' | 'mania7k', Chart> = {
     songUrl: 'https://cametek.bandcamp.com/track/circles-of-death',
     beatmapUrl: 'https://osu.ppy.sh/beatmapsets/2404655#taiko/5216517',
     difficulty: 'Planet of Death', stars: 9.57, bpm: 200, lengthSec: 204,
-    keys: 'D F J K', audio: 'Camellia-Circles_of_Death', osu: 'circles-of-death-taiko.osu',
+    keys: 'D F J K', audio: 'Camellia-Circles_of_Death', lufs: -4.1, osu: 'circles-of-death-taiko.osu',
   },
   mania4k: {
     id: 'quaoar', mode: 'mania', keyMode: '4k',
@@ -115,7 +117,7 @@ export const charts: Record<'taiko' | 'mania4k' | 'mania7k', Chart> = {
     // Beatmapset 1203155 has [4K] To the star (2857557), [4K] Insane (3269223) and [18K] komi im sorry (3579522).
     beatmapUrl: 'https://osu.ppy.sh/beatmapsets/1203155#mania/2857557',
     difficulty: '[4K] To the star', stars: 5.43, bpm: 174, lengthSec: 275,
-    keys: 'D F J K', scrollSpeed: maniaScrollSpeed['4k'], audio: 'Camellia-Quaoar', osu: 'quaoar-4k.osu',
+    keys: 'D F J K', scrollSpeed: maniaScrollSpeed['4k'], audio: 'Camellia-Quaoar', lufs: -8.2, osu: 'quaoar-4k.osu',
   },
   mania7k: {
     id: 'under-construction', mode: 'mania', keyMode: '7k',
@@ -124,7 +126,7 @@ export const charts: Record<'taiko' | 'mania4k' | 'mania7k', Chart> = {
     songUrl: 'https://cametek.bandcamp.com/track/under-construxion',
     beatmapUrl: 'https://osu.ppy.sh/beatmapsets/1122675#mania/2346118',
     difficulty: '[7K] incompleteness', stars: 11.41, bpm: 157.5, lengthSec: 280,
-    keys: 'S D F Space J K L', scrollSpeed: maniaScrollSpeed['7k'], audio: 'Camellia-Under_Construction', osu: 'under-construction-7k.osu',
+    keys: 'S D F Space J K L', scrollSpeed: maniaScrollSpeed['7k'], audio: 'Camellia-Under_Construction', lufs: -3.6, osu: 'under-construction-7k.osu',
   },
 };
 
