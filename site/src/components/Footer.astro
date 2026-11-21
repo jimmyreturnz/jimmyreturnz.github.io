@@ -24,8 +24,8 @@ import { pages } from '../data/pages';
           <li>{c.songUrl ? <a href={c.songUrl} target="_blank" rel="noopener noreferrer">{c.artistLatin} – {c.title}</a> : <>{c.artistLatin} – {c.title}</>}{c.album && <> (<i>{c.album}</i>)</>}<br /><span>chart: {c.difficulty} by {c.mapper}{c.permission && `, ${c.permission}`}</span></li>
         ))}
       </ul>
-      <p class="meta">BGM: {bgm.artist} – {bgm.title} ({bgm.game}), piano arrangement by <a href={bgm.arrangementUrl} target="_blank" rel="noopener noreferrer">{bgm.arranger}</a>. Touhou Project is by ZUN / Team Shanghai Alice; this is an unofficial, non-commercial fan site.</p>
-      <p class="meta">Songs by <a href={camelliaUrl} target="_blank" rel="noopener noreferrer">Camellia</a>, used under Camellia’s song-use guidelines.</p>
+      <p class="meta">BGM: {bgm.artist} – {bgm.title} ({bgm.game}), piano arrangement by <a href={bgm.arrangementUrl} target="_blank" rel="noopener noreferrer">{bgm.arranger}</a>.</p>
+      <p class="meta">Songs by <a href={camelliaUrl} target="_blank" rel="noopener noreferrer">Camellia</a>, used with permission.</p>
     </div>
   </div>
   <p class="wrap tiny">© {new Date().getFullYear()} jimmyreturnz · <a href="/">Back to the Lobby</a> · <a href="/?intro=1" data-astro-reload>Replay intro</a></p>

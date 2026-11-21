@@ -16,6 +16,18 @@ const cache = new Map<string, HTMLImageElement>();
 const tints = new Map<string, HTMLCanvasElement>();
 const lower2 = (a: number[], t: number) => { let lo = 0, hi = a.length; while (lo < hi) { const m = (lo + hi) >> 1; if (a[m]! < t) lo = m + 1; else hi = m; } return lo; };
 const pic = (src: string) => { let i = cache.get(src); if (!i) { i = new Image(); i.onload = () => document.dispatchEvent(new Event('jr:chart-redraw')); i.src = src; cache.set(src, i); } return i; };
+/** Combo digits from the skin (assets/skin/<dir>/combo-N.png), centred on cx/cy, `h` px tall, `overlap` px like skin.ini ComboOverlap. */
+function digits(g: CanvasRenderingContext2D, dir: string, n: number, cx: number, cy: number, h: number, overlap: number, pop: number) {
+  const imgs = String(n).split('').map((c) => pic(`/skin/${dir}/combo-${c}.png`));
+  if (imgs.some((i) => !i.complete || !i.naturalWidth)) return;
+  const k = h / imgs[0]!.naturalHeight, ws = imgs.map((i) => i.naturalWidth * k), total = ws.reduce((a, b) => a + b, 0) - overlap * (imgs.length - 1);
+  g.save(); g.translate(cx, cy); g.scale(pop, pop);
+  let x = -total / 2; imgs.forEach((i, j) => { g.drawImage(i, x, -h / 2, ws[j]!, h); x += ws[j]! - overlap; });
+  g.restore();
+}
+/** How many of the sorted times are at or before t, and a short "pop" (1 -> 1.2 -> 1) after the latest one. */
+function comboAt(times: number[], t: number) { const n = lower2(times, t + 0.001); const since = n ? t - times[n - 1]! : 1e9; return { n, pop: 1 + 0.2 * Math.max(0, 1 - since / 110) }; }
+const COMBO_Y = 130; // skin.ini ComboPosition for 4K and 7K
 const skinReady = fetch('/skin/mania.json').then((r) => r.json()).then((j) => { skin = j; }).catch(() => {});
 
 interface Data { sm: number; mode: 'taiko' | 'mania'; keys: number; bars: number[][]; knots: number[][]; notes: number[][] }
@@ -29,6 +41,7 @@ function setup(root: HTMLElement) {
   const ctx = () => cv!.getContext('2d')!;
   const halfTimes: number[][] = [[], [], [], [], []]; // autoplay hit times per drum half (1 left kat, 2 left don, 3 right don, 4 right kat)
   const events: { t: number; halves: number[]; snd: string[] }[] = [];
+  let comboT: number[] = []; // times that add combo: taiko circles; mania note heads and hold ends
   const resize = () => {
     if (!cv) return;
     const r = stage.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2);
@@ -66,9 +79,13 @@ function setup(root: HTMLElement) {
     return since < 100 ? 1 : 1 - (since - 100) / 50;
   };
   function taiko(g: CanvasRenderingContext2D, W: number, Hc: number, t: number) {
-    const d = data!, H = Math.min(Hc, Math.max(170, W / 6.8267)), top = (Hc - H) / 2, u = H / 200, cy = top + H / 2, hitX = 1.28 * H;
+    const d = data!, H = Math.min(Hc, Math.max(170, W / 6.8267)), top = Math.max(0, Math.min(Hc - H, Hc * 0.32 - H / 2)), u = H / 200, cy = top + H / 2, hitX = 1.28 * H;
     const r = 0.2375 * H, R = r / 0.65, ppms = (v: number) => (1.12 * H * d.sm * v) / 300, xAt = (tt: number) => hitX + (tt - t) * ppms(vAt(tt));
-    g.fillStyle = '#12161d'; g.fillRect(0, 0, W, Hc);
+    const bg = g.createLinearGradient(0, 0, 0, Hc); bg.addColorStop(0, '#1d2233'); bg.addColorStop(1, '#0d1017');
+    g.fillStyle = bg; g.fillRect(0, 0, W, Hc);
+    for (const [gx, gy, gc] of [[0.2, 0.85, '255,179,209'], [0.8, 0.7, '166,216,255'], [0.55, 1, '201,182,255']] as const) { // soft pastel glows in the empty play view
+      const rg = g.createRadialGradient(W * gx, Hc * gy, 0, W * gx, Hc * gy, W * 0.4); rg.addColorStop(0, `rgba(${gc},.16)`); rg.addColorStop(1, `rgba(${gc},0)`); g.fillStyle = rg; g.fillRect(0, 0, W, Hc);
+    }
     g.save(); g.beginPath(); g.rect(0, top, W, H); g.clip();
     const bar = tk('bar-right'); if (bar) g.drawImage(bar, 0, top, W, H);
     // barlines: every measure from each red line, scrolling like notes
@@ -116,7 +133,10 @@ function setup(root: HTMLElement) {
       if (mirror) { g.save(); g.translate(hx * u + w, 0); g.scale(-1, 1); g.drawImage(img, 0, top, w, ih); g.restore(); } else g.drawImage(img, hx * u, top, w, ih);
       g.globalAlpha = 1;
     });
-    g.restore(); g.restore();
+    g.restore();
+    // combo (vnl skin digits, ComboOverlap -2) on the left panel under the drum
+    const cb = comboAt(comboT, t); if (cb.n) digits(g, 'taiko', cb.n, 90 * u, top + 0.84 * H, 0.26 * H, -2 * u, cb.pop);
+    g.restore();
   }
 
   // mania: drawn like osu! stable from the owner's skin.ini ([Mania] 4K / 7K, assets/skin/mania.json) in a 480-high playfield:
@@ -143,6 +163,7 @@ function setup(root: HTMLElement) {
     for (let i = 0; i <= k; i++) { const lw = (c.columnLineWidth[i] ?? 0) * sc; if (lw > 0) g.fillRect(x0 + (i ? colX[i - 1]! + c.columnWidth[i - 1]! : 0) * sc - lw / 2, 0, lw, 480 * sc); }
     // 2 · stage hint + judgement line at HitPosition
     const hint = im(c.stage.hint); if (hint) g.drawImage(hint, x0, hitY - (hint.naturalHeight * px) / 2, sw * sc, hint.naturalHeight * px);
+    const cm = comboAt(comboT, t); if (cm.n) digits(g, 'mania', cm.n, x0 + (sw * sc) / 2, COMBO_Y * sc, 56 * px, 0, cm.pop);
     if (c.judgementLine) { g.fillStyle = '#fff'; g.fillRect(x0, hitY - 1, sw * sc, 2); }
     // key images: bottom of the playfield, stretched to column width
     const keys = () => c.keys.forEach(([up, dn], i) => { const key = im(down.has(i) ? dn : up); if (!key) return; const w = c.columnWidth[i]! * sc, h = (key.naturalHeight * w) / key.naturalWidth; g.drawImage(key, x0 + colX[i]! * sc, 480 * sc - h, w, h); });
@@ -158,7 +179,9 @@ function setup(root: HTMLElement) {
         const yTail = yOf(n[2]!), tail = im(def.t) ?? head, th = tail ? (tail.naturalHeight * w) / tail.naturalWidth : 0, body = im(def.l);
         const top = yTail - th / 2, bot = yHead - hh / 2;
         if (body && bot > top) { g.save(); g.globalAlpha = down.has(col) ? 1 : 0.9; g.drawImage(body, x, top, w, bot - top); g.restore(); }
-        if (tail) g.drawImage(tail, x, yTail - th, w, th);
+        // 4K: the hold end reuses the head arrow, so draw it upside down (like the game does)
+        if (tail && k === 4) { g.save(); g.translate(x, yTail); g.scale(1, -1); g.drawImage(tail, 0, 0, w, th); g.restore(); }
+        else if (tail) g.drawImage(tail, x, yTail - th, w, th);
       }
       if (head) g.drawImage(head, x, yHead - hh, w, hh);
     }
@@ -184,6 +207,8 @@ function setup(root: HTMLElement) {
   const start = async () => {
     if (data || cv) return;
     try { data = (await (await fetch(`/charts/${root.dataset.chart}.json`)).json()) as Data; await skinReady; buildEvents(); } catch { return; }
+    comboT = (data.mode === 'taiko' ? data.notes.filter((n) => n[1]! <= 1).map((n) => n[0]!) : data.notes.flatMap((n) => (n[2]! > 0 ? [n[0]!, n[2]!] : [n[0]!]))).sort((a, b) => a - b);
+    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].forEach((c) => { pic(`/skin/${data!.mode}/combo-${c}.png`); });
     cv = document.createElement('canvas'); cv.className = 'notes'; cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
     stage.querySelectorAll('.taiko,.mania').forEach((e) => e.remove());
     stage.prepend(cv); resize(); new ResizeObserver(resize).observe(stage);
