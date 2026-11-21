@@ -52,7 +52,7 @@ export const projects: Project[] = [
   { title: 'Shipment Tracking', pinned: true, tags: ['data', 'BMW'], cover: 'sky', icon: 'vh-eq',
     outcome: { value: null, text: null }, stack: null, role: null, link: null, note: 'code private' },
   { title: 'Production-scale OCR', pinned: true, tags: ['data', 'BMW'], cover: 'mint', icon: 'vh-target',
-    outcome: { value: null, text: null }, stack: null, role: null, link: null, note: 'code private' },
+    outcome: { value: '≥ ฿500k', text: 'saved compared with buying a dedicated vision system' }, stack: null, role: null, link: null, note: 'code private' },
   { title: 'This portfolio', tags: ['dev', 'open source'], cover: 'pink', icon: 'vh-heart-target',
     outcome: { value: '60fps', text: 'target on a mid-range phone, with two playable osu! charts' },
     stack: 'Astro · TypeScript · GSAP · Hono · Cloudflare', role: 'Solo',
