@@ -134,8 +134,8 @@ function setup(root: HTMLElement) {
       g.globalAlpha = 1;
     });
     g.restore();
-    // combo (vnl skin digits, ComboOverlap -2) on the left panel under the drum
-    const cb = comboAt(comboT, t); if (cb.n) digits(g, 'taiko', cb.n, 90 * u, top + 0.84 * H, 0.26 * H, -2 * u, cb.pop);
+    // combo (vnl skin digits, ComboOverlap -2) on the left panel, just above the key indicator, over the drum art
+    const cb = comboAt(comboT, t); if (cb.n) digits(g, 'taiko', cb.n, 90 * u, top + 0.5 * H, 0.24 * H, -2 * u, cb.pop);
     g.restore();
   }
 
@@ -163,7 +163,6 @@ function setup(root: HTMLElement) {
     for (let i = 0; i <= k; i++) { const lw = (c.columnLineWidth[i] ?? 0) * sc; if (lw > 0) g.fillRect(x0 + (i ? colX[i - 1]! + c.columnWidth[i - 1]! : 0) * sc - lw / 2, 0, lw, 480 * sc); }
     // 2 · stage hint + judgement line at HitPosition
     const hint = im(c.stage.hint); if (hint) g.drawImage(hint, x0, hitY - (hint.naturalHeight * px) / 2, sw * sc, hint.naturalHeight * px);
-    const cm = comboAt(comboT, t); if (cm.n) digits(g, 'mania', cm.n, x0 + (sw * sc) / 2, COMBO_Y * sc, 56 * px, 0, cm.pop);
     if (c.judgementLine) { g.fillStyle = '#fff'; g.fillRect(x0, hitY - 1, sw * sc, 2); }
     // key images: bottom of the playfield, stretched to column width
     const keys = () => c.keys.forEach(([up, dn], i) => { const key = im(down.has(i) ? dn : up); if (!key) return; const w = c.columnWidth[i]! * sc, h = (key.naturalHeight * w) / key.naturalWidth; g.drawImage(key, x0 + colX[i]! * sc, 480 * sc - h, w, h); });
@@ -199,6 +198,8 @@ function setup(root: HTMLElement) {
     }
     for (const col of down) if (c.lightingL.length && [...strikes].every((s) => s[0] !== col)) { const f = im(c.lightingL[0]!); if (f && d.notes.some((n) => n[1] === col && n[2]! > 0 && n[0]! <= t && t < n[2]!)) { const w = f.naturalWidth * px, h = f.naturalHeight * px; g.drawImage(f, x0 + (colX[col]! + c.columnWidth[col]! / 2) * sc - w / 2, hitY - h / 2, w, h); } }
     g.restore();
+    // combo: the top layer, over notes, borders and lighting
+    const cm = comboAt(comboT, t); if (cm.n) digits(g, 'mania', cm.n, x0 + (sw * sc) / 2, COMBO_Y * sc, 56 * px, 0, cm.pop);
     // key letters under the stage
     g.textAlign = 'center'; g.font = '700 12px Orbitron, sans-serif';
     for (let i = 0; i < k; i++) { g.fillStyle = down.has(i) ? '#ffffff' : '#ffffffaa'; g.fillText(LET[i]!, x0 + (colX[i]! + c.columnWidth[i]! / 2) * sc, H - 8); }
