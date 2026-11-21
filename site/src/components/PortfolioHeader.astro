@@ -55,7 +55,6 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   .t :global(.mq){display:inline-flex;gap:3ch;animation:bgmscroll 14s linear infinite;will-change:transform}
   .t:hover :global(.mq){animation-play-state:paused}
   @keyframes bgmscroll{to{transform:translateX(calc(-50% - 1.5ch))}}
-  @media (prefers-reduced-motion:reduce){ .t :global(.mq){animation:none} }
   .sections{display:flex;gap:6px;overflow-x:auto;padding:0 clamp(16px,4vw,40px) 10px;scrollbar-width:none}
   .sections::-webkit-scrollbar{display:none}
   .sections .chip{flex:0 0 auto;min-width:108px;display:inline-flex;align-items:center;justify-content:center;text-align:center}
