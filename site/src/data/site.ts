@@ -60,9 +60,12 @@ export const projects: Project[] = [
 ];
 
 export const skills: { group: string; items: string[] }[] = [
-  { group: 'Data & ML', items: ['Python', 'OCR', 'Machine learning'] },
-  { group: 'Data engineering', items: ['SQL'] },
-  { group: 'Web', items: ['TypeScript', 'Astro'] },
+  { group: 'Data science & ML', items: ['Python', 'Machine learning', 'Deep learning (PyTorch)', 'Diffusion models', 'Audio / signal processing', 'Feature engineering', 'OCR', 'NumPy', 'SciPy', 'Jupyter'] },
+  { group: 'GenAI & LLMs', items: ['LLM orchestration', 'Prompt engineering', 'Multi-agent workflows', 'Claude / Anthropic API', 'AI-assisted development'] },
+  { group: 'Data analysis', items: ['SQL', 'R', 'Exploratory data analysis', 'Data profiling', 'Web scraping', 'Data visualisation', 'API data pipelines'] },
+  { group: 'Web & frontend', items: ['TypeScript', 'JavaScript', 'Astro', 'HTML / CSS', 'GSAP', 'Canvas 2D', 'Web Audio API', 'Accessibility (WCAG)', 'Web performance', 'Responsive design'] },
+  { group: 'Backend & software', items: ['FastAPI', 'REST APIs', 'Async Python', 'Rust', 'PySide6 / Qt (desktop apps)', 'Algorithms', 'Parsers / AST', 'Automation / bots'] },
+  { group: 'Tools & delivery', items: ['Git / GitHub', 'GitHub Actions (CI/CD)', 'Packaging & releases (PyInstaller)', 'Bun', 'uv', 'Cloudflare Pages'] },
 ];
 
 /** osu!lazer mania: a note's fall time to the hit line is MANIA_MAX_TIME_RANGE / scroll speed (ms). */
@@ -107,7 +110,7 @@ export const charts: Record<'taiko' | 'mania4k' | 'mania7k', Chart> = {
     songUrl: 'https://cametek.bandcamp.com/track/circles-of-death',
     beatmapUrl: 'https://osu.ppy.sh/beatmapsets/2404655#taiko/5216517',
     difficulty: 'Planet of Death', stars: 9.57, bpm: 200, lengthSec: 204,
-    keys: 'D F J K', audio: 'Camellia-Circles_of_Death', lufs: -4.1, osu: 'circles-of-death-taiko.osu',
+    keys: 'C V , .', audio: 'Camellia-Circles_of_Death', lufs: -4.1, osu: 'circles-of-death-taiko.osu',
   },
   mania4k: {
     id: 'quaoar', mode: 'mania', keyMode: '4k',
@@ -117,7 +120,7 @@ export const charts: Record<'taiko' | 'mania4k' | 'mania7k', Chart> = {
     // Beatmapset 1203155 has [4K] To the star (2857557), [4K] Insane (3269223) and [18K] komi im sorry (3579522).
     beatmapUrl: 'https://osu.ppy.sh/beatmapsets/1203155#mania/2857557',
     difficulty: '[4K] To the star', stars: 5.43, bpm: 174, lengthSec: 275,
-    keys: 'D F J K', scrollSpeed: maniaScrollSpeed['4k'], audio: 'Camellia-Quaoar', lufs: -8.2, osu: 'quaoar-4k.osu',
+    keys: 'C V , .', scrollSpeed: maniaScrollSpeed['4k'], audio: 'Camellia-Quaoar', lufs: -8.2, osu: 'quaoar-4k.osu',
   },
   mania7k: {
     id: 'under-construction', mode: 'mania', keyMode: '7k',
@@ -131,9 +134,9 @@ export const charts: Record<'taiko' | 'mania4k' | 'mania7k', Chart> = {
 };
 
 export const setups: { group: string; items: { label: string; value: string | null }[] }[] = [
-  { group: 'osu!taiko', items: [{ label: 'Keys', value: null }, { label: 'Keyboard', value: null }] },
-  { group: 'osu!mania', items: [{ label: 'Keys (4K)', value: null }, { label: 'Scroll speed', value: '29 (4K) · 32 (7K)' }] },
-  { group: 'TETR.IO', items: [{ label: 'ARR / DAS / SDF', value: null }, { label: 'Controls', value: null }] },
+  { group: 'osu!taiko', items: [{ label: 'Keys', value: 'C V , .' }, { label: 'Keyboard', value: 'Keychron K10' }] },
+  { group: 'osu!mania', items: [{ label: 'Keys (4K)', value: 'C V , .' }, { label: 'Keys (7K)', value: 'S D F Space J K L' }, { label: 'Keyboard', value: 'Keychron K10' }, { label: 'Scroll speed', value: '29 (4K) · 32 (7K)' }] },
+  { group: 'TETR.IO', items: [{ label: 'Handling', value: 'DAS 4.2 · ARR 0 · DCD 0.1 · SDF ∞' }, { label: 'Controls', value: '← → move · ↓ soft drop · ↑ rotate CW · D rotate CCW · S rotate 180° · Left Shift hold · Space hard drop' }] },
 ];
 
 export const timeline: { when: string | null; what: string; where: string | null }[] = [

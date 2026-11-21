@@ -149,7 +149,7 @@ function setup(root: HTMLElement) {
     c.columnWidth.forEach((w, i) => { colX.push(acc); acc += w + (c.columnSpacing[i] ?? 0); });
     const sw = acc - (c.columnSpacing[k - 1] ?? 0), x0 = (W - sw * sc) / 2, hitY = c.hitPosition * sc, im = (n: string | null) => { const i = n ? pic(`/skin/mania/${n}`) : null; return i?.complete && i.naturalWidth ? i : null; };
     const yOf = (nt: number) => hitY - ((nt - t) / span) * 480 * sc;
-    const LET = k === 7 ? ['S', 'D', 'F', '␣', 'J', 'K', 'L'] : ['D', 'F', 'J', 'K'];
+    const LET = k === 7 ? ['S', 'D', 'F', '␣', 'J', 'K', 'L'] : ['C', 'V', ',', '.'];
     // which columns are being hit right now (autoplay presses a key for taps for 90 ms, and for the whole length of a hold)
     const down = new Set<number>(), strikes: [number, number, boolean][] = [];
     for (let i = Math.max(0, lower(d.notes, t - 4000) - 1); i < d.notes.length && d.notes[i]![0]! <= t; i++) {

@@ -13,7 +13,7 @@ Recruiters and the osu!/TETR.IO community, equally. Identity: **Data Scientist &
 - Links straight to a section (e.g. `/#projects`, used on CV and LinkedIn) skip the Intro, Lobby and Warp.
 
 ## Inside the portfolio
-Pages (each its own URL, animated page transitions, header + BGM persist): **Projects** → **osu!** (osu!taiko, osu!mania 4K, chart carousel later, SoundCloud) → **TETR.IO** → **About** (Skills, Setups, Timeline) → **Community** (Shoutouts, Message Board). Footer on every page (LinkedIn, GitHub, Instagram, Discord, Facebook, work email). Full-screen menu overlay comes with the animation pass (see `docs/reviews/2026-11-16-thegeekdesigner-teardown.md`).
+Pages (each its own URL, animated page transitions, header + BGM persist): **About** (Skills, Setups, Timeline) → **Projects** → **osu!** (osu!taiko, osu!mania 4K/7K, chart carousel later, SoundCloud) → **TETR.IO** → **Community** (Shoutouts, Message Board). Footer on every page (LinkedIn, GitHub, Instagram, Discord, Facebook, work email). Full-screen menu overlay comes with the animation pass (see `docs/reviews/2026-11-16-thegeekdesigner-teardown.md`).
 
 - **BGM** at low volume, visibly pausable from the Portfolio header; mute is remembered. Crossfades out when Feature audio plays, back in when it stops.
 - **Projects**: GitHub repos, internship and career work, including **BMW** projects (data science). Filter chips: *data* / *dev*. 2–3 pinned data projects. Each card: one-line outcome (with a number where possible), method/stack, role, link. Private work gets a sanitised write-up instead of a link.
