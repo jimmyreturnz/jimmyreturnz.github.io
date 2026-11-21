@@ -72,6 +72,15 @@ export const maniaScrollTimeMs = (speed: number) => Math.round(MANIA_MAX_TIME_RA
 
 export const camelliaUrl = 'https://cametek.jp/';
 
+/** Background music (Portfolio header). Title format: original artist - song title. Arranger is credited separately. */
+export const bgm = {
+  file: '/audio/ZUN-Pure_Furies.m4a',
+  artist: 'ZUN', title: 'Pure Furies ~ Whereabouts of the Heart', game: 'Touhou 15: Legacy of Lunatic Kingdom',
+  arranger: 'Nnwt', arrangementUrl: 'https://www.youtube.com/watch?v=dSnTgNsFi1I',
+  /** Nnwt's description offers the MP3/MIDI/PDF for download and says to change it freely; keep that link if anyone asks. */
+  note: 'piano arrangement, shared by the arranger with the MP3 download',
+};
+
 export type Chart = {
   id: string;
   mode: 'taiko' | 'mania';

@@ -40,6 +40,13 @@ export function tap(el: HTMLAudioElement) {
   s.connect(songBus);
 }
 
+/** BGM goes through the music bus, so the header Sound button mutes it and the music slider sets its level. */
+export function tapBgm(el: HTMLAudioElement) {
+  if (el.dataset.tapped) return;
+  const c = unlock(); el.dataset.tapped = '1';
+  c.createMediaElementSource(el).connect(musicBus);
+}
+
 // taiko hit sounds (owner's skin samples in assets/sfx/), decoded once, played on the effects volume
 const buffers: Record<string, AudioBuffer> = {};
 export async function loadHits() {
