@@ -1,31 +1,38 @@
-// BGM: one looping track in the persistent header. Plays once Sound is on (power button / Sound switch), quietly (music volume),
-// pauses on demand, and fades out while a chart song plays (`jr:feature-audio`), then back in.
+// BGM: one looping track that lives for the whole visit (Lobby and Portfolio). Plays once Sound is on (power button / Sound switch),
+// quietly (music volume), starts when the Lobby appears (not during the Intro), pauses on demand from the header, and fades out while a chart
+// song plays (`jr:feature-audio`), then back in. The header only shows the title and the Pause button.
 import { tapBgm, normGain, BGM_LUFS } from './audio';
 
-const box = document.querySelector<HTMLElement>('[data-bgm-src]');
-if (box) {
-  const el = new Audio(box.dataset.bgmSrc); el.loop = true; el.preload = 'none'; el.volume = 0;
-  const btn = box.querySelector<HTMLButtonElement>('[data-bgm-toggle]')!;
-  const label = `BGM · ${box.dataset.bgmName}`;
-  box.querySelector('[data-bgm-title]')!.innerHTML = `<span class="mq"><span>${label}</span><span aria-hidden="true">${label}</span></span>`; // two copies for the endless scroll
-  box.querySelector('[data-bgm-title]')!.setAttribute('aria-label', label);
+const cfg = document.querySelector<HTMLElement>('[data-bgm-cfg]');
+if (cfg) {
+  const el = new Audio(cfg.dataset.src); el.loop = true; el.preload = 'none'; el.volume = 0;
+  const label = `BGM · ${cfg.dataset.name}`, norm = normGain(Number(cfg.dataset.lufs), BGM_LUFS);
   const store = { get: () => { try { return localStorage.getItem('jr.bgm') !== 'off'; } catch { return true; } }, set: (on: boolean) => { try { localStorage.setItem('jr.bgm', on ? 'on' : 'off'); } catch { /* private mode */ } } };
-  let want = store.get(), feature = false, raf = 0;
-  const norm = normGain(Number(box.dataset.bgmLufs), BGM_LUFS);
+  let want = store.get(), feature = false, lobby = false, raf = 0;
   const fadeTo = (v: number) => { // ~0.6 s linear fade on the element volume (1 = the normalised level); the music bus sets the real level
     v *= norm; cancelAnimationFrame(raf); const a = el.volume, t0 = performance.now();
     const f = (t: number) => { const p = Math.min(1, (t - t0) / 600); el.volume = a + (v - a) * p; if (p < 1) raf = requestAnimationFrame(f); else if (v === 0) el.pause(); };
     raf = requestAnimationFrame(f);
   };
   const soundOn = () => { try { return localStorage.getItem('jr.sound') === 'true'; } catch { return false; } };
+  const introOn = () => document.documentElement.dataset.intro === 'on' && !lobby;
+  const btn = () => document.querySelector<HTMLButtonElement>('[data-bgm-toggle]');
   const sync = () => {
-    btn.textContent = want ? 'Pause' : 'Play'; btn.setAttribute('aria-pressed', String(!want));
-    if (want && !feature && soundOn()) { tapBgm(el); void el.play().then(() => fadeTo(1)).catch(() => { /* needs a click first */ }); }
+    const b = btn(); if (b) { b.textContent = want ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', String(!want)); }
+    if (want && !feature && !introOn() && soundOn()) { tapBgm(el); void el.play().then(() => fadeTo(1)).catch(() => { /* needs a click first */ }); }
     else if (el.volume > 0 || !el.paused) fadeTo(0);
   };
-  btn.addEventListener('click', () => { want = !want; store.set(want); sync(); });
+  // the header (kept across page changes, absent on the Lobby) gets its title and button wired whenever it is on the page
+  const bind = () => {
+    const t = document.querySelector<HTMLElement>('[data-bgm-title]'), b = btn();
+    if (t && !t.querySelector('.mq')) { t.innerHTML = `<span class="mq"><span>${label}</span><span aria-hidden="true">${label}</span></span>`; t.setAttribute('aria-label', label); } // two copies for the endless scroll
+    if (b && !b.dataset.on) { b.dataset.on = '1'; b.addEventListener('click', () => { want = !want; store.set(want); sync(); }); }
+    sync();
+  };
+  document.addEventListener('astro:page-load', bind);
   document.addEventListener('jr:sound', sync);
+  document.addEventListener('jr:lobby', () => { lobby = true; sync(); });
   document.addEventListener('jr:feature-audio', (e) => { feature = (e as CustomEvent).detail.playing; sync(); });
   addEventListener('pointerdown', sync, { once: true }); // first click anywhere: browsers allow sound now
-  sync();
+  bind();
 }

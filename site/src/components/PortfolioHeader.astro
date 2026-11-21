@@ -10,7 +10,7 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   <canvas class="viz" aria-hidden="true"></canvas>
   <div class="bar">
     <a class="wordmark" href="/" title="Back to the Lobby"><Vh name="vh-heart" />jimmyreturnz</a>
-    <div class="bgm" role="group" aria-label="Background music" data-bgm-src={bgm.file} data-bgm-lufs={bgm.lufs} data-bgm-name={`${bgm.artist} - ${bgm.title}`} title={`Arr. ${bgm.arranger}`}>
+    <div class="bgm" role="group" aria-label="Background music" title={`Arr. ${bgm.arranger}`}>
       <Vh name="vh-eq" class="eq" />
       <span class="t" data-bgm-title>BGM</span>
       <button type="button" class="pause" aria-pressed="false" data-bgm-toggle>Pause</button>

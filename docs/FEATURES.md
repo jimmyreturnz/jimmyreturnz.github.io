@@ -67,6 +67,8 @@ Pages (each its own URL, animated page transitions, header + BGM persist): **Abo
 - **Visualizers react hard**: fast attack, bass-weighted, boosted; they follow the real song (chart songs and, later, the BGM) and beat on a synthetic pulse otherwise.
 - References studied: Joffrey Spitzer (Astro + GSAP Flip), Framer "Pixel Arcade" (boot screen, scroll HUD), Codrops pixel-mask transition. Pixel art rejected (Sage Agency: undermines a professional look); stay vector.
 
+- **Intro trimmed (owner, 2026-11-21)**: power button → ripples (no spark dots rushing in while holding) → boot text, logo, login → Lobby. The NSO desktop (stripes, stickers, profile.exe / player_card.exe windows), the arrow flocks and the wave are removed. BGM starts when the Lobby appears (not during the Intro) and keeps playing across all pages.
+
 ## Animation pass: ideas queued (pages first, animation later)
 - **Orbiting icons on the Lobby avatar** (owner's idea; reference: the About section of dousanmiao.com): hovering or focusing the profile picture makes osu!, TETR.IO, Python, Claude, SQL and ML icons orbit around it (owner confirmed, added ML). On touch, a tap toggles it. Icons from simple-icons (osu!, Python, Claude, a database glyph for SQL); TETR.IO uses our own tetromino mark; ML uses our own neural-network glyph. Static ring of icons under reduced motion.
 - Full-screen menu overlay with one slow marquee row per Portfolio page; hovering a row tints the overlay in that page's colour (see the thegeekdesigner teardown).
