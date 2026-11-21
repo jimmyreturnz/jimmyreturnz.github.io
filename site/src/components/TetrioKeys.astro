@@ -32,14 +32,16 @@ const rows: K[][] = [
 </div>
 
 <style>
-  .kb{--u:clamp(15px,4.4vw,38px)}
-  .board{display:grid;gap:calc(var(--u) * .12);width:max-content;max-width:100%;margin:6px 0 14px}
-  .r{display:flex;gap:calc(var(--u) * .12)}
-  .k,.gap{flex:none;width:calc(var(--u) * var(--w) + (var(--w) - 1) * var(--u) * .12);height:var(--u)}
+  .kb{margin-top:clamp(20px,4vw,36px);container-type:inline-size}
+  .board{--u:calc(100cqw / 18.5)}
+  .board{display:grid;gap:0;width:100%;margin:6px 0 14px}
+  .r{display:grid;grid-template-columns:repeat(74,1fr)}
+  .k,.gap{grid-column:span calc(var(--w) * 4);height:var(--u)}
+  .k{margin:calc(var(--u) * .05)}
   .k{display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;border:2px solid var(--rule,color-mix(in srgb,var(--ink) 30%,transparent));border-radius:calc(var(--u) * .2);
-    font:700 clamp(7px,1.9vw,12px)/1 var(--hud);color:var(--muted);overflow:hidden;white-space:nowrap}
-  .k.big{font-size:clamp(6px,1.5vw,10px)}
-  .k small{font-size:clamp(5px,1.1vw,8px);font-weight:700;margin-top:2px;display:none}
+    font:700 clamp(6px,1.6cqw,13px)/1 var(--hud);color:var(--muted);overflow:hidden;white-space:nowrap}
+  .k.big{font-size:clamp(5px,1.3cqw,11px)}
+  .k small{font-size:clamp(5px,1cqw,9px);font-weight:700;margin-top:2px;display:none}
   @media (min-width:700px){ .k small{display:block} }
   .k[class*="a-"]{border-color:var(--ink);color:var(--on-pastel)}
   .a-move{background:var(--sky)} .a-sd{background:var(--mint)} .a-cw{background:color-mix(in srgb,var(--sky) 45%,var(--lav))} .a-ccw{background:var(--lav)} .a-flip{background:var(--butter)}
