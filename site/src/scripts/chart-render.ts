@@ -170,7 +170,7 @@ function setup(root: HTMLElement) {
     // 3 · notes (and hold bodies), nearest the hit position last
     for (let i = Math.max(0, lower(d.notes, t - 400) - 40); i < d.notes.length; i++) {
       const n = d.notes[i]!; if (n[0]! > t + span * 1.05) break;
-      const hold = n[2]! > 0, endT = hold ? n[2]! : n[0]!; if (endT < t - 150) continue;
+      const hold = n[2]! > 0, endT = hold ? n[2]! : n[0]!; if (endT <= t) continue; // autoplay hits it exactly on time: a note disappears at the hit position, a hold ends there
       const col = n[1]!, w = c.columnWidth[col]! * sc, x = x0 + colX[col]! * sc, def = c.notes[col]!;
       const head = im(hold ? def.h : def.n) ?? im(def.n), hh = head ? (head.naturalHeight * w) / head.naturalWidth : 0;
       const yHead = yOf(hold && t > n[0]! ? t : n[0]!);
