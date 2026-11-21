@@ -101,7 +101,8 @@ const laneColour = (lanes: number, i: number) =>
   .player[hidden]{display:none}
   /* taiko: info hugs the left, the lane gets the room; mania: tall stage */
   .p-taiko{grid-template-columns:1fr}
-  .p-taiko .stage{order:-1;aspect-ratio:16/9;min-height:260px;border-left:0;border-bottom:var(--stroke) solid var(--ink)} /* full play view, like the game screen */
+  .p-taiko .stage{order:-1;aspect-ratio:6.8267/1;min-height:0;border-left:0;border-bottom:var(--stroke) solid var(--ink)} /* just the play lane, full width */
+  @media (max-width:820px){ .p-taiko .stage{aspect-ratio:auto;height:150px} }
   .p-mania .stage{min-height:520px}
   .info{padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
   h3{font-size:clamp(14px,1.6vw,22px);margin:0;white-space:nowrap}
