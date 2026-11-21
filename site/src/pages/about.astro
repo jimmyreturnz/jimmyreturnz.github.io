@@ -29,11 +29,22 @@ import { profile, skills, setups, timeline } from '../data/site';
   </Showcase>
 
   <Showcase id="timeline" title="Timeline" lead="The short version." motif="vh-arrow-thin" tint="sky">
-    <ol class="timeline">
-      {timeline.map((t) => (
-        <li class="card pad"><span class="when"><Ph value={t.when} hint="year" /></span><b>{t.what}</b><span class="meta"><Ph value={t.where} hint="where" /></span></li>
+    <div class="card pad ruler" data-ruler>
+      <div class="vp" role="radiogroup" aria-label="Timeline">
+        <div class="track">
+          {timeline.map((t, i) => (
+            <button type="button" role="radio" class="stop" style={`left:calc(var(--pad) + ${i} * var(--step))`} data-i={i} aria-checked="false" tabindex="-1"><span class="lb">{t.what}</span><i></i></button>
+          ))}
+        </div>
+        <span class="ptr" aria-hidden="true"></span>
+      </div>
+      {timeline.map((t, i) => (
+        <div class="row" data-row={i} hidden>
+          <div><span class="meta"><Ph value={t.where} hint="where" /></span><b>{t.what}</b></div>
+          <span class="when"><Ph value={t.when} hint="year" /></span>
+        </div>
       ))}
-    </ol>
+    </div>
   </Showcase>
 </Page>
 
@@ -42,8 +53,44 @@ import { profile, skills, setups, timeline } from '../data/site';
   .chips .chip{cursor:default}
   dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
   dt{color:var(--muted);font-weight:700} dd{margin:0}
-  .timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-  .timeline li{display:flex;flex-direction:column;gap:4px}
-  .when{font:700 13px var(--hud);color:var(--accent)}
-  @media (max-width:900px){ .timeline{grid-template-columns:1fr 1fr} }
+  /* ruler timeline: a scale you slide along; the chosen stop sits under the pointer (idea: dousanmiao.com) */
+  .ruler{--step:110px;--pad:400px;--rule:color-mix(in srgb,var(--ink) 28%,transparent);max-width:560px}
+  .vp{position:relative;height:84px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)}
+  .track{position:relative;height:64px;width:calc(var(--pad) * 2 + var(--step) * 3 + 1px);transition:transform .6s cubic-bezier(.22,1,.36,1);
+    background:linear-gradient(90deg,var(--rule) 1px,transparent 1px) 0 100%/calc(var(--step) / 10) 12px repeat-x,linear-gradient(90deg,var(--rule) 1px,transparent 1px) 0 100%/calc(var(--step) / 2) 20px repeat-x;background-origin:content-box}
+  .track{padding:0 var(--pad);box-sizing:content-box;margin-left:0}
+  .stop{position:absolute;top:0;bottom:0;width:80px;margin-left:-40px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;background:none;border:0;padding:0;color:var(--muted);cursor:pointer;font:700 12px var(--hud)}
+  .stop .lb{white-space:nowrap;transition:color .3s,transform .4s cubic-bezier(.22,1,.36,1)}
+  .stop i{display:block;width:2px;height:34px;background:var(--rule);transition:background .3s,height .3s}
+  .stop[aria-checked="true"]{color:var(--accent)} .stop[aria-checked="true"] .lb{transform:scale(1.15)} .stop[aria-checked="true"] i{background:var(--accent);height:40px}
+  .stop:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:8px}
+  .ptr{position:absolute;left:50%;bottom:0;margin-left:-6px;border:6px solid transparent;border-bottom:8px solid var(--accent);border-top:0}
+  .row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:10px}
+  .row[hidden]{display:none}
+  .row div{display:grid;gap:2px} .row b{font-size:clamp(18px,3vw,22px)}
+  .when{font:700 clamp(26px,5vw,36px)/1 var(--hud);color:var(--accent)}
 </style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const box = document.querySelector<HTMLElement>('[data-ruler]');
+    if (!box || box.dataset.on) return;
+    box.dataset.on = '1';
+    const vp = box.querySelector<HTMLElement>('.vp')!, track = box.querySelector<HTMLElement>('.track')!;
+    const stops = [...box.querySelectorAll<HTMLButtonElement>('.stop')], rows = [...box.querySelectorAll<HTMLElement>('.row')];
+    const num = (v: string) => parseFloat(getComputedStyle(box).getPropertyValue(v));
+    const pick = (i: number, focus = false) => {
+      stops.forEach((b, j) => { b.setAttribute('aria-checked', String(i === j)); b.tabIndex = i === j ? 0 : -1; rows[j]!.hidden = i !== j; });
+      track.style.transform = `translateX(${vp.clientWidth / 2 - num('--pad') - i * num('--step')}px)`;
+      if (focus) stops[i]!.focus();
+    };
+    let cur = stops.length - 1;
+    stops.forEach((b, i) => b.addEventListener('click', () => pick(cur = i)));
+    box.addEventListener('keydown', (e) => {
+      const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+      if (d) { e.preventDefault(); cur = Math.max(0, Math.min(stops.length - 1, cur + d)); pick(cur, true); }
+    });
+    addEventListener('resize', () => pick(cur), { passive: true });
+    track.style.transition = 'none'; pick(cur); void track.offsetWidth; track.style.transition = '';
+  });
+</script>
