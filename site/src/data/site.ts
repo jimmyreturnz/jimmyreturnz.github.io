@@ -139,11 +139,14 @@ export const setups: { group: string; items: { label: string; value: string | nu
   { group: 'TETR.IO', items: [{ label: 'Handling', value: 'DAS 4.2 · ARR 0 · DCD 0.1 · SDF ∞' }, { label: 'Controls', value: '← → move · ↓ soft drop · ↑ rotate CW · D rotate CCW · S rotate 180° · Left Shift hold · Space hard drop' }] },
 ];
 
-export const timeline: { when: string | null; what: string; where: string | null }[] = [
-  { when: null, what: 'High school', where: null },
-  { when: null, what: 'University', where: null },
-  { when: null, what: 'Internship', where: null },
-  { when: null, what: 'Career', where: null },
+/** Dates are 'YYYY-MM' (inclusive months); `to: null` = still going. Source: the owner's LinkedIn + own words. `lane` = row on the ruler. */
+export type Moment = { what: string; short: string; where: string; blurb?: string; from: string; to: string | null; expected?: boolean; lane: 0 | 1 | 2; highlight?: boolean };
+export const timeline: Moment[] = [
+  { what: 'Triam Udom Suksa Pattanakarn School', short: 'Triam Udom', where: 'High school · Intensive English + Science and Mathematics Program', from: '2017-05', to: '2023-02', lane: 0 },
+  { what: 'Mahidol University', short: 'Mahidol University', where: 'Bachelor’s degree, Industrial Mathematics and Data Science', from: '2023-08', to: '2027-05', expected: true, lane: 0 },
+  { what: 'MU Mental Math Competition', short: 'MU Mental Math Competition', where: 'Founder & Project Manager · Mahidol University', highlight: true, lane: 1, from: '2024-04', to: null,
+    blurb: '700+ participants from 100+ schools across Thailand. Python and Google Sheets workflows cut manual processing time by 67%.' },
+  { what: 'Data Scientist (Internship)', short: 'BMW Group', where: 'BMW Group · Rayong, Thailand · Production team of BMW Parts Manufacturing', from: '2026-06', to: null, lane: 2 },
 ];
 
 export const shoutouts: { name: string; quote: string | null; link: string | null }[] = [];
