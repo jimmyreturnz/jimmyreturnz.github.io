@@ -58,7 +58,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.15}
 .bg-pink{background:var(--pink)}.bg-lav{background:var(--lav)}.bg-mint{background:var(--mint)}.bg-sky{background:var(--sky)}.bg-butter{background:var(--butter)}
 
 /* shared page blocks */
-.grid3{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}
+.grid3{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
 .pad{padding:16px 18px}
 .pad h3{font-size:16px;margin:0 0 10px}
 .meta{margin:0;font-size:13px;color:var(--muted);font-weight:700}
@@ -83,6 +83,8 @@ h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.15}
 .tg[aria-pressed="true"]{background:var(--butter);color:var(--on-pastel);border-color:var(--on-pastel)}
 .tg[aria-pressed="true"] i{background:var(--accent);border-color:var(--on-pastel)}
 @media (max-width:820px){ .tg span{display:none} .tg{padding:0;width:var(--ctl)} .wordmark{font-size:18px} .wordmark svg{width:22px} }
+@media (max-width:440px){ .bar{gap:6px} .wordmark{font-size:15px;gap:5px} .wordmark svg{width:18px} }
+@media (max-width:380px){ .wordmark{font-size:0} }
 
 /* reduced motion: no idle loops */
 @media (prefers-reduced-motion:reduce){:root:not([data-motion="full"]) *,:root:not([data-motion="full"]) *::before,:root:not([data-motion="full"]) *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

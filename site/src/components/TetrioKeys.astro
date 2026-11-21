@@ -17,7 +17,7 @@ const rows: K[][] = [
 ---
 <div class="kb card pad">
   <h3>TETR.IO controls</h3>
-  <div class="board" role="img" aria-label="Keyboard layout: left and right arrows move, down arrow soft drops, up arrow rotates clockwise, D rotates counter-clockwise, S rotates 180 degrees, left Shift holds, Space hard drops.">
+  <div class="scroll"><div class="board" role="img" aria-label="Keyboard layout: left and right arrows move, down arrow soft drops, up arrow rotates clockwise, D rotates counter-clockwise, S rotates 180 degrees, left Shift holds, Space hard drops.">
     {rows.map((r) => (
       <div class="r">
         {r.map(([l, w = 1]) => w < 0 ? <i class="gap" style={`--w:${-w}`}></i> : (
@@ -26,6 +26,7 @@ const rows: K[][] = [
       </div>
     ))}
   </div>
+  </div>
   <ul class="legend">
     {(Object.keys(ACTIONS) as Act[]).map((a) => <li><i class={`sw a-${a}`}></i>{ACTIONS[a].label}: <b>{Object.entries(MAP).filter(([, v]) => v === a).map(([k]) => k).join(' / ')}</b></li>)}
   </ul>
@@ -33,15 +34,16 @@ const rows: K[][] = [
 
 <style>
   .kb{margin-top:clamp(20px,4vw,36px);container-type:inline-size}
-  .board{--u:calc(100cqw / 18.5)}
-  .board{display:grid;gap:0;width:100%;margin:6px 0 14px}
+  .scroll{overflow-x:auto;scrollbar-width:thin}
+  .board{--u:calc(max(100cqw,560px) / 18.5)}
+  .board{display:grid;gap:0;width:max(100%,560px);margin:6px 0 14px}
   .r{display:grid;grid-template-columns:repeat(74,1fr)}
   .k,.gap{grid-column:span calc(var(--w) * 4);height:var(--u)}
   .k{margin:calc(var(--u) * .05)}
   .k{display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;border:2px solid var(--rule,color-mix(in srgb,var(--ink) 30%,transparent));border-radius:calc(var(--u) * .2);
-    font:700 clamp(6px,1.6cqw,13px)/1 var(--hud);color:var(--muted);overflow:hidden;white-space:nowrap}
-  .k.big{font-size:clamp(5px,1.3cqw,11px)}
-  .k small{font-size:clamp(5px,1cqw,9px);font-weight:700;margin-top:2px;display:none}
+    font:700 max(8px,calc(var(--u) * .32))/1 var(--hud);color:var(--muted);overflow:hidden;white-space:nowrap}
+  .k.big{font-size:max(7px,calc(var(--u) * .26))}
+  .k small{font-size:max(6px,calc(var(--u) * .2));font-weight:700;margin-top:2px;display:none}
   @media (min-width:700px){ .k small{display:block} }
   .k[class*="a-"]{border-color:var(--ink);color:var(--on-pastel)}
   .a-move{background:var(--sky)} .a-sd{background:var(--mint)} .a-cw{background:color-mix(in srgb,var(--sky) 45%,var(--lav))} .a-ccw{background:var(--lav)} .a-flip{background:var(--butter)}

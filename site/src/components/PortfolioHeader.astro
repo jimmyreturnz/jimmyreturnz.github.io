@@ -65,6 +65,8 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   /* full-screen menu: circle reveal from the button, one marquee row per page, hover tints the screen */
   .menu{position:fixed;inset:0;z-index:50;background:var(--tint,var(--bg));transition:background .35s;display:grid;align-content:center;padding:clamp(16px,4vw,48px);overflow:hidden}
   .menu[hidden]{display:none}
+  /* dark theme: the menu is dark until a row tints it pastel, so its text and lines go light then */
+  :global(:root[data-theme="dark"]) .menu:not([style*="--tint"]){--navy:var(--ink)}
   .menu ul{list-style:none;margin:0;padding:0;display:grid;gap:clamp(6px,1.6vh,14px)}
   .menu a{position:relative;display:block;overflow:hidden;border-top:var(--stroke) solid var(--navy);padding:clamp(6px,1.4vh,14px) 0;text-decoration:none;color:var(--navy)}
   .menu b{position:relative;display:block;font:clamp(40px,9vw,104px)/1 var(--display);font-weight:400;transition:transform .25s}

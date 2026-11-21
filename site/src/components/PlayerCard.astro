@@ -160,6 +160,8 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu-taiko' | 'osu-man
 </style>
 
 <script>
+  import { gsap } from 'gsap';
+  import { reduced } from '../scripts/motion';
   import { rollTo, watchRolls } from '../scripts/roll';
   document.addEventListener('astro:page-load', () => watchRolls());
   // Year switch for the GitHub heatmap: shows that year's grid and updates the numbers.
@@ -170,6 +172,10 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu-taiko' | 'osu-man
       heat.querySelectorAll<HTMLElement>('.hm').forEach((g) => { g.hidden = g.dataset.year !== b.dataset.year; });
       const g = heat.querySelector<HTMLElement>(`.hm[data-year="${b.dataset.year}"]`)!, n = (v?: string) => Number(v ?? 0).toLocaleString('en-US');
       rollTo(heat.querySelector<HTMLElement>('[data-heat-total]')!, n(g.dataset.total));
+      if (!reduced()) { // the new year's squares ripple in from the left, week by week
+        const cells = [...g.children] as HTMLElement[], first = Number(cells[0]?.style.gridRowStart) || 1;
+        gsap.fromTo(cells, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(2)', overwrite: true, clearProps: 'transform,opacity', delay: (i: number) => 0.05 + Math.floor((i + first - 1) / 7) * 0.014 });
+      }
       const tile = root.querySelector<HTMLElement>('[data-gh-total]');
       if (tile) rollTo(tile, n(g.dataset.total));
     }));
