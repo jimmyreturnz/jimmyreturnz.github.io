@@ -1,0 +1,52 @@
+---
+// My TETR.IO controls drawn on a full-size keyboard (Keychron K10): main block plus the arrow cluster, mapped keys coloured by action.
+type Act = 'move' | 'sd' | 'cw' | 'ccw' | 'flip' | 'hold' | 'hard';
+const ACTIONS: Record<Act, { label: string; short: string }> = {
+  move: { label: 'Move left / right', short: 'move' }, sd: { label: 'Soft drop', short: 'SD' }, cw: { label: 'Rotate clockwise', short: 'CW' },
+  ccw: { label: 'Rotate counter-clockwise', short: 'CCW' }, flip: { label: 'Rotate 180°', short: '180°' }, hold: { label: 'Hold', short: 'hold' }, hard: { label: 'Hard drop', short: 'hard drop' },
+};
+const MAP: Record<string, Act> = { '←': 'move', '→': 'move', '↓': 'sd', '↑': 'cw', D: 'ccw', S: 'flip', 'L Shift': 'hold', Space: 'hard' };
+type K = [string, number?]; // [label, width in key units]
+const sp = (w: number): K => ['', -w]; // a gap
+const rows: K[][] = [
+  [['Tab', 1.5], ...'QWERTYUIOP[]'.split('').map((c): K => [c]), ['\\', 1.5]],
+  [['Caps', 1.75], ...'ASDFGHJKL;\''.split('').map((c): K => [c]), ['Enter', 2.25]],
+  [['L Shift', 2.25], ...'ZXCVBNM,./'.split('').map((c): K => [c]), ['Shift', 2.75], sp(0.5), sp(1), ['↑']],
+  [['Ctrl', 1.25], ['Win', 1.25], ['Alt', 1.25], ['Space', 6.25], ['Alt', 1.25], ['Win', 1.25], ['Menu', 1.25], ['Ctrl', 1.25], sp(0.5), ['←'], ['↓'], ['→']],
+];
+---
+<div class="kb card pad">
+  <h3>TETR.IO controls</h3>
+  <div class="board" role="img" aria-label="Keyboard layout: left and right arrows move, down arrow soft drops, up arrow rotates clockwise, D rotates counter-clockwise, S rotates 180 degrees, left Shift holds, Space hard drops.">
+    {rows.map((r) => (
+      <div class="r">
+        {r.map(([l, w = 1]) => w < 0 ? <i class="gap" style={`--w:${-w}`}></i> : (
+          <span class:list={['k', MAP[l] && `a-${MAP[l]}`, { big: l.length > 2 }]} style={`--w:${w}`}>{l}{MAP[l] && <small>{ACTIONS[MAP[l]!].short}</small>}</span>
+        ))}
+      </div>
+    ))}
+  </div>
+  <ul class="legend">
+    {(Object.keys(ACTIONS) as Act[]).map((a) => <li><i class={`sw a-${a}`}></i>{ACTIONS[a].label}: <b>{Object.entries(MAP).filter(([, v]) => v === a).map(([k]) => k).join(' / ')}</b></li>)}
+  </ul>
+</div>
+
+<style>
+  .kb{--u:clamp(15px,4.4vw,38px)}
+  .board{display:grid;gap:calc(var(--u) * .12);width:max-content;max-width:100%;margin:6px 0 14px}
+  .r{display:flex;gap:calc(var(--u) * .12)}
+  .k,.gap{flex:none;width:calc(var(--u) * var(--w) + (var(--w) - 1) * var(--u) * .12);height:var(--u)}
+  .k{display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;border:2px solid var(--rule,color-mix(in srgb,var(--ink) 30%,transparent));border-radius:calc(var(--u) * .2);
+    font:700 clamp(7px,1.9vw,12px)/1 var(--hud);color:var(--muted);overflow:hidden;white-space:nowrap}
+  .k.big{font-size:clamp(6px,1.5vw,10px)}
+  .k small{font-size:clamp(5px,1.1vw,8px);font-weight:700;margin-top:2px;display:none}
+  @media (min-width:700px){ .k small{display:block} }
+  .k[class*="a-"]{border-color:var(--ink);color:var(--on-pastel)}
+  .a-move{background:var(--sky)} .a-sd{background:var(--mint)} .a-cw{background:color-mix(in srgb,var(--sky) 45%,var(--lav))} .a-ccw{background:var(--lav)} .a-flip{background:var(--butter)}
+  .a-hold{background:color-mix(in srgb,var(--pink) 50%,var(--butter))}
+  .k.a-hard{background:var(--accent);color:#fff}
+  .sw.a-hard{background:var(--accent)}
+  .legend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 16px;font-size:13px}
+  .legend li{display:flex;align-items:center;gap:8px}
+  .sw{width:14px;height:14px;border:2px solid var(--ink);border-radius:5px;flex:none}
+</style>

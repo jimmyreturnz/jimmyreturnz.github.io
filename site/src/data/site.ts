@@ -136,7 +136,7 @@ export const charts: Record<'taiko' | 'mania4k' | 'mania7k', Chart> = {
 export const setups: { group: string; items: { label: string; value: string | null }[] }[] = [
   { group: 'osu!taiko', items: [{ label: 'Keys', value: 'C V , .' }, { label: 'Keyboard', value: 'Keychron K10' }] },
   { group: 'osu!mania', items: [{ label: 'Keys (4K)', value: 'C V , .' }, { label: 'Keys (7K)', value: 'S D F Space J K L' }, { label: 'Keyboard', value: 'Keychron K10' }, { label: 'Scroll speed', value: '29 (4K) · 32 (7K)' }] },
-  { group: 'TETR.IO', items: [{ label: 'Handling', value: 'DAS 4.2 · ARR 0 · DCD 0.1 · SDF ∞' }, { label: 'Controls', value: '← → move · ↓ soft drop · ↑ rotate CW · D rotate CCW · S rotate 180° · Left Shift hold · Space hard drop' }] },
+  { group: 'TETR.IO', items: [{ label: 'Handling', value: 'DAS 4.2 · ARR 0 · DCD 0.1 · SDF ∞' }] },
 ];
 
 /** Dates are 'YYYY-MM' (inclusive months); `to: null` = still going. Source: the owner's LinkedIn + own words. `lane` = row on the ruler. */

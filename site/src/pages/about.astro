@@ -2,6 +2,7 @@
 import Page from '../layouts/Page.astro';
 import Showcase from '../components/Showcase.astro';
 import Ph from '../components/Ph.astro';
+import TetrioKeys from '../components/TetrioKeys.astro';
 import { profile, skills, setups, timeline } from '../data/site';
 
 // ruler: one tick per month, years labelled (idea: dousanmiao.com)
@@ -38,6 +39,7 @@ const stages = timeline.map((t) => {
         </div>
       ))}
     </div>
+    <TetrioKeys />
   </Showcase>
 
   <Showcase id="timeline" title="Timeline" motif="vh-arrow-thin" tint="sky">
