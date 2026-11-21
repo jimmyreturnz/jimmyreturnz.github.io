@@ -6,3 +6,7 @@ graphify-out/cache/
 # osu! beatmaps: never commit (owner rule)
 *.osu
 *.osz
+
+# Claude files: local only, never on GitHub (owner rule)
+.claude/
+CLAUDE.md
