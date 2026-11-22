@@ -7,7 +7,7 @@ Design council review that shaped this version: `docs/reviews/2026-11-16-design-
 Recruiters and the osu!/TETR.IO community, equally. Identity: **Data Scientist & Developer** first, rhythm-game player second (the player side is personality, not the whole identity). Working towards AI Engineer; don't claim that title yet.
 
 ## Panel review 2026-11-22 (applied)
-- Nothing unfinished is shown: no `[placeholder]`, "coming soon" or disabled buttons. Community is out of the nav until it has shoutouts or the Message Board API; the TETR.IO gameplay video slot comes back when the clip exists; chart Play buttons come back with Play mode.
+- Nothing unfinished is shown: no `[placeholder]`, "coming soon" or disabled buttons. Community is in the nav (owner, 2026-11-23); its Message Board shows only when the site is built with the API address; the TETR.IO gameplay video slot comes back when the clip exists; chart Play buttons come back with Play mode.
 - SEO and AI search: Open Graph, JSON-LD `Person`, `/llms.txt`, `/robots.txt`, `/sitemap.xml`. Set `SITE_URL` at build time for canonical links and the sitemap. `assets/og.png` is a stand-in until the brand pass.
 
 ## Flow
@@ -32,7 +32,7 @@ Pages (each its own URL, animated page transitions, header + BGM persist): **Abo
 - **Timeline**: high school, university, internship, career only; secondary, not a main focus.
 - **Stats Cards**: osu!, TETR.IO, GitHub; refreshed **daily** by a build job. GitHub leads in the Lobby player card; each card links to the matching profile.
 - **Shoutouts**: friends and people I respect, optional avatar, link and short quote each. Editable as content.
-- **Message Board**: TH / EN / JP with cute fonts. No accounts, no username verification: visitors type any name, shown as **plain text** (no automatic hover card, avatar or rank). The owner approves every message by hand and may attach a profile link by hand while approving. Per-visitor limits by an HMAC of the IP with a daily-rotated secret (never the raw IP), disclosed on the page: 1 pending, 1 post per day. Paginated: 20 per page, newest first.
+- **Message Board**: TH / EN / JP with cute fonts. No accounts, no username verification: visitors type any name, shown as **plain text** (no automatic hover card, avatar or rank). The owner approves every message by hand and may attach a profile link by hand while approving. Messages up to 1000 characters, no links (owner, 2026-11-23). Per-visitor limit by an HMAC of the IP with a daily-rotated key (never the raw IP): 1 message per day. No note about it under the form (owner, 2026-11-23). 20 per page, newest first, in a box as tall as the form that scrolls and loads older pages as you reach the end. Owner's inbox: `/community/admin/` (built: `api/`, see `api/README.md`).
 - **SoundCloud**: embedded playlist (owner's, link to come). Click-to-load so nothing from SoundCloud loads until a visitor asks; volume can duck under Feature audio via SoundCloud's Widget API. Security headers must allow `w.soundcloud.com`.
 - **Blog**: write, edit, add images like a blogger (Sveltia CMS). Hidden until it has a few posts.
 - **Night theme**: switch design coming from owner; night palette designed alongside the day palette.

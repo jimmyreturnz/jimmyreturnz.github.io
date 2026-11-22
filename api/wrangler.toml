@@ -1,0 +1,17 @@
+name = "jimmyreturnz-api"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+
+[vars]
+# sites allowed to call the API (comma separated); add the pages.dev / jimmyreturnz.dev address when deploying
+ALLOWED_ORIGINS = "http://localhost:4321,http://localhost:4330"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "board"
+database_id = "00000000-0000-0000-0000-000000000000" # replace with the id from `wrangler d1 create board`
+
+# Secrets (never in this file): `wrangler secret put NAME` for production, `.dev.vars` for local dev.
+#   TURNSTILE_SECRET  Turnstile secret key
+#   VISITOR_SECRET    long random string; the daily key for visitor fingerprints is derived from it
+#   ADMIN_TOKEN       long random string; the owner pastes it on /community/admin/ to approve messages

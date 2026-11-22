@@ -10,3 +10,6 @@ graphify-out/cache/
 # Claude files: local only, never on GitHub (owner rule)
 .claude/
 CLAUDE.md
+.wrangler/
+.dev.vars
+node_modules/

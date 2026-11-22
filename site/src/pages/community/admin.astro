@@ -1,0 +1,97 @@
+---
+// The owner's Message Board inbox: approve (optionally with a profile link) or delete. Not linked anywhere, kept out of search.
+// Everything here needs the ADMIN_TOKEN secret, which is typed in and kept only for this browser tab (sessionStorage).
+import Page from '../../layouts/Page.astro';
+const api = import.meta.env.PUBLIC_API_URL as string | undefined;
+---
+<Page title="Message Board inbox" noindex jp>
+  <header class="page-hero">
+    <h1>Inbox</h1>
+    <p>Messages waiting for you. Nothing shows on the Community page until you approve it.</p>
+  </header>
+  {api ? (
+    <div class="inbox" data-inbox data-api={api}>
+      <form class="card pad key" data-key>
+        <label>Admin token<input type="password" name="token" autocomplete="current-password" required /></label>
+        <button class="btn fill" type="submit">Open</button>
+      </form>
+      <div data-lists hidden>
+        <h2>Waiting <span data-n></span></h2>
+        <ol class="items" data-pending></ol>
+        <h2>Published</h2>
+        <ol class="items" data-published></ol>
+        <button class="chip" type="button" data-lock>Lock</button>
+      </div>
+      <p class="meta" role="status" data-out></p>
+    </div>
+  ) : <p>Set PUBLIC_API_URL to use the inbox.</p>}
+</Page>
+
+<script>
+  type Msg = { id: number; name: string; body: string; link?: string | null; created_at: number };
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-inbox]');
+    if (!root) return;
+    const api = root.dataset.api!, q = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+    const keyForm = q<HTMLFormElement>('[data-key]'), lists = q('[data-lists]'), out = q('[data-out]');
+    const KEY = 'jr.admin';
+    const token = () => { try { return sessionStorage.getItem(KEY) ?? ''; } catch { return ''; } };
+    const call = (path: string, init: RequestInit = {}) => fetch(api + path, { ...init, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` } });
+    const date = (t: number) => new Date(t).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+
+    const row = (m: Msg, pending: boolean) => {
+      const li = document.createElement('li'); li.className = 'card pad';
+      const head = document.createElement('div'); head.className = 'head';
+      head.append(Object.assign(document.createElement('b'), { textContent: m.name }), Object.assign(document.createElement('small'), { textContent: date(m.created_at) }));
+      const body = Object.assign(document.createElement('p'), { textContent: m.body });
+      const acts = document.createElement('div'); acts.className = 'acts';
+      const del = Object.assign(document.createElement('button'), { type: 'button', className: 'chip', textContent: 'Delete' });
+      del.addEventListener('click', async () => { if ((await call(`/admin/messages/${m.id}`, { method: 'DELETE' })).ok) li.remove(); else out.textContent = 'Couldn’t delete that.'; });
+      if (pending) {
+        const link = Object.assign(document.createElement('input'), { type: 'url', placeholder: 'Profile link (optional, https://…)', className: 'link' });
+        const ok = Object.assign(document.createElement('button'), { type: 'button', className: 'btn fill', textContent: 'Approve' });
+        ok.addEventListener('click', async () => {
+          const r = await call(`/admin/messages/${m.id}/approve`, { method: 'POST', body: JSON.stringify({ link: link.value.trim() }) });
+          const d = (await r.json().catch(() => ({}))) as { error?: string };
+          if (r.ok) void load(); else out.textContent = d.error ?? 'Couldn’t approve that.';
+        });
+        acts.append(link, ok, del);
+      } else {
+        if (m.link) acts.append(Object.assign(document.createElement('a'), { href: m.link, textContent: m.link, rel: 'noopener', target: '_blank' }));
+        acts.append(del);
+      }
+      li.append(head, body, acts); return li;
+    };
+
+    const load = async () => {
+      out.textContent = '';
+      const r = await call('/admin/messages').catch(() => null);
+      if (!r || r.status === 401) { try { sessionStorage.removeItem(KEY); } catch {} keyForm.hidden = false; lists.hidden = true; out.textContent = r ? 'That token didn’t work.' : 'The API isn’t reachable.'; return; }
+      const pend = ((await r.json()) as { items: Msg[] }).items;
+      const pub = ((await (await fetch(`${api}/messages?page=1`, { cache: 'no-store' })).json()) as { items: Msg[] }).items;
+      q('[data-pending]').replaceChildren(...pend.map((m) => row(m, true)));
+      q('[data-published]').replaceChildren(...pub.map((m) => row(m, false)));
+      q('[data-n]').textContent = `(${pend.length})`;
+      keyForm.hidden = true; lists.hidden = false;
+    };
+
+    keyForm.addEventListener('submit', (e) => { e.preventDefault(); try { sessionStorage.setItem(KEY, String(new FormData(keyForm).get('token') ?? '')); } catch {} keyForm.reset(); void load(); });
+    q('[data-lock]').addEventListener('click', () => { try { sessionStorage.removeItem(KEY); } catch {} lists.hidden = true; keyForm.hidden = false; });
+    if (token()) void load();
+  });
+</script>
+
+<style>
+  .key{display:flex;gap:12px;align-items:end;max-width:520px}
+  .key label{flex:1;display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px}
+  input{font:inherit;border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk);color:var(--ink)}
+  [hidden]{display:none !important}
+  h2{font:22px var(--display);margin:28px 0 12px}
+  .items{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+  .items :global(.head){display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .items :global(.head small){color:var(--muted)}
+  .items :global(p){margin:6px 0 10px;white-space:pre-line;overflow-wrap:anywhere;font-family:var(--body),'Mali','M PLUS Rounded 1c',sans-serif}
+  .items :global(.acts){display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .items :global(.link){flex:1;min-width:220px}
+  [data-lock]{margin-top:20px}
+</style>
