@@ -18,7 +18,17 @@ const mv = (v: { globalRank: number | null; countryRank: number | null; pp: numb
     <p>osu! is one of the games I play every day. Here are a few example charts.</p>
   </header>
 
-  <Showcase id="taiko" title="osu!taiko" motif="vh-target" tint="mint">
+  <Showcase id="taiko" title="osu!taiko" tint="mint">
+    <!-- k d d k d d k: kat (sky) and don (pink) notes, same colours as the player below -->
+    <svg slot="motif" class="notes" viewBox="0 0 168 24" aria-hidden="true">
+      {[...'kddkddk'].map((n, i) => (
+        <g transform={`translate(${12 + i * 24} 12)`}>
+          <circle r="10.8" fill="#1f1e33" />
+          <circle r="9.2" fill="#fff" />
+          <circle r="7.4" fill={n === 'd' ? 'var(--pink)' : 'var(--sky)'} />
+        </g>
+      ))}
+    </svg>
     <ChartPlayer items={[{ chart: charts.taiko, stats: [
       { label: 'global rank', value: rank(osu.taiko?.globalRank), hint: '#00,000' },
       { label: '🇹🇭 Thailand', value: rank(osu.taiko?.countryRank), hint: '#000' },
@@ -39,3 +49,7 @@ const mv = (v: { globalRank: number | null; countryRank: number | null; pp: numb
     </Showcase>
   )}
 </Page>
+
+<style>
+  .notes{height:.62em;width:auto;flex:none}
+</style>

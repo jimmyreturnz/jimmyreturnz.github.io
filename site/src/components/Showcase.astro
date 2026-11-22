@@ -5,7 +5,7 @@ const { id, title, lead, motif = 'vh-chevrons', tint = 'pink' } = Astro.props;
 ---
 <section class="show" id={id} aria-labelledby={`${id}-h`} style={`--tint:var(--${tint})`}>
   <div class="head">
-    <h2 id={`${id}-h`}>{title} <Vh name={motif} class="m" /></h2>
+    <h2 id={`${id}-h`}>{title} {Astro.slots.has('motif') ? <slot name="motif" /> : <Vh name={motif} class="m" />}</h2>
     {lead && <p>{lead}</p>}
   </div>
   <slot />
