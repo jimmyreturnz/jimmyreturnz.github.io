@@ -129,6 +129,13 @@ const stages = timeline.map((t) => {
     vp.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; x0 = e.clientX; s0 = vp.scrollLeft; vp.classList.remove('moved'); });
     addEventListener('pointermove', (e) => { if (!down) return; const dx = e.clientX - x0; if (Math.abs(dx) > 4) { vp.classList.add('drag', 'moved'); vp.scrollLeft = s0 - dx; } });
     addEventListener('pointerup', () => { if (!down) return; down = false; vp.classList.remove('drag'); setTimeout(() => vp.classList.remove('moved')); });
+    // mouse wheel over the ruler scrolls it sideways; at either end the page scrolls as usual
+    vp.addEventListener('wheel', (e) => {
+      if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // pinch-zoom, or a trackpad already scrolling sideways
+      const max = vp.scrollWidth - vp.clientWidth;
+      if ((e.deltaY < 0 && vp.scrollLeft <= 0) || (e.deltaY > 0 && vp.scrollLeft >= max - 1)) return;
+      e.preventDefault(); vp.scrollLeft += e.deltaY;
+    }, { passive: false });
     pick(stages.length - 1, false);
   });
 </script>
