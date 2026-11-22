@@ -2,6 +2,7 @@
 // Lobby: a cosy landing page. (The Intro animation will end on this page later.)
 import Base from '../layouts/Base.astro';
 import Settings from '../components/Settings.astro';
+import BgmPill from '../components/BgmPill.astro';
 import PlayerCard from '../components/PlayerCard.astro';
 import Socials from '../components/Socials.astro';
 import Vh from '../components/Vh.astro';
@@ -24,6 +25,7 @@ const avatar = stats.osu.avatar;
 
     <div class="bar">
       <a class="wordmark" href="/"><Vh name="vh-heart" />jimmyreturnz</a>
+      <BgmPill />
       <Settings />
     </div>
 

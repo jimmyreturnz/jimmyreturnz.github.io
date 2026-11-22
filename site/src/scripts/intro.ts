@@ -125,6 +125,7 @@ function run(el: HTMLElement) {
       .fromTo(login, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.2, ease: 'back.out(2)' }, 2.05)
       .to(login, { opacity: 0, duration: 0.15 }, 2.4)
       .call(() => sfx.swish(), [], 2.45)
+      .to(skip, { autoAlpha: 0, duration: 0.1 }, 2.4) // gone before the Lobby bar (theme switch under it) pops in
       .to(boot, { opacity: 0, duration: 0.2 }, 2.5)
       .to(el, { backgroundColor: 'transparent', duration: 0.01 }, 2.55)
       .fromTo('svg.floor', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 2.6);

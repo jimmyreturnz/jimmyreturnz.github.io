@@ -24,7 +24,7 @@ if (cfg) {
     if (want && !feature && !introOn() && soundOn()) { tapBgm(el); void el.play().then(() => fadeTo(1)).catch(() => { /* needs a click first */ }); }
     else if (el.volume > 0 || !el.paused) fadeTo(0);
   };
-  // the header (kept across page changes, absent on the Lobby) gets its title and button wired whenever it is on the page
+  // the BGM pill (Lobby bar, and the Portfolio header kept across page changes) gets its title and button wired whenever it is on the page
   const bind = () => {
     const t = document.querySelector<HTMLElement>('[data-bgm-title]'), b = btn();
     if (t && !t.querySelector('.mq')) { t.innerHTML = `<span class="mq"><span>${label}</span><span aria-hidden="true">${label}</span></span>`; t.setAttribute('aria-label', label); } // two copies for the endless scroll
