@@ -34,5 +34,6 @@ if (cfg) {
   document.addEventListener('jr:lobby', () => { lobby = true; sync(); });
   document.addEventListener('jr:feature-audio', (e) => { feature = (e as CustomEvent).detail.playing; sync(); });
   addEventListener('pointerdown', sync, { once: true }); // first click anywhere: browsers allow sound now
+  addEventListener('keydown', sync, { once: true }); // keyboard visitors too
   bind();
 }

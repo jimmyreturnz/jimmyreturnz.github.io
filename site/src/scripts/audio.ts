@@ -50,8 +50,10 @@ export function tap(el: HTMLAudioElement) {
 
 /** BGM goes through the music bus, so the header Sound button mutes it and the music slider sets its level. */
 export function tapBgm(el: HTMLAudioElement) {
+  // unlock() also resumes the context: one made before any click starts suspended, and the BGM would play into silence
+  const c = unlock();
   if (el.dataset.tapped) return;
-  const c = unlock(); el.dataset.tapped = '1';
+  el.dataset.tapped = '1';
   c.createMediaElementSource(el).connect(musicBus);
 }
 
