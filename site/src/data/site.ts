@@ -8,7 +8,7 @@ export const profile = {
   role: 'Data Scientist & Developer',
   aspiration: 'on my way to AI Engineer',
   bio: [
-    'I build data and ML tools for the production team at BMW Group in Rayong, like a shipment tracker that cut airfreight cost by 15% and an OCR system for the line.',
+    'I build data and ML tools for the production team at BMW Group in Rayong, such as a shipment tracker that cut airfreight cost by 15% and an OCR system for the line.',
     'You might also know me from osu!taiko, osu!mania or TETR.IO, and I’m a big fan of hardcore EDM.',
   ],
   study: 'Mahidol University, graduating 2027',
