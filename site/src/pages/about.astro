@@ -9,8 +9,8 @@ import { profile, skills, setups, timeline } from '../data/site';
 const Y0 = 2017, Y1 = 2028, YW = 120, MW = YW / 12;
 const mi = (d: string) => { const [y, m] = d.split('-').map(Number) as [number, number]; return (y - Y0) * 12 + m - 1; };
 const now = new Date(), nowI = (now.getFullYear() - Y0) * 12 + now.getMonth();
-const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const fmt = (d: string) => `${MON[Number(d.slice(5)) - 1]} ${d.slice(0, 4)}`;
+const monthYear = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+const fmt = (d: string) => monthYear.format(new Date(`${d}-01T00:00:00Z`));
 const dur = (m: number) => ((m >= 12 ? `${Math.floor(m / 12)} yr` : '') + (m % 12 ? ` ${m % 12} mo` : '')).trim();
 const stages = timeline.map((t) => {
   const a = mi(t.from), months = (t.to ? mi(t.to) : nowI) - a + 1;
@@ -20,27 +20,13 @@ const stages = timeline.map((t) => {
 <Page title="About" description="About Jimmy (Apiwat Kongsawat, jimmyreturnz), data scientist intern at BMW Group and Mahidol University student. Skills, setups and timeline.">
   <header class="page-hero">
     <h1>About</h1>
-    <p>{profile.fullName} ({profile.nickname}) · {profile.role} · {profile.location} · speaks {profile.languages}</p>
+    <p class="intro">{profile.fullName} ({profile.nickname}). {profile.bio[0]}</p>
+    <ul class="facts" aria-label="Quick facts">
+      <li class="chip">📍 {profile.location}</li>
+      <li class="chip">🎓 {profile.study}</li>
+      <li class="chip" lang="en">💬 {profile.languages}</li>
+    </ul>
   </header>
-
-  <Showcase id="skills" title="Skills" lead="What I work with, grouped." motif="vh-dots" tint="mint">
-    <div class="grid3">
-      {skills.map((g) => (
-        <div class="card pad"><h3>{g.group}</h3><div class="chips">{g.items.map((s) => <span class="chip">{s}</span>)}</div></div>
-      ))}
-    </div>
-  </Showcase>
-
-  <Showcase id="setups" title="Setups" lead="My gear and game settings." motif="vh-eq" tint="lav">
-    <div class="grid3">
-      {setups.map((g) => (
-        <div class="card pad"><h3>{g.group}</h3>
-          <dl>{g.items.map((i) => <><dt>{i.label}</dt><dd><Ph value={i.value} hint="…" /></dd></>)}</dl>
-        </div>
-      ))}
-    </div>
-    <TetrioKeys />
-  </Showcase>
 
   <Showcase id="timeline" title="Timeline" motif="vh-arrow-thin" tint="sky">
     <div class="card pad ruler" data-ruler style={`--yw:${YW}px`}>
@@ -61,9 +47,32 @@ const stages = timeline.map((t) => {
       ))}
     </div>
   </Showcase>
+
+  <Showcase id="skills" title="Skills" lead="What I work with, grouped." motif="vh-dots" tint="mint">
+    <div class="grid3">
+      {skills.map((g) => (
+        <div class="card pad"><h3>{g.group}</h3><div class="chips" translate="no">{g.items.map((s) => <span class="chip">{s}</span>)}</div></div>
+      ))}
+    </div>
+  </Showcase>
+
+  <Showcase id="setups" title="Setups" lead="My gear and game settings." motif="vh-eq" tint="lav">
+    <div class="grid3">
+      {setups.map((g) => (
+        <div class="card pad"><h3>{g.group}</h3>
+          <dl>{g.items.map((i) => <><dt>{i.label}</dt><dd><Ph value={i.value} hint="…" /></dd></>)}</dl>
+        </div>
+      ))}
+    </div>
+    <TetrioKeys />
+  </Showcase>
 </Page>
 
 <style>
+  .page-hero .intro{color:var(--ink);font-weight:400;font-size:17px;max-width:60ch}
+  .facts{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+  .facts .chip{cursor:default}
+  @media (max-width:520px){ .facts .chip{white-space:normal;text-align:left;line-height:1.3;padding-block:6px 4px} }
   .chips{display:flex;flex-wrap:wrap;gap:6px}
   .chips .chip{cursor:default}
   dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
@@ -82,7 +91,7 @@ const stages = timeline.map((t) => {
   .stage{position:absolute;height:32px;box-sizing:border-box;padding:0 10px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;
     background:color-mix(in srgb,var(--accent) 14%,var(--paper));border:2px solid var(--ink);border-radius:99px;color:var(--ink);font:700 12px var(--hud);cursor:pointer;transition:background .25s,color .25s,transform .25s}
   .stage.hl{background:var(--butter);color:var(--on-pastel)}
-  .stage:hover{transform:translateY(-2px)}
+  @media (hover:hover) and (pointer:fine){ .stage:hover{transform:translateY(-2px)} }
   .stage:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .stage[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
   .row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:12px}
@@ -90,7 +99,7 @@ const stages = timeline.map((t) => {
   .row div{display:grid;gap:2px}
   .row b{font-size:clamp(18px,3vw,22px)}
   .blurb{font-size:14px;margin-top:4px}
-  .when{font:700 clamp(24px,5vw,34px)/1 var(--hud);color:var(--accent);text-align:right;white-space:nowrap}
+  .when{font:700 clamp(24px,5vw,34px)/1 var(--hud);color:var(--accent);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 </style>
 
 <script>

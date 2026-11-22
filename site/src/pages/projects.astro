@@ -13,22 +13,29 @@ const tags = ['all', ...new Set(projects.flatMap((p) => p.tags))];
   <div class="filters" role="group" aria-label="Filter projects">
     {tags.map((t, i) => <button class="chip" type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-filter={t}>{t}</button>)}
   </div>
+  <p class="sr-only" aria-live="polite" data-count></p>
   <div class="projects">
     {projects.map((p) => (
       <article class="card proj" data-tags={p.tags.join(' ')}>
+        <!-- the result is the first thing to read on each card -->
         <div class={`cover bg-${p.cover}`}>
           {p.pinned && <span class="pin">★ PINNED</span>}
-          <Vh name={p.icon} />
+          <Vh name={p.icon} class="mark" />
+          {p.outcome.value && <p class="win"><b>{p.outcome.value}</b><span>{p.outcome.text}</span></p>}
         </div>
         <div class="body">
           <div class="tags">{p.tags.map((t) => <span class="chip">{t}</span>)}</div>
           <h2>{p.title}</h2>
           <p class="sum">{p.summary}</p>
-          {p.outcome.value && <div class="outcome"><b>{p.outcome.value}</b><span>{p.outcome.text}</span></div>}
-          {(p.stack || p.role) && <p class="meta">{[p.stack, p.role && `Role: ${p.role}`].filter(Boolean).join(' · ')}</p>}
+          {(p.stack || p.role) && (
+            <dl class="facts">
+              {p.stack && <><dt>Stack</dt><dd translate="no">{p.stack}</dd></>}
+              {p.role && <><dt>Role</dt><dd>{p.role}</dd></>}
+            </dl>
+          )}
           {(p.link || p.note) && (
             <p class="links">
-              {p.link && <a href={p.link.href} target="_blank" rel="noopener noreferrer">{p.link.label}</a>}
+              {p.link && <a href={p.link.href} target="_blank" rel="noopener noreferrer">{p.link.label}<span class="sr-only"> (opens in a new tab)</span></a>}
               {p.note && <span class="meta">{p.note}</span>}
             </p>
           )}
@@ -43,28 +50,55 @@ const tags = ['all', ...new Set(projects.flatMap((p) => p.tags))];
   .projects{display:grid;gap:22px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));padding-bottom:30px}
   .proj{display:flex;flex-direction:column;overflow:hidden}
   .proj[hidden]{display:none}
-  .cover{position:relative;aspect-ratio:16/9;border-bottom:var(--stroke) solid var(--ink);display:grid;place-items:center}
-  .cover :global(svg){width:42%;color:#fff}
+  .cover{position:relative;min-height:176px;border-bottom:var(--stroke) solid var(--ink);display:flex;flex-direction:column;justify-content:flex-end;padding:44px 16px 14px;color:var(--on-pastel)}
+  .cover :global(.mark){position:absolute;right:14px;top:12px;width:64px;color:#fff}
   .pin{position:absolute;left:10px;top:10px;font:700 11px var(--hud);letter-spacing:.1em;background:var(--navy);color:var(--butter);border-radius:99px;padding:4px 10px}
+  .win{position:relative;margin:0;display:flex;flex-direction:column;gap:4px;max-width:30ch}
+  .win b{font:clamp(34px,4vw,44px)/1 var(--display);font-variant-numeric:tabular-nums}
+  .win span{font-size:14px;font-weight:700;line-height:1.35;text-wrap:pretty}
   .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
   .tags{display:flex;gap:6px;flex-wrap:wrap}
   .tags .chip{font-size:11px;min-height:24px;padding:var(--nudge) 9px 0;cursor:default}
   h2{font-size:19px;margin:2px 0 0}
-  .sum{margin:0;font-size:14.5px}
-  .outcome{display:flex;gap:10px;align-items:baseline;border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk)}
-  .outcome b{font:700 22px/1 var(--hud);color:var(--accent);white-space:nowrap}
-  .outcome span{font-size:14px}
-  .links{margin:auto 0 0;display:flex;gap:14px;align-items:center;font-size:14px}
+  .sum{margin:0;font-size:14.5px;text-wrap:pretty}
+  .facts{margin:2px 0 0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:13px}
+  .facts dt{color:var(--muted);font-weight:700}
+  .facts dd{margin:0;min-width:0}
+  .links{margin:auto 0 0;padding-top:4px;display:flex;gap:14px;align-items:center;font-size:14px}
 </style>
 
 <script>
+  import { reduced } from '../scripts/motion';
   document.addEventListener('astro:page-load', () => {
     const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
     const cards = [...document.querySelectorAll<HTMLElement>('.proj')];
+    const count = document.querySelector<HTMLElement>('[data-count]');
+    if (!buttons.length) return;
+    const STAGGER = [0, 40, 70, 90]; // gaps shrink, so the group reads as one wave; later cards arrive with the last one
+    const apply = (f: string, animate: boolean) => {
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.filter === f)));
+      const shown = cards.filter((c) => {
+        const on = f === 'all' || c.dataset.tags!.split(' ').includes(f);
+        c.getAnimations().forEach((a) => a.cancel()); // a fast second click restarts cleanly
+        c.hidden = !on; // a hidden card leaves the layout at once, so the rest move up together
+        return on;
+      });
+      if (count) count.textContent = `Showing ${shown.length} project${shown.length === 1 ? '' : 's'}`;
+      if (!animate) return;
+      const r = reduced();
+      shown.forEach((c, i) => c.animate(
+        r ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: `translateY(${i ? 4 : 6}px)` }, { opacity: 1, transform: 'none' }],
+        { duration: r ? 150 : 220, delay: r ? 0 : STAGGER[Math.min(i, 3)], easing: 'cubic-bezier(.23,1,.32,1)', fill: 'backwards' },
+      ));
+    };
+    // the filter lives in the URL (?tag=work), so a filtered view can be linked and survives a reload
+    const fromUrl = new URLSearchParams(location.search).get('tag');
+    if (fromUrl && buttons.some((b) => b.dataset.filter === fromUrl)) apply(fromUrl, false);
     buttons.forEach((b) => b.addEventListener('click', () => {
-      const f = b.dataset.filter!;
-      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      cards.forEach((c) => { c.hidden = f !== 'all' && !c.dataset.tags!.split(' ').includes(f); });
+      const f = b.dataset.filter!, u = new URL(location.href);
+      if (f === 'all') u.searchParams.delete('tag'); else u.searchParams.set('tag', f);
+      history.replaceState(history.state, '', u);
+      apply(f, true);
     }));
   });
 </script>
