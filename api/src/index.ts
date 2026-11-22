@@ -56,8 +56,10 @@ app.post('/messages', async (c) => {
   if (wait > 0) return c.json({ error: `Please wait ${wait} s before sending another message.`, retryAfter: wait }, 429);
   // the edit key goes back to the sender only; the database keeps its hash
   const key = `${crypto.randomUUID()}${crypto.randomUUID()}`.replaceAll('-', '');
-  const row = await c.env.DB.prepare('INSERT INTO messages (name, body, status, visitor, edit_hash, created_at) VALUES (?, ?, ?, ?, ?, ?) RETURNING id')
-    .bind(msg.name, msg.body, 'approved', visitor, await sha256(key), at).first<{ id: number }>();
+  // the cooldown is checked again inside the insert itself, so two requests sent at once can't both get through
+  const row = await c.env.DB.prepare('INSERT INTO messages (name, body, status, visitor, edit_hash, created_at) SELECT ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM messages WHERE visitor = ? AND created_at > ?) RETURNING id')
+    .bind(msg.name, msg.body, 'approved', visitor, await sha256(key), at, visitor, at - COOLDOWN_MS).first<{ id: number }>();
+  if (!row) return c.json({ error: 'Please wait a moment before sending another message.', retryAfter: COOLDOWN_MS / 1000 }, 429);
   return c.json({ id: row?.id, name: msg.name, body: msg.body, link: null, created_at: at, edited_at: null, key, cooldown: COOLDOWN_MS / 1000 }, 201);
 });
 
