@@ -5,8 +5,10 @@ CREATE TABLE IF NOT EXISTS messages (
   body       TEXT NOT NULL,                     -- max 1000 characters, no links
   status     TEXT NOT NULL DEFAULT 'approved',  -- messages go public straight away; kept so hiding without deleting stays possible
   link       TEXT,                              -- profile link the owner attaches by hand while approving
-  visitor    TEXT NOT NULL,                     -- HMAC of the IP with a key that changes daily; never the IP
-  created_at INTEGER NOT NULL                   -- unix ms
+  visitor    TEXT NOT NULL,                     -- HMAC of the IP with a key that changes daily; never the IP (60 s cooldown)
+  edit_hash  TEXT,                              -- SHA-256 of the edit key only the sender's browser holds
+  created_at INTEGER NOT NULL,                  -- unix ms
+  edited_at  INTEGER                            -- unix ms of the last edit, shown as "(edited)"
 );
 CREATE INDEX IF NOT EXISTS messages_board ON messages (status, created_at DESC);
 CREATE INDEX IF NOT EXISTS messages_visitor ON messages (visitor);

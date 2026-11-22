@@ -45,7 +45,12 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
 
 <script>
   import { gsap } from 'gsap';
-  type Msg = { id: number; name: string; body: string; link: string | null; created_at: number };
+  type Msg = { id: number; name: string; body: string; link: string | null; created_at: number; edited_at: number | null };
+
+  // edit keys for messages sent from this browser ({id: key}); the server only keeps their hashes
+  const KEYS = 'jr.board.keys';
+  const keys = (): Record<string, string> => { try { return JSON.parse(localStorage.getItem(KEYS) ?? '{}'); } catch { return {}; } };
+  const saveKey = (id: number, key: string) => { try { localStorage.setItem(KEYS, JSON.stringify({ ...keys(), [id]: key })); } catch { /* private mode: no editing later */ } };
   type Turnstile = { render: (el: HTMLElement, o: object) => string; reset: (id: string) => void; remove: (id: string) => void };
 
   // Turnstile's script loads only once someone starts writing a message
@@ -71,15 +76,41 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
     let page = 1, more = false, loading = false;
 
     // names and messages go in with textContent only: always plain text, never HTML
-    const item = (m: Pick<Msg, 'name' | 'body' | 'link' | 'created_at'>) => {
+    const item = (m: Msg) => {
       const li = document.createElement('li');
       const av = Object.assign(document.createElement('span'), { className: `av bg-${tintOf(m.name)}`, textContent: firstLetter(m.name) }); av.setAttribute('aria-hidden', 'true');
       const head = document.createElement('div'), name = document.createElement(m.link ? 'a' : 'b');
       name.textContent = m.name; name.className = 'who';
       if (m.link) Object.assign(name, { href: m.link, rel: 'nofollow noopener ugc', target: '_blank' });
       const t = Object.assign(document.createElement('time'), { textContent: when(m.created_at), dateTime: new Date(m.created_at).toISOString() });
-      head.append(name, t);
-      const text = document.createElement('div'); text.append(head, Object.assign(document.createElement('p'), { textContent: m.body }));
+      const edited = Object.assign(document.createElement('small'), { className: 'edited', textContent: m.edited_at ? '(edited)' : '' });
+      head.append(name, t, edited);
+      const p = Object.assign(document.createElement('p'), { textContent: m.body });
+      const text = document.createElement('div'); text.append(head, p);
+      const key = keys()[m.id];
+      if (key) { // your own message: edit it in place (no cooldown)
+        const eb = Object.assign(document.createElement('button'), { type: 'button', className: 'edit', textContent: 'Edit' });
+        eb.addEventListener('click', () => {
+          const ta = Object.assign(document.createElement('textarea'), { value: m.body, maxLength: 1000, rows: 2, className: 'editbox' });
+          ta.setAttribute('aria-label', 'Edit your message');
+          const err = Object.assign(document.createElement('small'), { className: 'edit-err' });
+          const done = () => { ta.replaceWith(p); err.remove(); eb.hidden = false; };
+          const save = async () => {
+            if (ta.value.trim() === m.body) return done();
+            const r = await fetch(`${api}/messages/${m.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: ta.value, key }) }).catch(() => null);
+            const d = (await r?.json().catch(() => ({}))) as { body?: string; edited_at?: number; error?: string };
+            if (!r?.ok) { err.textContent = d?.error ?? 'That didn’t save. Please try again.'; return; }
+            m.body = d.body ?? ta.value.trim(); m.edited_at = d.edited_at ?? Date.now();
+            p.textContent = m.body; edited.textContent = '(edited)'; done();
+          };
+          // Enter saves, Shift+Enter makes a new line, Escape cancels
+          ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); void save(); } else if (e.key === 'Escape') done(); });
+          p.replaceWith(ta); ta.after(err); eb.hidden = true;
+          ta.style.height = `${Math.min(ta.scrollHeight, 200)}px`; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+          err.textContent = 'Enter to save · Esc to cancel';
+        });
+        head.append(eb);
+      }
       li.append(av, text); return li;
     };
     // newest at the bottom, like a chat; scrolling to the top loads older messages above without moving what you're reading
@@ -113,26 +144,41 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
     // Enter sends, Shift+Enter makes a new line (not while typing Thai/Japanese with an input method)
     msg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit(); } });
 
+    // spam filter: 60 s between messages; the send button counts down
+    const btn = q<HTMLButtonElement>('.send');
+    let coolTimer = 0;
+    const cooldown = (s: number) => {
+      clearInterval(coolTimer); btn.disabled = true;
+      const end = Date.now() + s * 1000;
+      const tick = () => { const left = Math.ceil((end - Date.now()) / 1000); if (left > 0) { btn.textContent = String(left); btn.setAttribute('aria-label', `Send again in ${left} seconds`); } else { clearInterval(coolTimer); btn.textContent = '➤'; btn.setAttribute('aria-label', 'Send'); btn.disabled = false; } };
+      tick(); coolTimer = window.setInterval(tick, 250);
+    };
+    document.addEventListener('astro:before-swap', () => clearInterval(coolTimer), { once: true });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = q<HTMLButtonElement>('.send');
+      if (btn.disabled) return;
       await ensureTs();
       if (!token) { out.textContent = 'One moment, the spam check is still running.'; return; }
       btn.disabled = true; out.textContent = '';
       const fd = new FormData(form), name = String(fd.get('name') ?? ''), body = String(fd.get('message') ?? '');
       try {
         const r = await fetch(`${api}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, message: body, token }) });
-        const d = (await r.json().catch(() => ({}))) as Partial<Msg> & { error?: string };
-        if (r.ok) {
-          // the message pops in at the bottom, as the server stored it
-          const li = item({ name: d.name ?? name.trim(), body: d.body ?? body.trim(), link: null, created_at: d.created_at ?? Date.now() });
+        const d = (await r.json().catch(() => ({}))) as Partial<Msg> & { error?: string; key?: string; cooldown?: number; retryAfter?: number };
+        if (r.ok && d.id) {
+          // the message pops in at the bottom, as the server stored it; this browser keeps its edit key
+          if (d.key) saveKey(d.id, d.key);
+          const li = item({ id: d.id, name: d.name ?? name.trim(), body: d.body ?? body.trim(), link: null, created_at: d.created_at ?? Date.now(), edited_at: null });
           list.append(li); state.hidden = true; feed.scrollTop = feed.scrollHeight;
           gsap.from(li, { y: 18, opacity: 0, scale: 0.97, duration: 0.45, ease: 'back.out(1.6)', clearProps: 'transform' });
           msg.value = ''; grow(); count.textContent = '';
-        } else out.textContent = d.error ?? 'That didn’t send. Please try again.';
-      } catch { out.textContent = 'That didn’t send. Please try again.'; }
+          cooldown(d.cooldown ?? 60);
+        } else {
+          out.textContent = d.error ?? 'That didn’t send. Please try again.';
+          if (d.retryAfter) cooldown(d.retryAfter); else btn.disabled = false;
+        }
+      } catch { out.textContent = 'That didn’t send. Please try again.'; btn.disabled = false; }
       token = ''; if (ts && wid) ts.reset(wid);
-      btn.disabled = false;
     });
 
     document.addEventListener('astro:before-swap', () => { if (ts && wid) ts.remove(wid); }, { once: true });
@@ -151,7 +197,11 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
   .list :global(li > div > div){display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
   .list :global(.who){font-weight:700;overflow-wrap:anywhere}
   .list :global(a.who){color:var(--accent)}
-  .list :global(time){font-size:12px;color:var(--muted)}
+  .list :global(time),.list :global(.edited){font-size:12px;color:var(--muted)}
+  .list :global(.edit){margin-left:auto;font:700 12px var(--body);color:var(--accent);background:none;border:0;padding:2px 4px;cursor:pointer;opacity:.75}
+  .list :global(.edit:hover),.list :global(.edit:focus-visible){opacity:1;text-decoration:underline}
+  .list :global(.editbox){display:block;width:100%;margin-top:4px;font:inherit;font-family:var(--body),'Mali','M PLUS Rounded 1c',sans-serif;border:2px solid var(--ink);border-radius:10px;padding:6px 8px;background:var(--sunk);color:var(--ink);resize:vertical}
+  .list :global(.edit-err){display:block;font-size:12px;color:var(--muted);margin-top:2px}
   .list :global(p){margin:2px 0 0;white-space:pre-line;overflow-wrap:anywhere;font-family:var(--body),'Mali','M PLUS Rounded 1c',sans-serif}
   .state{position:absolute;inset:0;display:grid;place-items:center;margin:0;text-align:center;padding:16px}
   .state[hidden]{display:none}
@@ -162,7 +212,8 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
   .compose textarea{flex:1;resize:none;min-height:36px;line-height:1.5}
   .compose input:focus-visible,.compose textarea:focus-visible{outline:none}
   .compose .row:focus-within{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent)}
-  .send{flex:none;width:38px;height:38px;border-radius:50%;border:2px solid var(--ink);background:var(--pink);color:var(--on-pastel);cursor:pointer;font-size:15px}
+  .send{flex:none;width:38px;height:38px;padding:0;display:grid;place-items:center;border-radius:50%;border:2px solid var(--ink);background:var(--pink);color:var(--on-pastel);cursor:pointer;font:700 15px/1 var(--hud);font-variant-numeric:tabular-nums}
+  .send[disabled]{font-size:12px} /* the cooldown seconds */
   .send[disabled]{opacity:.6}
   .count{align-self:flex-end;color:var(--muted);font-size:12px}
   .count:empty,.out:empty,.ts:empty{display:none}

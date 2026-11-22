@@ -1,6 +1,8 @@
 // Message Board API (Hono on Cloudflare Workers, data in D1). See schema.sql and README.md.
 //   GET  /messages?page=1            messages, newest first, 20 a page
-//   POST /messages {name, message, token}   a new message, public straight away once it passes the checks (owner, 2026-11-23)
+//   POST /messages {name, message, token}   a new message, public straight away once it passes the checks (owner, 2026-11-23);
+//                                           60 s cooldown per visitor; returns an edit key only the sender's browser keeps
+//   PUT  /messages/:id {message, key}       edit your own message (no cooldown, same checks)
 //   POST /admin/messages/:id/link {link?}   attach or clear a profile link   (Authorization: Bearer ADMIN_TOKEN)
 //   DELETE /admin/messages/:id                                               (same)
 import { Hono } from 'hono';
@@ -11,7 +13,7 @@ import { checkMessage, checkLink, PAGE_SIZE } from './rules';
 type Env = { DB: D1Database; ALLOWED_ORIGINS: string; TURNSTILE_SECRET: string; VISITOR_SECRET: string; ADMIN_TOKEN: string };
 const app = new Hono<{ Bindings: Env }>();
 
-app.use('*', (c, next) => cors({ origin: c.env.ALLOWED_ORIGINS.split(',').map((s) => s.trim()), allowMethods: ['GET', 'POST', 'DELETE'], allowHeaders: ['Content-Type', 'Authorization'], maxAge: 86400 })(c, next));
+app.use('*', (c, next) => cors({ origin: c.env.ALLOWED_ORIGINS.split(',').map((s) => s.trim()), allowMethods: ['GET', 'POST', 'PUT', 'DELETE'], allowHeaders: ['Content-Type', 'Authorization'], maxAge: 86400 })(c, next));
 
 const enc = new TextEncoder();
 const hmac = async (key: string, data: string) => {
@@ -22,6 +24,9 @@ const hmac = async (key: string, data: string) => {
  *  reversed or linked across days. The raw IP is never stored. */
 const visitorId = async (secret: string, ip: string) => hmac(await hmac(secret, new Date().toISOString().slice(0, 10)), ip);
 
+const sha256 = async (s: string) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
+const COOLDOWN_MS = 60_000;
+
 const turnstileOk = async (secret: string, token: unknown, ip: string) => {
   if (typeof token !== 'string' || !token) return false;
   const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: new URLSearchParams({ secret, response: token, remoteip: ip }) });
@@ -30,7 +35,7 @@ const turnstileOk = async (secret: string, token: unknown, ip: string) => {
 
 app.get('/messages', async (c) => {
   const page = Math.max(1, Math.min(1000, Number(c.req.query('page')) || 1));
-  const { results } = await c.env.DB.prepare('SELECT id, name, body, link, created_at FROM messages WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?')
+  const { results } = await c.env.DB.prepare('SELECT id, name, body, link, created_at, edited_at FROM messages WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?')
     .bind('approved', PAGE_SIZE + 1, (page - 1) * PAGE_SIZE).all();
   c.header('Cache-Control', 'public, max-age=5'); // new messages show up for everyone within a few seconds
   return c.json({ items: results.slice(0, PAGE_SIZE), more: results.length > PAGE_SIZE });
@@ -44,19 +49,36 @@ app.post('/messages', async (c) => {
   const ip = c.req.header('CF-Connecting-IP') ?? '0.0.0.0';
   if (!(await turnstileOk(c.env.TURNSTILE_SECRET, input.token, ip))) return c.json({ error: 'The spam check didn’t pass. Please try again.' }, 403);
   const visitor = await visitorId(c.env.VISITOR_SECRET, ip);
-  // one message a day per visitor
-  const seen = await c.env.DB.prepare('SELECT 1 FROM messages WHERE visitor = ? LIMIT 1').bind(visitor).first();
-  if (seen) return c.json({ error: 'You’ve already sent a message today. Thank you!' }, 429);
+  // spam filter: one message per visitor every 60 s
   const at = Date.now();
-  const row = await c.env.DB.prepare('INSERT INTO messages (name, body, status, visitor, created_at) VALUES (?, ?, ?, ?, ?) RETURNING id').bind(msg.name, msg.body, 'approved', visitor, at).first<{ id: number }>();
-  return c.json({ id: row?.id, name: msg.name, body: msg.body, link: null, created_at: at }, 201); // as stored, so the page shows exactly what others will see
+  const last = await c.env.DB.prepare('SELECT MAX(created_at) AS t FROM messages WHERE visitor = ?').bind(visitor).first<{ t: number | null }>();
+  const wait = last?.t ? Math.ceil((last.t + COOLDOWN_MS - at) / 1000) : 0;
+  if (wait > 0) return c.json({ error: `Please wait ${wait} s before sending another message.`, retryAfter: wait }, 429);
+  // the edit key goes back to the sender only; the database keeps its hash
+  const key = `${crypto.randomUUID()}${crypto.randomUUID()}`.replaceAll('-', '');
+  const row = await c.env.DB.prepare('INSERT INTO messages (name, body, status, visitor, edit_hash, created_at) VALUES (?, ?, ?, ?, ?, ?) RETURNING id')
+    .bind(msg.name, msg.body, 'approved', visitor, await sha256(key), at).first<{ id: number }>();
+  return c.json({ id: row?.id, name: msg.name, body: msg.body, link: null, created_at: at, edited_at: null, key, cooldown: COOLDOWN_MS / 1000 }, 201);
+});
+
+app.put('/messages/:id', async (c) => {
+  const input = await c.req.json<{ message?: unknown; key?: unknown }>().catch(() => null);
+  if (!input || typeof input.key !== 'string' || input.key.length < 32) return c.json({ error: 'Bad request.' }, 400);
+  const id = Number(c.req.param('id'));
+  const row = await c.env.DB.prepare('SELECT name, edit_hash FROM messages WHERE id = ?').bind(id).first<{ name: string; edit_hash: string | null }>();
+  if (!row || !row.edit_hash || row.edit_hash !== (await sha256(input.key))) return c.json({ error: 'You can only edit your own messages.' }, 403);
+  const msg = checkMessage({ name: row.name, message: input.message });
+  if (!msg.ok) return c.json({ error: msg.error }, 400);
+  const at = Date.now();
+  await c.env.DB.prepare('UPDATE messages SET body = ?, edited_at = ? WHERE id = ?').bind(msg.body, at, id).run();
+  return c.json({ id, body: msg.body, edited_at: at });
 });
 
 app.use('/admin/*', bearerAuth({ verifyToken: async (t, c) => { const want = (c.env as Env).ADMIN_TOKEN; return !!want && t === want; } }));
 
 // the inbox: the latest 100, uncached
 app.get('/admin/messages', async (c) => {
-  const { results } = await c.env.DB.prepare('SELECT id, name, body, link, created_at FROM messages ORDER BY created_at DESC LIMIT 100').all();
+  const { results } = await c.env.DB.prepare('SELECT id, name, body, link, created_at, edited_at FROM messages ORDER BY created_at DESC LIMIT 100').all();
   return c.json({ items: results });
 });
 

@@ -8,7 +8,7 @@ Hono on Cloudflare Workers, messages in Cloudflare D1. The Community page reads 
 cd api
 bun install
 cp .dev.vars.example .dev.vars   # test secrets; the Turnstile one always passes
-bun run db:local                 # create the table in the local database
+bun run db:local                 # create the table in the local database (after a schema change: drop the table first)
 bun run dev                      # http://localhost:8787
 bun run test                     # input rules
 ```
@@ -31,5 +31,6 @@ The site picks up the local API from `site/.env.development` (restart `bun run d
 ## Rules
 
 - Name up to 40 characters, message up to 1000, no links. Names and messages are plain text everywhere.
-- One message per visitor per day. A visitor is an HMAC of their IP under a key derived from `VISITOR_SECRET` and the date, so it changes daily and the IP itself is never stored.
+- Spam filter: one message per visitor every 60 seconds (owner, 2026-11-23). A visitor is an HMAC of their IP under a key derived from `VISITOR_SECRET` and the date, so it changes daily and the IP itself is never stored.
+- Senders can edit their own messages, with no cooldown and the same checks. Posting returns a random edit key that only the sender's browser keeps (localStorage); the database stores its SHA-256. Edited messages show "(edited)".
 - Messages are public straight away (owner, 2026-11-23). The owner can delete any message and attach an `https://` profile link in the inbox.
