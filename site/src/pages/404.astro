@@ -6,11 +6,17 @@ import Page from '../layouts/Page.astro';
     <h1>Miss!</h1>
     <p>That note slipped past. The page you wanted isn’t here.</p>
   </header>
-  <div class="lane" aria-hidden="true">
+  <div class="lane" aria-hidden="true" data-miss>
     <span class="note"></span><span class="miss">MISS</span>
   </div>
   <p><a class="btn fill" href="/">Back to the Lobby</a></p>
 </Page>
+
+<script>
+  import { playOnce } from '../scripts/audio';
+  // the error sound, each time this page is shown (also after a client-side page change)
+  document.addEventListener('astro:page-load', () => { if (document.querySelector('[data-miss]')) void playOnce('/sfx/bluescreen.m4a'); });
+</script>
 
 <style>
   .lane{position:relative;height:150px;margin:24px 0;border:var(--stroke) solid var(--ink);border-radius:var(--radius);background:var(--paper);overflow:hidden}

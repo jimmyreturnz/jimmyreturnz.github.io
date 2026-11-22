@@ -99,14 +99,45 @@ function noise(dur: number, gain = 0.15, at = 0, hp = 1500) {
   s.buffer = buf; f.type = 'highpass'; f.frequency.value = hp; g.gain.value = gain;
   s.connect(f).connect(g).connect(sfxBus); s.start(t);
 }
+/** Play a sound file once on the effects volume (fetched only when called). Waits for the first click/key if the browser
+ *  hasn't allowed sound yet, and fades the BGM out meanwhile (`jr:feature-audio`). */
+export async function playOnce(url: string) {
+  if (muted()) return;
+  const bytes = await fetch(url).then((r) => r.arrayBuffer()).catch(() => null);
+  if (!bytes) return;
+  const go = async () => {
+    const c = unlock(), buf = await c.decodeAudioData(bytes).catch(() => null);
+    if (!buf || muted()) return;
+    const s = c.createBufferSource(); s.buffer = buf; s.connect(sfxBus);
+    const duck = (playing: boolean) => document.dispatchEvent(new CustomEvent('jr:feature-audio', { detail: { playing, id: url } }));
+    s.onended = () => duck(false); duck(true); s.start();
+  };
+  if (navigator.userActivation?.hasBeenActive ?? true) void go();
+  else { const once = () => { removeEventListener('pointerdown', once); removeEventListener('keydown', once); void go(); }; addEventListener('pointerdown', once); addEventListener('keydown', once); }
+}
+
+// the power-button hold sound (assets/sfx/pill-guiiin.m4a): fetched when the Intro shows, decoded on the first press
+let holdBytes: Promise<ArrayBuffer> | null = null, holdBuf: Promise<AudioBuffer | null> | null = null;
+export function preloadHold() { holdBytes ??= fetch('/sfx/pill-guiiin.m4a').then((r) => r.arrayBuffer()).catch(() => new ArrayBuffer(0)); }
+
 export const sfx = {
-  /** rising hum while the power button is held; call `stop()` on the result. */
+  /** The hold sound, starting at the press and following the hold: if decoding takes a moment it starts that far in,
+   *  and `stop(fade)` cuts it where the hold ended (a short fade on release, a longer one when the hold completes). */
   hum() {
-    if (!ctx || muted()) return () => {};
-    const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime;
-    o.type = 'sawtooth'; o.frequency.setValueAtTime(70, t); o.frequency.exponentialRampToValueAtTime(260, t + 0.7);
-    g.gain.value = 0.06; o.connect(g).connect(sfxBus); o.start();
-    return () => { g.gain.setTargetAtTime(0, ctx!.currentTime, 0.03); o.stop(ctx!.currentTime + 0.15); };
+    if (!ctx || muted()) return (_fade?: number) => {};
+    const c = ctx, t0 = c.currentTime, g = c.createGain(); g.connect(sfxBus);
+    let src: AudioBufferSourceNode | null = null, stopped = false;
+    preloadHold();
+    holdBuf ??= holdBytes!.then((b) => (b.byteLength ? c.decodeAudioData(b) : null)).catch(() => null);
+    void holdBuf.then((buf) => {
+      if (!buf || stopped) return;
+      const at = c.currentTime - t0; if (at >= buf.duration) return;
+      src = c.createBufferSource(); src.buffer = buf; src.connect(g); src.start(0, at);
+    });
+    return (fade = 0.04) => {
+      stopped = true; const t = c.currentTime;
+      g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + fade); src?.stop(t + fade + 0.02);
+    };
   },
   boom() { tone(90, 0.5, 'sine', 0.5, 40); noise(0.25, 0.12, 0, 600); },
   chime() { tone(659, 0.5, 'triangle', 0.2); tone(988, 0.7, 'triangle', 0.18, undefined, 0.12); tone(1318, 0.9, 'sine', 0.12, undefined, 0.24); },

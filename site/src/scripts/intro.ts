@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { reduced } from './motion';
 import { rollIn } from './roll';
-import { sfx, unlock, setSound } from './audio';
+import { sfx, unlock, setSound, preloadHold } from './audio';
 
 const root = document.documentElement;
 const LOBBY = ['.bar', '.sky .h1', '.sky .h2', '.sky .s1', '.sky .s2', '.bubble', '.id', '.role', '.about', '.facts', '.ctas', '.socials', '.player'].map((s) => `.lobby ${s}`).join(',');
@@ -42,7 +42,7 @@ function run(el: HTMLElement) {
   const bios = q('.bios'), logo = q('.logo'), bar = q('.lbar i'), login = q('.login');
   const rip = [...el.querySelectorAll<SVGCircleElement>('.ripples circle')], flash = q('.flash'), skip = q('[data-skip]');
   const W = () => innerWidth, H = () => innerHeight;
-  let started = false, held = false, tween: gsap.core.Tween | null = null, stopHum = () => {}, tl: gsap.core.Timeline | null = null;
+  let started = false, held = false, tween: gsap.core.Tween | null = null, stopHum = (_fade?: number) => {}, tl: gsap.core.Timeline | null = null;
   const lobbyEls = gsap.utils.toArray<HTMLElement>(LOBBY);
 
   // --- reduced motion: a still title card instead of the sequence ---
@@ -53,6 +53,8 @@ function run(el: HTMLElement) {
     q<HTMLButtonElement>('[data-enter]').focus({ preventScroll: true });
     return;
   }
+
+  preloadHold(); // the hold sound, so it is ready by the first press
 
   // holding builds up: glow grows, the button shakes harder, a pink vignette closes in
   let shake: ((t: number, dt: number) => void) | null = null;
@@ -79,7 +81,7 @@ function run(el: HTMLElement) {
   btn.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse') startHold(0.7); else { held = true; unlock(); setSound(true); } });
   btn.addEventListener('pointerup', (e) => {
     if (e.pointerType === 'mouse') cancelHold();
-    else if (!started) tween = gsap.to(ring, { strokeDashoffset: 0, duration: 0.25, onComplete: go }); // phone: one tap
+    else if (!started) { stopHum(); stopHum = sfx.hum(); tween = gsap.to(ring, { strokeDashoffset: 0, duration: 0.25, onComplete: go }); } // phone: one tap
   });
   btn.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') cancelHold(); });
   btn.addEventListener('pointercancel', cancelHold);
@@ -96,7 +98,7 @@ function run(el: HTMLElement) {
 
   function go() {
     if (started) return;
-    started = true; stopHum();
+    started = true; stopHum(0.15); // hold complete: the sound hands over to the boom
     gsap.set(lobbyEls, { opacity: 0 });
     tl = gsap.timeline({ onComplete: () => { finish(el); gsap.set(lobbyEls, { clearProps: 'all' }); } });
     tl.timeScale(INTRO_SPEED); // the whole Intro runs at this speed (0.5 = about 10 seconds)
