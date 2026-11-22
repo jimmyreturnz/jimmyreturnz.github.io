@@ -7,7 +7,7 @@ import { stats } from '../lib/stats';
 import sprite from '../../../assets/vectorheart/vectorheart.svg?raw';
 
 interface Props { title: string; description?: string }
-const { title, description = 'Apiwat Kongsawat (Jimmy, jimmyreturnz): Data Scientist & Developer in Bangkok, data science intern at BMW Group, and osu!taiko, osu!mania and TETR.IO player.' } = Astro.props;
+const { title, description = 'Apiwat Kongsawat (Jimmy, jimmyreturnz) is a Data Scientist & Developer in Bangkok, a data science intern at BMW Group, and an osu!taiko, osu!mania and TETR.IO player.' } = Astro.props;
 // Absolute URLs need the deployed address: set SITE_URL at build time (astro.config.mjs). Without it, these tags are left out.
 const site = Astro.site;
 const canonical = site && new URL(Astro.url.pathname, site).href;

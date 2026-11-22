@@ -67,7 +67,7 @@ export const projects: Project[] = [
     stack: 'Python · PySide6 · PyInstaller', role: 'Solo',
     link: { label: 'GitHub ↗', href: 'https://github.com/jimmyreturnz/KatsuDonEditor' } },
   { title: 'This portfolio', tags: ['dev', 'open source'], cover: 'pink', icon: 'vh-heart-target',
-    summary: 'osu! charts parsed from .osu files and drawn in the browser in sync with the song, plus live game stats fetched at build time.',
+    summary: 'osu! charts parsed from .osu files and drawn in the browser in sync with the song, plus game stats fetched at build time.',
     outcome: { value: '3', text: 'playable osu! charts rendered from the original chart files' },
     stack: 'Astro · TypeScript · GSAP · Canvas · Web Audio', role: 'Solo',
     link: { label: 'GitHub ↗', href: 'https://github.com/jimmyreturnz/jimmyreturnz.github.io' } },

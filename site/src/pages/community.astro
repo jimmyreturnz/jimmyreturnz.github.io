@@ -4,17 +4,17 @@ import Showcase from '../components/Showcase.astro';
 import Vh from '../components/Vh.astro';
 import { shoutouts } from '../data/site';
 ---
-<Page title="Community" description="Shoutouts and a Message Board for friends, fellow players and visitors.">
+<Page title="Community" description="Shoutouts and the Message Board on jimmyreturnz’s portfolio, for friends, fellow players and visitors.">
   <header class="page-hero">
     <h1>Community</h1>
-    <p>Friends, fellow players and anyone passing by, this page is for you.</p>
+    <p>This page is for friends, fellow players and anyone passing by.</p>
   </header>
 
   <Showcase id="shoutouts" title="Shoutouts" lead="Friends and people I look up to." motif="vh-sparkle" tint="butter">
     {shoutouts.length ? (
       <div class="grid3">{shoutouts.map((s) => <div class="card pad"><b>{s.name}</b>{s.quote && <p>“{s.quote}”</p>}</div>)}</div>
     ) : (
-      <div class="card pad empty"><Vh name="vh-heart-outline" /><p>The first shoutouts are on their way.</p></div>
+      <div class="card pad empty"><Vh name="vh-heart-outline" /><p>No shoutouts yet.</p></div>
     )}
   </Showcase>
 

@@ -17,7 +17,7 @@ const items = [
     <li>
       {i.href
         ? <a class="soc" href={i.href} target={i.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener noreferrer" aria-label={i.label} title={i.label}><Icon name={i.name} size={20} /></a>
-        : <span class="soc off" role="img" aria-label={`${i.label} (link coming soon)`} title={`${i.label}: link coming soon`}><Icon name={i.name} size={20} /></span>}
+        : <span class="soc off" role="img" aria-label={`${i.label} (link coming soon)`} title={`${i.label} (link coming soon)`}><Icon name={i.name} size={20} /></span>}
     </li>
   ))}
 </ul>

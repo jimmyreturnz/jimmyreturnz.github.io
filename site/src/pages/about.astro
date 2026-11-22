@@ -17,7 +17,7 @@ const stages = timeline.map((t) => {
   return { ...t, x: a * MW, w: months * MW, range: `${fmt(t.from)} – ${t.to ? fmt(t.to) : 'Present'}${t.expected ? ' (expected)' : ''}`, dur: dur(months) };
 });
 ---
-<Page title="About" description="Skills, setups and timeline of Jimmy (Apiwat Kongsawat).">
+<Page title="About" description="About Jimmy (Apiwat Kongsawat, jimmyreturnz), data scientist intern at BMW Group and Mahidol University student. Skills, setups and timeline.">
   <header class="page-hero">
     <h1>About</h1>
     <p>{profile.fullName} ({profile.nickname}) · {profile.role} · {profile.location} · speaks {profile.languages}</p>
@@ -31,7 +31,7 @@ const stages = timeline.map((t) => {
     </div>
   </Showcase>
 
-  <Showcase id="setups" title="Setups" lead="Gear and settings, for the curious." motif="vh-eq" tint="lav">
+  <Showcase id="setups" title="Setups" lead="My gear and game settings." motif="vh-eq" tint="lav">
     <div class="grid3">
       {setups.map((g) => (
         <div class="card pad"><h3>{g.group}</h3>

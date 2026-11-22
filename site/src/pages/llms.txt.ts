@@ -7,7 +7,7 @@ export function GET({ site }: { site?: URL }) {
   const text = [
     `# ${profile.fullName} (${profile.handle})`,
     '',
-    `> ${profile.fullName}, also known as ${profile.nickname} and ${profile.handle}: ${profile.role} based in ${profile.location}. ${profile.study}.`,
+    `> ${profile.fullName}, also known as ${profile.nickname} and ${profile.handle}, is a ${profile.role} based in ${profile.location}. ${profile.study}.`,
     '',
     ...profile.bio,
     '',
