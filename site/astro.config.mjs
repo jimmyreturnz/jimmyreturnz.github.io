@@ -4,6 +4,8 @@ import { defineConfig } from 'astro/config';
 // The repo-level assets/ folder (fonts, vectorheart kit, later audio and charts)
 // is served as-is at the site root, so the design mockups and the site share one copy.
 export default defineConfig({
+  // The deployed address (e.g. https://jimmyreturnz.pages.dev). Turns on canonical links, og:url and the sitemap.
+  site: process.env.SITE_URL || undefined,
   publicDir: '../assets',
   build: { format: 'directory' },
   // the old one-page Portfolio address

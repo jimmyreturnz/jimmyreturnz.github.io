@@ -2,11 +2,26 @@
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import Warp from '../components/Warp.astro';
-import { bgm } from '../data/site';
+import { bgm, profile } from '../data/site';
+import { stats } from '../lib/stats';
 import sprite from '../../../assets/vectorheart/vectorheart.svg?raw';
 
 interface Props { title: string; description?: string }
-const { title, description = 'Jimmy (Apiwat Kongsawat): Data Scientist & Developer, and osu!taiko, osu!mania and TETR.IO player.' } = Astro.props;
+const { title, description = 'Apiwat Kongsawat (Jimmy, jimmyreturnz): Data Scientist & Developer in Bangkok, data science intern at BMW Group, and osu!taiko, osu!mania and TETR.IO player.' } = Astro.props;
+// Absolute URLs need the deployed address: set SITE_URL at build time (astro.config.mjs). Without it, these tags are left out.
+const site = Astro.site;
+const canonical = site && new URL(Astro.url.pathname, site).href;
+const ogImage = site ? new URL('/og.png', site).href : '/og.png';
+const person = {
+  '@context': 'https://schema.org', '@type': 'Person',
+  name: profile.fullName, alternateName: [profile.handle, profile.nickname],
+  jobTitle: profile.role, ...(site && { url: site.href }),
+  address: { '@type': 'PostalAddress', addressLocality: 'Bangkok', addressCountry: 'TH' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Mahidol University' },
+  knowsLanguage: ['th', 'en', 'ja'],
+  sameAs: [profile.links.github, profile.links.linkedin, profile.links.instagram, profile.links.facebook,
+    stats.osu.profileUrl, stats.tetrio.profileUrl].filter(Boolean),
+};
 ---
 <!doctype html>
 <html lang="en" data-theme="light">
@@ -20,10 +35,19 @@ const { title, description = 'Jimmy (Apiwat Kongsawat): Data Scientist & Develop
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#fff8fc" />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(person)} />
     <link rel="icon" type="image/jpeg" href="/stats/osu-avatar.jpg" />
     <link rel="preload" href="/fonts/zen-dots/zen-dots-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css" />
-    <link rel="stylesheet" href="/fonts/fonts-jp.css" />
+    <!-- Japanese glyphs: a big @font-face list, so it loads without blocking the first paint -->
+    <link rel="stylesheet" href="/fonts/fonts-jp.css" media="print" onload="this.media='all'" />
     <!-- apply saved theme before first paint to avoid a flash -->
     <script is:inline>
       try {

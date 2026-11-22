@@ -8,9 +8,10 @@ export const profile = {
   role: 'Data Scientist & Developer',
   aspiration: 'on my way to AI Engineer',
   bio: [
-    'I create ML projects, including Shipment Tracking, a production-scale OCR project, and more!',
+    'I build data and ML tools for the production team at BMW Group in Rayong, like a shipment tracker that cut airfreight cost by 15% and an OCR system for the line.',
     'You might also know me from osu!taiko, osu!mania or TETR.IO, and I’m a big fan of hardcore EDM.',
   ],
+  study: 'Mahidol University, graduating 2027',
   location: 'Bangkok, Thailand' as string | null,
   languages: 'TH / EN / JP (ちょっと)',
   openTo: 'Data Scientist positions' as string | null,
@@ -38,7 +39,9 @@ export const github = {
 export type Project = {
   title: string;
   pinned?: boolean;
-  tags: ('data' | 'dev' | 'BMW' | 'internship' | 'open source')[];
+  tags: ('data' | 'dev' | 'work' | 'open source')[];
+  /** one plain sentence: what it does, for whom */
+  summary: string;
   outcome: { value: string | null; text: string | null };
   stack: string | null;
   role: string | null;
@@ -49,13 +52,24 @@ export type Project = {
 };
 
 export const projects: Project[] = [
-  { title: 'Shipment Tracking', pinned: true, tags: ['data', 'BMW'], cover: 'sky', icon: 'vh-eq',
-    outcome: { value: null, text: null }, stack: null, role: null, link: null, note: 'code private' },
-  { title: 'Production-scale OCR', pinned: true, tags: ['data', 'BMW'], cover: 'mint', icon: 'vh-target',
-    outcome: { value: '≥ ฿500k', text: 'saved compared with buying a dedicated vision system' }, stack: null, role: null, link: null, note: 'code private' },
+  { title: 'Shipment Tracking', pinned: true, tags: ['data', 'work'], cover: 'sky', icon: 'vh-eq',
+    summary: 'Tracks inbound sea containers, predicts which will arrive late from carrier plans, vessel positions and weather, and alerts the team early.',
+    outcome: { value: '−35%', text: 'chance of a line stop from late parts, and 15% lower airfreight cost' },
+    stack: 'Python · pandas · web scraping · Power Automate', role: 'Data Scientist intern, BMW Group', link: null, note: 'code private' },
+  { title: 'Production-scale OCR', pinned: true, tags: ['data', 'work'], cover: 'mint', icon: 'vh-target',
+    summary: 'Reads hand-stamped codes on cast parts from the line camera, checks them against the PLC in seconds, and rejects any code it isn’t sure of.',
+    outcome: { value: '≥ ฿500k', text: 'saved compared with buying a dedicated vision system' },
+    stack: 'Python · PaddleOCR · OPC UA / PLC · offline installer', role: 'Data Scientist intern, BMW Group', link: null, note: 'code private' },
+  // download and star counts as of 2026-11-22 (GitHub releases)
+  { title: 'KatsuDon Editor', pinned: true, tags: ['dev', 'open source'], cover: 'butter', icon: 'vh-chevrons',
+    summary: 'A desktop osu!taiko editor that arranges notes into shapes for gimmick charts, so mappers don’t place every note by hand.',
+    outcome: { value: '258', text: 'downloads and 12 stars on GitHub' },
+    stack: 'Python · PySide6 · PyInstaller', role: 'Solo',
+    link: { label: 'GitHub ↗', href: 'https://github.com/jimmyreturnz/KatsuDonEditor' } },
   { title: 'This portfolio', tags: ['dev', 'open source'], cover: 'pink', icon: 'vh-heart-target',
-    outcome: { value: '60fps', text: 'target on a mid-range phone, with two playable osu! charts' },
-    stack: 'Astro · TypeScript · GSAP · Hono · Cloudflare', role: 'Solo',
+    summary: 'osu! charts parsed from .osu files and drawn in the browser in sync with the song, plus live game stats fetched at build time.',
+    outcome: { value: '3', text: 'playable osu! charts rendered from the original chart files' },
+    stack: 'Astro · TypeScript · GSAP · Canvas · Web Audio', role: 'Solo',
     link: { label: 'GitHub ↗', href: 'https://github.com/jimmyreturnz/jimmyreturnz.github.io' } },
 ];
 

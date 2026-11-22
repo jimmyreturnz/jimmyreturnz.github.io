@@ -20,10 +20,10 @@ const stages = timeline.map((t) => {
 <Page title="About" description="Skills, setups and timeline of Jimmy (Apiwat Kongsawat).">
   <header class="page-hero">
     <h1>About</h1>
-    <p>{profile.fullName} ({profile.nickname}) · {profile.role} · {profile.location}</p>
+    <p>{profile.fullName} ({profile.nickname}) · {profile.role} · {profile.location} · speaks {profile.languages}</p>
   </header>
 
-  <Showcase id="skills" title="Skills" lead="Grouped, and each one will link to where I used it." motif="vh-dots" tint="mint">
+  <Showcase id="skills" title="Skills" lead="What I work with, grouped." motif="vh-dots" tint="mint">
     <div class="grid3">
       {skills.map((g) => (
         <div class="card pad"><h3>{g.group}</h3><div class="chips">{g.items.map((s) => <span class="chip">{s}</span>)}</div></div>

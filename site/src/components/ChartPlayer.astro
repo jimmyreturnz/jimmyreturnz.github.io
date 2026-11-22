@@ -35,7 +35,7 @@ const laneColour = (lanes: number, i: number) =>
     return (
       <div class:list={['player card', `p-${c.mode}`]} data-chart={c.id} data-keys-panel={c.id} hidden={k !== 0}>
         <div class="info">
-          <p class="label">{kind}</p>
+          <p class="label brand">{kind}</p>
           <h3><span lang={/[^\x00-\x7F]/.test(c.artist) ? 'ja' : undefined}>{c.artist}</span> – {c.title}</h3>
           <div class="credits">
             <p>Music: <a href={c.songUrl ?? camelliaUrl} target="_blank" rel="noopener noreferrer">{c.artistLatin}</a> – {c.title}{c.album && <> (<i>{c.album}</i>)</>}</p>
@@ -61,7 +61,6 @@ const laneColour = (lanes: number, i: number) =>
             : <p class="soon">Song coming soon. The slider will scrub through it.</p>}
 
           <div class="controls">
-            <button class="btn" type="button" disabled title="Play mode coming soon">Play</button>
             <a class="btn" href={c.beatmapUrl} target="_blank" rel="noopener noreferrer">osu! link ↗</a>
           </div>
           {c.scrollSpeed && <p class="foot">Scroll speed: <b>{c.scrollSpeed}</b></p>}

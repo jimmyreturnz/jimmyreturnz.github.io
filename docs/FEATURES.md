@@ -6,9 +6,13 @@ Design council review that shaped this version: `docs/reviews/2026-11-16-design-
 ## Who it's for
 Recruiters and the osu!/TETR.IO community, equally. Identity: **Data Scientist & Developer** first, rhythm-game player second (the player side is personality, not the whole identity). Working towards AI Engineer; don't claim that title yet.
 
+## Panel review 2026-11-22 (applied)
+- Nothing unfinished is shown: no `[placeholder]`, "coming soon" or disabled buttons. Community is out of the nav until it has shoutouts or the Message Board API; the TETR.IO gameplay video slot comes back when the clip exists; chart Play buttons come back with Play mode.
+- SEO and AI search: Open Graph, JSON-LD `Person`, `/llms.txt`, `/robots.txt`, `/sitemap.xml`. Set `SITE_URL` at build time for canonical links and the sitemap. `assets/og.png` is a stand-in until the brand pass.
+
 ## Flow
 1. **Intro**: game-like, first visit only (remembered in localStorage). **Skip** is a focusable button from the very first frame (Esc also skips). At most **4 s** (adjustable later). It ends *as* the Lobby, not before it.
-2. **Lobby**: role headline ("Data Scientist & Developer"), avatar, short info, player card, a **contact row** (email, GitHub, LinkedIn) and a "Projects" jump link, then the **Enter** button.
+2. **Lobby**: role headline ("Data Scientist & Developer"), avatar, short info, player card, status chips (open to, location, study), a **contact row** (email, GitHub, LinkedIn). **Enter** is the one main button, beside "Say hi", on the first screen (panel review 2026-11-22: one door, no separate "Projects" link).
 3. **Warp**: under **0.8 s**, max 3 flashes per second. *(animation + sound TBD)*
 - Links straight to a section (e.g. `/#projects`, used on CV and LinkedIn) skip the Intro, Lobby and Warp.
 

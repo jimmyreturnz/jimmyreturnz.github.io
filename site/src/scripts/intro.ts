@@ -7,7 +7,7 @@ import { rollIn } from './roll';
 import { sfx, unlock, setSound } from './audio';
 
 const root = document.documentElement;
-const LOBBY = ['.bar', '.sky .h1', '.sky .h2', '.sky .s1', '.sky .s2', '.bubble', '.id', '.role', '.about', '.facts', '.ctas', '.socials', '.player', '.enter'].map((s) => `.lobby ${s}`).join(',');
+const LOBBY = ['.bar', '.sky .h1', '.sky .h2', '.sky .s1', '.sky .s2', '.bubble', '.id', '.role', '.about', '.facts', '.ctas', '.socials', '.player'].map((s) => `.lobby ${s}`).join(',');
 const BIOS = [
   'x3NiGMaZ BIOS v1.0',
   'CPU: heart @ 3.0GHz   MEM: 1337 MB ok ♥',
