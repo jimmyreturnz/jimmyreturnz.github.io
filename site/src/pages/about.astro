@@ -6,7 +6,7 @@ import TetrioKeys from '../components/TetrioKeys.astro';
 import { profile, skills, setups, timeline } from '../data/site';
 
 // ruler: one tick per month, years labelled (idea: dousanmiao.com)
-const Y0 = 2017, Y1 = 2028, YW = 120, MW = YW / 12;
+const Y0 = 2017, Y1 = 2028, YW = 240, MW = YW / 12; // 20 px a month, so a short stage (BMW, 6 months) still fits its label
 const mi = (d: string) => { const [y, m] = d.split('-').map(Number) as [number, number]; return (y - Y0) * 12 + m - 1; };
 const now = new Date(), nowI = (now.getFullYear() - Y0) * 12 + now.getMonth();
 const monthYear = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
