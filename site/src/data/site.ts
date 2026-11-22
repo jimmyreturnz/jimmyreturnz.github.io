@@ -77,6 +77,9 @@ export const skills: { group: string; items: string[] }[] = [
   { group: 'Tools & delivery', items: ['Git / GitHub', 'GitHub Actions (CI/CD)', 'Packaging & releases (PyInstaller)', 'Bun', 'uv', 'Cloudflare Pages'] },
 ];
 
+/** Skills a project on the Projects page backs up; the About page shows them in bold. Names must match `skills` exactly. */
+export const provenSkills = ['Python', 'OCR', 'Web scraping', 'PySide6 / Qt (desktop apps)', 'Packaging & releases (PyInstaller)'];
+
 /** osu!lazer mania: a note's fall time to the hit line is MANIA_MAX_TIME_RANGE / scroll speed (ms). */
 export const MANIA_MAX_TIME_RANGE = 11485;
 export const maniaScrollSpeed = { '4k': 29, '7k': 32 } as const;

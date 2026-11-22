@@ -3,7 +3,7 @@ import Page from '../layouts/Page.astro';
 import Showcase from '../components/Showcase.astro';
 import Ph from '../components/Ph.astro';
 import TetrioKeys from '../components/TetrioKeys.astro';
-import { profile, skills, setups, timeline } from '../data/site';
+import { profile, skills, provenSkills, setups, timeline } from '../data/site';
 
 // ruler: one tick per month, years labelled (idea: dousanmiao.com)
 const Y0 = 2017, Y1 = 2028, YW = 120, MW = YW / 12;
@@ -48,12 +48,15 @@ const stages = timeline.map((t) => {
     </div>
   </Showcase>
 
-  <Showcase id="skills" title="Skills" lead="What I work with, grouped." motif="vh-dots" tint="mint">
-    <div class="grid3">
+  <Showcase id="skills" title="Skills" lead="Bold ones are used in my projects." motif="vh-dots" tint="mint">
+    <dl class="card skills">
       {skills.map((g) => (
-        <div class="card pad"><h3>{g.group}</h3><div class="chips" translate="no">{g.items.map((s) => <span class="chip">{s}</span>)}</div></div>
+        <div class="srow">
+          <dt>{g.group}</dt>
+          <dd translate="no">{g.items.map((s) => provenSkills.includes(s) ? <b>{s}</b> : <span>{s}</span>)}</dd>
+        </div>
       ))}
-    </div>
+    </dl>
   </Showcase>
 
   <Showcase id="setups" title="Setups" lead="My gear and game settings." motif="vh-eq" tint="lav">
@@ -73,10 +76,17 @@ const stages = timeline.map((t) => {
   .facts{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
   .facts .chip{cursor:default}
   @media (max-width:520px){ .facts .chip{white-space:normal;text-align:left;line-height:1.3;padding-block:6px 4px} }
-  .chips{display:flex;flex-wrap:wrap;gap:6px}
-  .chips .chip{cursor:default}
-  dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
-  dt{color:var(--muted);font-weight:700} dd{margin:0}
+  /* skills: one card, a row per group, plain words separated by dots */
+  .skills{margin:0;padding:6px 22px}
+  .srow{display:grid;grid-template-columns:200px minmax(0,1fr);gap:6px 24px;padding:14px 0;border-top:2px dashed var(--dash)}
+  .srow:first-child{border-top:0}
+  .srow dt{font:15px/1.4 var(--display)}
+  .srow dd{margin:0;min-width:0;overflow-wrap:break-word;font-size:15px;line-height:1.7;color:var(--muted)}
+  .srow dd > *:not(:last-child)::after{content:'·';margin:0 .55em;color:var(--dash);font-weight:700}
+  .srow b{color:var(--ink)}
+  @media (max-width:640px){ .skills{padding:4px 16px} .srow{grid-template-columns:minmax(0,1fr)} }
+  .grid3 dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+  .grid3 dt{color:var(--muted);font-weight:700} .grid3 dd{margin:0}
   /* ruler timeline: one tick per month, a bar per stage; scroll or drag sideways, click a bar for details */
   .ruler{--pad:160px;--rule:color-mix(in srgb,var(--ink) 30%,transparent);max-width:760px}
   .vp{position:relative;overflow-x:auto;scrollbar-width:none;cursor:grab;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
