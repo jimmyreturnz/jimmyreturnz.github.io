@@ -16,7 +16,7 @@ const tags = ['all', ...new Set(projects.flatMap((p) => p.tags))];
   <p class="sr-only" aria-live="polite" data-count></p>
   <div class="projects">
     {projects.map((p) => (
-      <article class="card proj" data-tags={p.tags.join(' ')}>
+      <article class="card proj" data-tags={p.tags.join(',')}>
         <!-- the result is the first thing to read on each card -->
         <div class={`cover bg-${p.cover}`}>
           {p.pinned && <span class="pin">★ PINNED</span>}
@@ -83,7 +83,7 @@ const tags = ['all', ...new Set(projects.flatMap((p) => p.tags))];
     const apply = (f: string, animate: boolean) => {
       buttons.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.filter === f)));
       const shown = cards.filter((c) => {
-        const on = f === 'all' || c.dataset.tags!.split(' ').includes(f);
+        const on = f === 'all' || c.dataset.tags!.split(',').includes(f); // comma: tags can contain spaces ("open source")
         c.getAnimations().forEach((a) => a.cancel()); // a fast second click restarts cleanly
         c.hidden = !on; // a hidden card leaves the layout at once, so the rest move up together
         return on;

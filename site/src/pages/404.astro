@@ -4,7 +4,7 @@ import Page from '../layouts/Page.astro';
 <Page title="Miss!" description="That page doesn’t exist.">
   <header class="page-hero">
     <h1>Miss!</h1>
-    <p>That note slipped past. The page you wanted isn’t here.</p>
+    <p>The page you wanted isn’t here.</p>
   </header>
   <div class="lane" aria-hidden="true" data-miss>
     <span class="note"></span><span class="miss">MISS</span>
@@ -14,15 +14,20 @@ import Page from '../layouts/Page.astro';
 
 <script>
   import { playOnce, SFX } from '../scripts/audio';
-  // the error sound, each time this page is shown (also after a client-side page change)
-  document.addEventListener('astro:page-load', () => { if (document.querySelector('[data-miss]')) void playOnce(SFX.error); });
+  // the error sound as the page opens (also after a client-side page change); never later on a click, and leaving stops it
+  document.addEventListener('astro:page-load', () => {
+    if (!document.querySelector('[data-miss]')) return;
+    const stop = playOnce(SFX.error, { wait: false });
+    document.addEventListener('astro:before-preparation', stop, { once: true });
+  });
 </script>
 
 <style>
   .lane{position:relative;height:150px;margin:24px 0;border:var(--stroke) solid var(--ink);border-radius:var(--radius);background:var(--paper);overflow:hidden}
-  .lane::after{content:'';position:absolute;right:56px;top:0;bottom:0;width:4px;background:var(--pink)}
-  .note{position:absolute;left:-60px;top:50%;width:46px;height:46px;margin-top:-23px;border-radius:50%;background:var(--pink);border:var(--stroke) solid var(--ink);animation:note-pass 3.2s linear infinite}
-  .miss{position:absolute;right:20px;top:50%;margin-top:-14px;font:700 22px var(--hud);color:var(--accent);opacity:0;animation:miss-pop 3.2s linear infinite}
-  @keyframes note-pass{0%{transform:translateX(0)}75%{transform:translateX(calc(min(100vw,1100px) - 40px));opacity:1}100%{transform:translateX(calc(min(100vw,1100px) + 60px));opacity:0}}
+  /* the note scrolls right to left (like osu!taiko) past the hit line on the left */
+  .lane::after{content:'';position:absolute;left:56px;top:0;bottom:0;width:4px;background:var(--pink)}
+  .note{position:absolute;right:-60px;top:50%;width:46px;height:46px;margin-top:-23px;border-radius:50%;background:var(--pink);border:var(--stroke) solid var(--ink);animation:note-pass 3.2s linear infinite}
+  .miss{position:absolute;left:20px;top:50%;margin-top:-14px;font:700 22px var(--hud);color:var(--accent);opacity:0;animation:miss-pop 3.2s linear infinite}
+  @keyframes note-pass{0%{transform:translateX(0)}75%{transform:translateX(calc(-1 * min(100vw,1100px) + 40px));opacity:1}100%{transform:translateX(calc(-1 * min(100vw,1100px) - 60px));opacity:0}}
   @keyframes miss-pop{0%,72%{opacity:0;transform:scale(.6)}78%{opacity:1;transform:scale(1.2)}90%{opacity:1;transform:scale(1)}100%{opacity:0}}
 </style>

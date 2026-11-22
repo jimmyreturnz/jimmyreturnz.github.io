@@ -112,19 +112,30 @@ function fileBuffer(url: string) {
   return p;
 }
 
-/** Play a sound file once on the effects volume. `duck` fades the BGM out while it plays (`jr:feature-audio`).
- *  `wait`: if the browser hasn't allowed sound yet, play on the first click/key instead of skipping it. */
+/** Play a sound file once on the effects volume; returns a function that stops it. `duck` fades the BGM out while it plays
+ *  (`jr:feature-audio`). Before any click the browser may still allow sound (sites visited often); if it doesn't, `wait` plays
+ *  it on the first click/key instead, otherwise it is skipped. */
 export function playOnce(url: string, { duck = true, wait = true } = {}) {
-  if (muted()) return;
-  const go = async () => {
-    const buf = await fileBuffer(url); if (!buf || muted()) return;
-    const c = unlock(), s = c.createBufferSource(); s.buffer = buf; s.connect(sfxBus);
-    const tell = (playing: boolean) => document.dispatchEvent(new CustomEvent('jr:feature-audio', { detail: { playing, id: url } }));
-    if (duck) { s.onended = () => tell(false); tell(true); }
-    s.start();
+  let src: AudioBufferSourceNode | null = null, stopped = false, once: (() => void) | null = null;
+  const tell = (playing: boolean) => duck && document.dispatchEvent(new CustomEvent('jr:feature-audio', { detail: { playing, id: url } }));
+  const stop = () => {
+    stopped = true;
+    if (once) { removeEventListener('pointerdown', once); removeEventListener('keydown', once); }
+    if (src) { src.onended = null; try { src.stop(); } catch { /* not started */ } tell(false); src = null; }
   };
+  if (muted()) return stop;
+  const go = async () => {
+    const buf = await fileBuffer(url); if (!buf || muted() || stopped) return;
+    const c = unlock(), s = c.createBufferSource(); s.buffer = buf; s.connect(sfxBus);
+    s.onended = () => { tell(false); src = null; }; tell(true); s.start(); src = s;
+  };
+  const later = () => { if (!wait || stopped) return; once = () => { stop(); stopped = false; void go(); }; addEventListener('pointerdown', once); addEventListener('keydown', once); };
   if (navigator.userActivation?.hasBeenActive ?? true) void go();
-  else if (wait) { const once = () => { removeEventListener('pointerdown', once); removeEventListener('keydown', once); void go(); }; addEventListener('pointerdown', once); addEventListener('keydown', once); }
+  else {
+    const c = unlock(); // the browser may allow it anyway: resume settles quickly either way
+    void Promise.race([c.resume(), new Promise((r) => setTimeout(r, 300))]).then(() => (c.state === 'running' ? go() : later()));
+  }
+  return stop;
 }
 
 export const sfx = {
