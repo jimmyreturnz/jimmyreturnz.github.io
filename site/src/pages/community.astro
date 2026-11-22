@@ -22,17 +22,21 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
 
   {api && sitekey && (
     <Showcase id="board" title="Message Board" lead="Leave a message here" motif="vh-heart" tint="pink">
-      <div class="guest" data-board data-api={api} data-sitekey={sitekey}>
-        <div class="card board">
-          <ol class="list" aria-live="polite" aria-label="Messages"></ol>
+      <div class="card chat" data-board data-api={api} data-sitekey={sitekey}>
+        <header class="chat-top"><b><span aria-hidden="true">#</span> messages</b></header>
+        <div class="feed" data-feed>
           <p class="state meta" role="status">Loading messages…</p>
+          <ol class="list" aria-live="polite" aria-label="Messages"></ol>
         </div>
-        <form class="card pad gform">
-          <label>Name<input name="name" maxlength="40" autocomplete="nickname" required /></label>
-          <label>Message <small data-count>0 / 1000</small><textarea name="message" maxlength="1000" rows="5" required></textarea></label>
+        <form class="compose">
           <div class="ts"></div>
-          <button class="btn fill" type="submit">Send ♥</button>
-          <p class="meta" role="status" data-out></p>
+          <p class="meta out" role="status" data-out></p>
+          <div class="row">
+            <input name="name" maxlength="40" autocomplete="nickname" required placeholder="Your name" aria-label="Your name" />
+            <textarea name="message" maxlength="1000" rows="1" required placeholder="Message #messages" aria-label="Message"></textarea>
+            <button class="send" type="submit" aria-label="Send">➤</button>
+          </div>
+          <small class="count" data-count></small>
         </form>
       </div>
     </Showcase>
@@ -51,63 +55,81 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
     s.onload = () => res((window as unknown as { turnstile: Turnstile }).turnstile); s.onerror = rej; document.head.append(s);
   });
 
+  // no profile pictures: each name gets a pastel circle with its first letter, the colour picked from the name
+  const TINTS = ['pink', 'lav', 'mint', 'sky', 'butter'];
+  const tintOf = (name: string) => TINTS[[...name].reduce((h, c) => (h * 31 + c.codePointAt(0)!) >>> 0, 7) % TINTS.length];
+  const firstLetter = (name: string) => [...new Intl.Segmenter().segment(name)][0]?.segment.toUpperCase() ?? '?';
+
   document.addEventListener('astro:page-load', () => {
     const root = document.querySelector<HTMLElement>('[data-board]');
     if (!root) return;
-    const api = root.dataset.api!, list = root.querySelector('ol')!, state = root.querySelector<HTMLElement>('.state')!;
-    const form = root.querySelector('form')!, out = form.querySelector<HTMLElement>('[data-out]')!, count = form.querySelector<HTMLElement>('[data-count]')!;
-    const date = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const q = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+    const api = root.dataset.api!, feed = q('[data-feed]'), list = q('ol'), state = q('.state');
+    const form = q<HTMLFormElement>('form'), out = q('[data-out]'), count = q('[data-count]');
+    const day = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }), time = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const when = (t: number) => { const d = new Date(t); return d.toDateString() === new Date().toDateString() ? `Today at ${time.format(d)}` : day.format(d); };
     let page = 1, more = false, loading = false;
 
     // names and messages go in with textContent only: always plain text, never HTML
-    const item = (m: Msg) => {
-      const li = document.createElement('li'), head = document.createElement('div'), name = document.createElement(m.link ? 'a' : 'b');
+    const item = (m: Pick<Msg, 'name' | 'body' | 'link' | 'created_at'>, pending = false) => {
+      const li = document.createElement('li'); if (pending) li.className = 'pending';
+      const av = Object.assign(document.createElement('span'), { className: `av bg-${tintOf(m.name)}`, textContent: firstLetter(m.name) }); av.setAttribute('aria-hidden', 'true');
+      const head = document.createElement('div'), name = document.createElement(m.link ? 'a' : 'b');
       name.textContent = m.name; name.className = 'who';
       if (m.link) Object.assign(name, { href: m.link, rel: 'nofollow noopener ugc', target: '_blank' });
-      const when = Object.assign(document.createElement('time'), { textContent: date.format(m.created_at), dateTime: new Date(m.created_at).toISOString() });
-      const p = Object.assign(document.createElement('p'), { textContent: m.body });
-      head.append(name, when); li.append(head, p); return li;
+      const t = Object.assign(document.createElement('time'), { textContent: pending ? 'waiting for approval' : when(m.created_at), dateTime: new Date(m.created_at).toISOString() });
+      head.append(name, t);
+      const text = document.createElement('div'); text.append(head, Object.assign(document.createElement('p'), { textContent: m.body }));
+      li.append(av, text); return li;
     };
+    // newest at the bottom, like a chat; scrolling to the top loads older messages above without moving what you're reading
     const load = async () => {
       if (loading) return; loading = true;
       try {
         const r = await fetch(`${api}/messages?page=${page}`); if (!r.ok) throw 0;
         const d = (await r.json()) as { items: Msg[]; more: boolean };
-        const lis = d.items.map(item); list.append(...lis); more = d.more; page++;
-        if (lis.length) gsap.from(lis, { y: 14, opacity: 0, duration: 0.4, stagger: 0.04, ease: 'power2.out', clearProps: 'all' });
+        const first = page === 1, keep = feed.scrollHeight - feed.scrollTop;
+        const lis = d.items.slice().reverse().map((m) => item(m));
+        list.prepend(...lis); more = d.more; page++;
+        if (first) { feed.scrollTop = feed.scrollHeight; if (lis.length) gsap.from(lis.slice(-6), { y: 14, opacity: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out', clearProps: 'all' }); }
+        else feed.scrollTop = feed.scrollHeight - keep;
         state.hidden = !!list.children.length; state.textContent = 'No messages yet. Be the first!';
       } catch { state.hidden = false; state.textContent = 'Messages couldn’t load right now.'; }
       loading = false;
     };
-    // older pages load as the list scrolls near its end
-    const board = root.querySelector<HTMLElement>('.board')!;
-    board.addEventListener('scroll', () => { if (more && board.scrollTop + board.clientHeight > board.scrollHeight - 80) void load(); }, { passive: true });
+    feed.addEventListener('scroll', () => { if (more && feed.scrollTop < 80) void load(); }, { passive: true });
     void load();
 
     let ts: Turnstile | null = null, wid = '', token = '';
     const ensureTs = async () => {
       if (wid) return;
       ts = await loadTurnstile().catch(() => null); if (!ts || wid) return;
-      wid = ts.render(form.querySelector<HTMLElement>('.ts')!, { sitekey: root.dataset.sitekey, size: 'flexible', theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light', callback: (t: string) => { token = t; }, 'expired-callback': () => { token = ''; } });
+      wid = ts.render(q('.ts'), { sitekey: root.dataset.sitekey, size: 'flexible', appearance: 'interaction-only', theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light', callback: (t: string) => { token = t; }, 'expired-callback': () => { token = ''; } });
     };
     form.addEventListener('focusin', () => void ensureTs());
     const msg = form.elements.namedItem('message') as HTMLTextAreaElement;
-    msg.addEventListener('input', () => { count.textContent = `${[...msg.value].length} / 1000`; });
+    const grow = () => { msg.style.height = 'auto'; msg.style.height = `${Math.min(msg.scrollHeight, 140)}px`; };
+    msg.addEventListener('input', () => { grow(); const n = [...msg.value].length; count.textContent = n > 800 ? `${n} / 1000` : ''; });
+    // Enter sends, Shift+Enter makes a new line (not while typing Thai/Japanese with an input method)
+    msg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit(); } });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = form.querySelector<HTMLButtonElement>('button')!;
+      const btn = q<HTMLButtonElement>('.send');
       await ensureTs();
       if (!token) { out.textContent = 'One moment, the spam check is still running.'; return; }
-      btn.disabled = true; out.textContent = 'Sending…';
-      const fd = new FormData(form);
+      btn.disabled = true; out.textContent = '';
+      const fd = new FormData(form), name = String(fd.get('name') ?? ''), body = String(fd.get('message') ?? '');
       try {
-        const r = await fetch(`${api}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: fd.get('name'), message: fd.get('message'), token }) });
+        const r = await fetch(`${api}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, message: body, token }) });
         const d = (await r.json().catch(() => ({}))) as { error?: string };
         if (r.ok) {
-          form.reset(); count.textContent = '0 / 1000';
-          out.textContent = 'Thank you! Your message shows here once I’ve read it.';
-          gsap.fromTo(btn, { scale: 0.9 }, { scale: 1, duration: 0.6, ease: 'elastic.out(1, 0.4)' });
+          // your own message shows straight away, faded, until it's approved
+          const li = item({ name: name.trim(), body: body.trim(), link: null, created_at: Date.now() }, true);
+          list.append(li); state.hidden = true; feed.scrollTop = feed.scrollHeight;
+          gsap.from(li, { y: 18, opacity: 0, scale: 0.97, duration: 0.45, ease: 'back.out(1.6)', clearProps: 'transform' });
+          msg.value = ''; grow(); count.textContent = '';
+          out.textContent = 'Thank you! It shows for everyone once I’ve read it.';
         } else out.textContent = d.error ?? 'That didn’t send. Please try again.';
       } catch { out.textContent = 'That didn’t send. Please try again.'; }
       token = ''; if (ts && wid) ts.reset(wid);
@@ -119,26 +141,33 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
 </script>
 
 <style>
-  .guest{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
-  /* the list is as tall as the form next to it and scrolls inside */
-  .board{position:relative;min-height:240px;overflow-y:auto;overscroll-behavior:contain;padding:0;contain:size}
-  .list{list-style:none;margin:0;padding:6px 18px}
-  .list :global(li){padding:12px 0;border-bottom:2px dashed color-mix(in srgb,var(--ink) 18%,transparent)}
-  .list :global(li:last-child){border-bottom:0}
-  .list :global(li > div){display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .chat{display:flex;flex-direction:column;height:min(560px,72vh);padding:0;overflow:hidden}
+  .chat-top{padding:12px 18px;border-bottom:2px solid color-mix(in srgb,var(--ink) 15%,transparent)}
+  .chat-top b{font:15px var(--display)} .chat-top b span{color:var(--accent)}
+  .feed{position:relative;flex:1;overflow-y:auto;overscroll-behavior:contain}
+  .list{list-style:none;margin:0;padding:8px 18px}
+  /* list items are made by the script, so their styles are global (scoped styles only reach markup in this file) */
+  .list :global(li){display:grid;grid-template-columns:38px 1fr;gap:12px;padding:10px 0}
+  .list :global(li.pending){opacity:.55}
+  .list :global(.av){width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:700 16px var(--body),'Mali','M PLUS Rounded 1c',sans-serif;color:var(--on-pastel);border:2px solid var(--ink)}
+  .list :global(li > div > div){display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
   .list :global(.who){font-weight:700;overflow-wrap:anywhere}
   .list :global(a.who){color:var(--accent)}
-  .list :global(time){font-size:12px;color:var(--muted);white-space:nowrap}
-  .list :global(p){margin:4px 0 0;white-space:pre-line;overflow-wrap:anywhere;font-family:var(--body),'Mali','M PLUS Rounded 1c',sans-serif}
+  .list :global(time){font-size:12px;color:var(--muted)}
+  .list :global(p){margin:2px 0 0;white-space:pre-line;overflow-wrap:anywhere;font-family:var(--body),'Mali','M PLUS Rounded 1c',sans-serif}
   .state{position:absolute;inset:0;display:grid;place-items:center;margin:0;text-align:center;padding:16px}
   .state[hidden]{display:none}
-  .gform{display:flex;flex-direction:column;gap:12px}
-  .gform label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px}
-  .gform label small{font-weight:400;color:var(--muted)}
-  .gform input,.gform textarea{font:inherit;font-family:var(--body),'Mali','M PLUS Rounded 1c',sans-serif;border:2px solid var(--ink);border-radius:12px;padding:8px 10px;background:var(--sunk);color:var(--ink)}
-  .gform textarea{resize:vertical}
-  .gform button[disabled]{opacity:.6}
-  .ts:empty{display:none}
-  .meta:empty{display:none}
-  @media (max-width:900px){ .guest{grid-template-columns:1fr} .board{contain:none;max-height:420px} }
+  .compose{padding:10px 14px 12px;border-top:2px solid color-mix(in srgb,var(--ink) 15%,transparent);display:flex;flex-direction:column;gap:6px}
+  .compose .row{display:flex;gap:8px;align-items:flex-end;background:var(--sunk);border:2px solid var(--ink);border-radius:14px;padding:6px}
+  .compose input,.compose textarea{font:inherit;font-family:var(--body),'Mali','M PLUS Rounded 1c',sans-serif;border:0;background:transparent;color:var(--ink);padding:6px 8px}
+  .compose input{width:9.5em;flex:none;border-right:2px dashed color-mix(in srgb,var(--ink) 25%,transparent);border-radius:0}
+  .compose textarea{flex:1;resize:none;min-height:36px;line-height:1.5}
+  .compose input:focus-visible,.compose textarea:focus-visible{outline:none}
+  .compose .row:focus-within{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent)}
+  .send{flex:none;width:38px;height:38px;border-radius:50%;border:2px solid var(--ink);background:var(--pink);color:var(--on-pastel);cursor:pointer;font-size:15px}
+  .send[disabled]{opacity:.6}
+  .count{align-self:flex-end;color:var(--muted);font-size:12px}
+  .count:empty,.out:empty,.ts:empty{display:none}
+  .out{margin:0}
+  @media (max-width:560px){ .compose .row{flex-wrap:wrap} .compose input{width:100%;border-right:0;border-bottom:2px dashed color-mix(in srgb,var(--ink) 25%,transparent)} }
 </style>
