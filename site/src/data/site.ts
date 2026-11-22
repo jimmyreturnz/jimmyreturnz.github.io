@@ -150,7 +150,7 @@ export const setups: { group: string; items: { label: string; value: string | nu
 /** Dates are 'YYYY-MM' (inclusive months); `to: null` = still going. Source: the owner's LinkedIn + own words. `lane` = row on the ruler. */
 export type Moment = { what: string; short: string; where: string; blurb?: string; from: string; to: string | null; expected?: boolean; lane: 0 | 1 | 2; highlight?: boolean };
 export const timeline: Moment[] = [
-  { what: 'Triam Udom Suksa Pattanakarn School', short: 'Triam Udom', where: 'High school · Intensive English + Science and Mathematics Program', from: '2017-05', to: '2023-02', lane: 0 },
+  { what: 'Triam Udom Suksa Pattanakarn School', short: 'Triam Udom Suksa Pattanakarn', where: 'High school · Intensive English + Science and Mathematics Program', from: '2017-05', to: '2023-02', lane: 0 },
   { what: 'Mahidol University', short: 'Mahidol University', where: 'Bachelor’s degree, Industrial Mathematics and Data Science', from: '2023-08', to: '2027-05', expected: true, lane: 0 },
   { what: 'MU Mental Math Competition', short: 'MU Mental Math Competition', where: 'Founder & Project Manager · Mahidol University', highlight: true, lane: 1, from: '2024-04', to: null,
     blurb: '700+ participants from 100+ schools across Thailand. Python and Google Sheets workflows cut manual processing time by 67%.' },

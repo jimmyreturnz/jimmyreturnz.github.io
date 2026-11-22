@@ -101,7 +101,7 @@ function noise(dur: number, gain = 0.15, at = 0, hp = 1500) {
   s.connect(f).connect(g).connect(sfxBus); s.start(t);
 }
 // sound files in assets/sfx/: each fetched once (when first asked for) and decoded once
-export const SFX = { hold: '/sfx/intro-hold.m4a', boom: '/sfx/intro-boom.mp3', loading: '/sfx/intro-loading.m4a', welcome: '/sfx/lobby-welcome.m4a', error: '/sfx/error.m4a' } as const;
+export const SFX = { hold: '/sfx/intro-hold.m4a', boom: '/sfx/intro-boom.mp3', loading: '/sfx/intro-loading.m4a', welcome: '/sfx/lobby-welcome.m4a', error: '/sfx/error.m4a', click: '/sfx/ui-click.wav', warp: '/sfx/warp.mp3' } as const;
 const fileBytes = new Map<string, Promise<ArrayBuffer>>(), fileBufs = new Map<string, Promise<AudioBuffer | null>>();
 /** Start downloading sound files now so they're ready when played (no sound context needed yet). */
 export function prefetch(...urls: string[]) { for (const u of urls) if (!fileBytes.has(u)) fileBytes.set(u, fetch(u).then((r) => (r.ok ? r.arrayBuffer() : new ArrayBuffer(0))).catch(() => new ArrayBuffer(0))); }
@@ -151,5 +151,10 @@ export const sfx = {
   pop() { tone(520, 0.09, 'sine', 0.22, 900); },
   swish() { noise(0.3, 0.07, 0, 3000); tone(300, 0.3, 'sine', 0.06, 1200); },
   shimmer() { [880, 1175, 1568, 2093].forEach((f, i) => tone(f, 0.6, 'sine', 0.08, undefined, i * 0.07)); },
-  click() { tone(700, 0.05, 'sine', 0.12, 400); },
+  /** Button click (assets/sfx/ui-click.wav, WAV so it plays without a delay). Called from a pointerdown, so sound is allowed. */
+  click() {
+    if (muted()) return;
+    const c = unlock();
+    void fileBuffer(SFX.click).then((b) => { if (!b) return; const s = c.createBufferSource(); s.buffer = b; s.connect(sfxBus); s.start(); });
+  },
 };

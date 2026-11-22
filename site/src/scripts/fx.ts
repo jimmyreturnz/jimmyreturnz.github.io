@@ -2,9 +2,11 @@
 // All of it is off under reduced motion (see motion.ts) and re-initialises on each Astro page change.
 import { gsap } from 'gsap';
 import { reduced } from './motion';
-import { sfx } from './audio';
+import { sfx, prefetch, SFX } from './audio';
 
 const HEART = '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" stroke="#1f1e33" stroke-width="1.6" stroke-linejoin="round" d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z"/></svg>';
+
+prefetch(SFX.click); // 17 KB, so the first click already has its sound
 
 // ---- click squish + 3–4 tiny hearts ----
 document.addEventListener('pointerdown', (e) => {
@@ -12,7 +14,7 @@ document.addEventListener('pointerdown', (e) => {
   const t = (e.target as Element | null)?.closest<HTMLElement>('.btn, .chip, .enter-btn, button:not([disabled]), [role="tab"]');
   if (!t || t.matches('[disabled], [aria-disabled="true"], input, [data-no-fx]')) return;
   gsap.fromTo(t, { scale: 0.92 }, { scale: 1, duration: 0.55, ease: 'elastic.out(1, 0.4)', overwrite: 'auto' });
-  sfx.click();
+  if (!t.closest('[data-warp]')) sfx.click(); // Enter and menu pages play the warp sound instead
   for (let i = 0; i < 4; i++) {
     const h = document.createElement('span');
     h.innerHTML = HEART; h.setAttribute('aria-hidden', 'true');

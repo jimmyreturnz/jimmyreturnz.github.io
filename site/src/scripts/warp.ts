@@ -3,8 +3,9 @@
 import { gsap } from 'gsap';
 import { navigate } from 'astro:transitions/client';
 import { reduced } from './motion';
-import { sfx } from './audio';
+import { playOnce, prefetch, SFX } from './audio';
 
+prefetch(SFX.warp); // ~10 KB, so it plays the instant Enter or a menu page is clicked
 let busy = false;
 document.addEventListener('click', (e) => {
   const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('a[data-warp]');
@@ -19,7 +20,7 @@ document.addEventListener('click', (e) => {
   const cx = mouse ? e.clientX : r.left + r.width / 2, cy = mouse ? e.clientY : r.top + r.height / 2;
   const R = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
   warp.style.display = 'block';
-  sfx.swish();
+  playOnce(SFX.warp, { duck: false });
 
   gsap.timeline()
     .fromTo(wash, { clipPath: `circle(0px at ${cx}px ${cy}px)` }, { clipPath: `circle(${R}px at ${cx}px ${cy}px)`, duration: 0.45, ease: 'power2.in' })
