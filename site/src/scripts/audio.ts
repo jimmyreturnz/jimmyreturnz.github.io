@@ -71,27 +71,15 @@ export function hit(names: string[]) {
   for (const n of names) { const b = buffers[n]; if (!b) continue; const s = ctx.createBufferSource(); s.buffer = b; s.connect(hitBus); s.start(); }
 }
 
-/** Is anything audible going through the analyser right now? */
-export function hasSignal(): boolean {
-  if (!ctx) return false;
+/** 0..1 levels for `n` bars from the real music (punchy: bass-weighted, boosted); all zero when nothing plays, so the visualizers vanish. */
+export function levels(n: number): number[] {
+  if (!ctx) return Array(n).fill(0);
   const d = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(d);
-  return d.some((x) => x > 8);
-}
-
-/** 0..1 levels for `n` bars: the real music (punchy: bass-weighted, boosted) when something plays, else a beating synthetic wave. */
-export function levels(n: number, t: number, live = true): number[] {
-  if (live && ctx) {
-    const d = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(d);
-    if (d.some((x) => x > 8)) {
-      return Array.from({ length: n }, (_, i) => {
-        const lo = Math.floor(Math.pow(i / n, 1.7) * d.length * 0.75), hi = Math.max(lo + 1, Math.floor(Math.pow((i + 1) / n, 1.7) * d.length * 0.75));
-        let m = 0; for (let k = lo; k < hi; k++) m = Math.max(m, d[k]!);
-        return Math.min(1, Math.pow(m / 255, 1.5) * 1.7);
-      });
-    }
-  }
-  const beat = Math.pow(Math.max(0, Math.sin(t * Math.PI * 2.4)), 5); // ~144 bpm kick
-  return Array.from({ length: n }, (_, i) => Math.min(1, 0.14 + 0.62 * beat * (1 - (i / n) * 0.6) + 0.18 * Math.abs(Math.sin(t * 3.1 + i * 0.7))));
+  return Array.from({ length: n }, (_, i) => {
+    const lo = Math.floor(Math.pow(i / n, 1.7) * d.length * 0.75), hi = Math.max(lo + 1, Math.floor(Math.pow((i + 1) / n, 1.7) * d.length * 0.75));
+    let m = 0; for (let k = lo; k < hi; k++) m = Math.max(m, d[k]!);
+    return m > 8 ? Math.min(1, Math.pow(m / 255, 1.5) * 1.7) : 0;
+  });
 }
 
 // --- generated effects (placeholders until the owner picks real SFX) ---

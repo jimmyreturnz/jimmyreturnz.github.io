@@ -1,6 +1,6 @@
 // Visualizers: the Lobby's floor histogram (SVG bars) and the faint header bar (canvas). One shared rAF loop that
-// only runs while something is on screen. Bars follow the real music when it plays, a gentle wave otherwise.
-import { levels, hasSignal } from './audio';
+// only runs while something is on screen. Bars follow the real music, and sink out of sight when nothing plays.
+import { levels } from './audio';
 import { reduced } from './motion';
 
 const jobs = new Set<(t: number) => void>();
@@ -19,8 +19,8 @@ const follow = (cur: number[], next: number[]) => next.map((v, i) => (cur[i] = v
 
 export function floorHistogram(svg: SVGSVGElement): () => void {
   const bars = [...svg.querySelectorAll<SVGRectElement>('rect')], cur: number[] = [];
-  const draw = (t: number) => follow(cur, levels(bars.length, t)).forEach((v, i) => { bars[i]!.style.transform = `scaleY(${Math.max(0.04, v)})`; });
-  if (reduced()) { draw(0); return () => {}; }
+  const draw = () => follow(cur, levels(bars.length)).forEach((v, i) => { bars[i]!.style.transform = `scaleY(${v < 0.01 ? 0 : v})`; });
+  if (reduced()) { draw(); return () => {}; }
   jobs.add(draw); kick();
   return () => jobs.delete(draw);
 }
@@ -30,14 +30,13 @@ export function headerViz(canvas: HTMLCanvasElement): void {
   const g = canvas.getContext('2d')!;
   const fit = () => { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; };
   new ResizeObserver(fit).observe(canvas); fit();
-  const draw = (t: number) => {
+  const draw = () => {
     const { width: w, height: h } = canvas, n = Math.max(24, Math.floor(w / 18)), bw = w / n;
     g.clearRect(0, 0, w, h);
-    const live = hasSignal() || localStorage.getItem('jr.sound') === 'true';
     g.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--pink') || '#ffb3d1';
-    g.globalAlpha = live ? 0.3 : 0.1;
-    follow(cur, levels(n, t, live)).forEach((v, i) => { const bh = (live ? v : 0.2 + v * 0.3) * h * 0.9; g.fillRect(i * bw + 2, h - bh, bw - 4, bh); });
+    g.globalAlpha = 0.3;
+    follow(cur, levels(n)).forEach((v, i) => { if (v >= 0.01) g.fillRect(i * bw + 2, h - v * h * 0.9, bw - 4, v * h * 0.9); });
   };
-  if (reduced()) { draw(0); return; }
+  if (reduced()) { draw(); return; }
   jobs.add(draw); kick();
 }
