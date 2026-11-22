@@ -1,6 +1,6 @@
 # Message Board API
 
-Hono on Cloudflare Workers, messages in Cloudflare D1. The Community page reads and posts here; the owner approves messages at `/community/admin/`.
+Hono on Cloudflare Workers, messages in Cloudflare D1. The Community page reads and posts here; messages go public as soon as they pass the checks. The owner can delete them or attach a profile link at `/community/admin/`.
 
 ## Local
 
@@ -32,4 +32,4 @@ The site picks up the local API from `site/.env.development` (restart `bun run d
 
 - Name up to 40 characters, message up to 1000, no links. Names and messages are plain text everywhere.
 - One message per visitor per day. A visitor is an HMAC of their IP under a key derived from `VISITOR_SECRET` and the date, so it changes daily and the IP itself is never stored.
-- Nothing is public until approved. The owner can attach an `https://` profile link while approving.
+- Messages are public straight away (owner, 2026-11-23). The owner can delete any message and attach an `https://` profile link in the inbox.

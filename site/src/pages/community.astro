@@ -71,13 +71,13 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
     let page = 1, more = false, loading = false;
 
     // names and messages go in with textContent only: always plain text, never HTML
-    const item = (m: Pick<Msg, 'name' | 'body' | 'link' | 'created_at'>, pending = false) => {
-      const li = document.createElement('li'); if (pending) li.className = 'pending';
+    const item = (m: Pick<Msg, 'name' | 'body' | 'link' | 'created_at'>) => {
+      const li = document.createElement('li');
       const av = Object.assign(document.createElement('span'), { className: `av bg-${tintOf(m.name)}`, textContent: firstLetter(m.name) }); av.setAttribute('aria-hidden', 'true');
       const head = document.createElement('div'), name = document.createElement(m.link ? 'a' : 'b');
       name.textContent = m.name; name.className = 'who';
       if (m.link) Object.assign(name, { href: m.link, rel: 'nofollow noopener ugc', target: '_blank' });
-      const t = Object.assign(document.createElement('time'), { textContent: pending ? 'waiting for approval' : when(m.created_at), dateTime: new Date(m.created_at).toISOString() });
+      const t = Object.assign(document.createElement('time'), { textContent: when(m.created_at), dateTime: new Date(m.created_at).toISOString() });
       head.append(name, t);
       const text = document.createElement('div'); text.append(head, Object.assign(document.createElement('p'), { textContent: m.body }));
       li.append(av, text); return li;
@@ -122,14 +122,13 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
       const fd = new FormData(form), name = String(fd.get('name') ?? ''), body = String(fd.get('message') ?? '');
       try {
         const r = await fetch(`${api}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, message: body, token }) });
-        const d = (await r.json().catch(() => ({}))) as { error?: string };
+        const d = (await r.json().catch(() => ({}))) as Partial<Msg> & { error?: string };
         if (r.ok) {
-          // your own message shows straight away, faded, until it's approved
-          const li = item({ name: name.trim(), body: body.trim(), link: null, created_at: Date.now() }, true);
+          // the message pops in at the bottom, as the server stored it
+          const li = item({ name: d.name ?? name.trim(), body: d.body ?? body.trim(), link: null, created_at: d.created_at ?? Date.now() });
           list.append(li); state.hidden = true; feed.scrollTop = feed.scrollHeight;
           gsap.from(li, { y: 18, opacity: 0, scale: 0.97, duration: 0.45, ease: 'back.out(1.6)', clearProps: 'transform' });
           msg.value = ''; grow(); count.textContent = '';
-          out.textContent = 'Thank you! It shows for everyone once I’ve read it.';
         } else out.textContent = d.error ?? 'That didn’t send. Please try again.';
       } catch { out.textContent = 'That didn’t send. Please try again.'; }
       token = ''; if (ts && wid) ts.reset(wid);
@@ -148,7 +147,6 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
   .list{list-style:none;margin:0;padding:8px 18px}
   /* list items are made by the script, so their styles are global (scoped styles only reach markup in this file) */
   .list :global(li){display:grid;grid-template-columns:38px 1fr;gap:12px;padding:10px 0}
-  .list :global(li.pending){opacity:.55}
   .list :global(.av){width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:700 16px var(--body),'Mali','M PLUS Rounded 1c',sans-serif;color:var(--on-pastel);border:2px solid var(--ink)}
   .list :global(li > div > div){display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
   .list :global(.who){font-weight:700;overflow-wrap:anywhere}
