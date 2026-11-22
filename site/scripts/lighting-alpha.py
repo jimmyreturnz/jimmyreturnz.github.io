@@ -6,6 +6,7 @@ from PIL import Image
 D = '../../assets/skin/mania/'
 for f in glob.glob(D + 'lightingN-*.png'):
     im = Image.open(f).convert('RGBA'); px = im.load()
+    if im.getextrema()[3][0] < 255: continue  # already done
     for y in range(im.height):
         for x in range(im.width):
             r, g, b, _ = px[x, y]; a = max(r, g, b)

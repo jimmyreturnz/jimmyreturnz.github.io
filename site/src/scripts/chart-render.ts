@@ -174,7 +174,8 @@ function setup(root: HTMLElement) {
       const hold = n[2]! > 0, endT = hold ? n[2]! : n[0]!; if (endT <= t) continue; // autoplay hits it exactly on time: a note disappears at the hit position, a hold ends there
       const col = n[1]!, w = c.columnWidth[col]! * sc, x = x0 + colX[col]! * sc, def = c.notes[col]!;
       const head = im(hold ? def.h : def.n) ?? im(def.n), hh = head ? (head.naturalHeight * w) / head.naturalWidth : 0;
-      const yHead = yOf(hold && t > n[0]! ? t : n[0]!);
+      // a held head rests just above the judgement line (its black bottom would cover it otherwise)
+      const held = hold && t > n[0]!, yHead = held ? hitY - (c.judgementLine ? 1 : 0) : yOf(n[0]!);
       if (hold) {
         const yTail = yOf(n[2]!), tail = im(def.t) ?? head, th = tail ? (tail.naturalHeight * w) / tail.naturalWidth : 0, body = im(def.l);
         const top = yTail - th / 2, bot = yHead - hh / 2;
