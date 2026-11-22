@@ -1,22 +1,14 @@
 ---
-// Lobby → Portfolio: the Enter button bursts into ripples, a pink wash fills the screen with hearts and arrows streaking
-// through, the page changes underneath, and the wash shrinks into the header logo (scripts/warp.ts). It lives in the
-// layout and persists across page changes.
-import Vh from './Vh.astro';
+// Lobby → Portfolio and menu → page: a pastel wash grows from the clicked link, the page changes underneath, and the wash
+// shrinks into the header logo (scripts/warp.ts). It lives in the layout and persists across page changes.
 ---
 <div class="warp" transition:persist="warp" aria-hidden="true">
   <div class="wash"></div>
-  <svg class="wr" width="100%" height="100%"><circle r="40" /><circle r="40" /><circle r="40" /></svg>
-  <Vh name="vh-arrow" /><Vh name="vh-arrow" /><Vh name="vh-heart" /><Vh name="vh-heart" /><Vh name="vh-heart" />
 </div>
 
 <style is:global>
   .warp{position:fixed;inset:0;z-index:800;pointer-events:none;display:none;overflow:hidden}
   .warp .wash{position:absolute;inset:0;background:linear-gradient(135deg,var(--pink),var(--lav) 55%,var(--sky));clip-path:circle(0 at 50% 50%)}
-  .warp .wr{position:absolute;inset:0}
-  .warp .wr circle{fill:none;stroke:var(--navy);stroke-width:5;opacity:0;transform-box:fill-box;transform-origin:center}
-  .warp .vh{position:absolute;left:0;top:0;opacity:0;width:clamp(80px,14vw,170px);color:#fff;--vh-ink:#1f1e33}
-  .warp .vh:nth-of-type(n+3){width:clamp(28px,5vw,54px);color:var(--butter)}
 </style>
 
 <script>
