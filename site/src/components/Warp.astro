@@ -7,7 +7,9 @@
 </div>
 
 <style is:global>
-  .warp{position:fixed;inset:0;z-index:800;pointer-events:none;display:none;overflow:hidden}
+  /* its own view-transition layer: otherwise the page swap's fade draws the new page above the wash, uncovering it early */
+  .warp{position:fixed;inset:0;z-index:800;pointer-events:none;display:none;overflow:hidden;view-transition-name:warp}
+  ::view-transition-group(warp),::view-transition-old(warp),::view-transition-new(warp){animation:none}
   .warp .wash{position:absolute;inset:0;background:linear-gradient(135deg,var(--pink),var(--lav) 55%,var(--sky));clip-path:circle(0 at 50% 50%)}
 </style>
 

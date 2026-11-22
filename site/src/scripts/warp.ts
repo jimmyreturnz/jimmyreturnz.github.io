@@ -22,7 +22,11 @@ document.addEventListener('click', (e) => {
   gsap.timeline()
     .fromTo(wash, { clipPath: `circle(0px at ${cx}px ${cy}px)` }, { clipPath: `circle(${R}px at ${cx}px ${cy}px)`, duration: 0.45, ease: 'power2.in' })
     .add(() => {
-      const wait = new Promise<void>((res) => { document.addEventListener('astro:page-load', () => res(), { once: true }); setTimeout(res, 3000); });
+      // stay covered until the new page is in and drawn (two frames after page-load); 10 s only as a safety net
+      const wait = new Promise<void>((res) => {
+        document.addEventListener('astro:page-load', () => requestAnimationFrame(() => requestAnimationFrame(() => res())), { once: true });
+        setTimeout(res, 10000);
+      });
       void navigate(a.href);
       void wait.then(() => {
         const t = document.querySelector<HTMLElement>('.top .wordmark svg')?.getBoundingClientRect();
