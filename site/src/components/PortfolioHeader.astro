@@ -59,7 +59,7 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   .menu li:nth-child(even) .mq{animation-direction:reverse}
   @keyframes mq{to{transform:translateX(-50%)}}
   .menu a:hover b,.menu a:focus-visible b{transform:translateX(14px)}
-  .mclose{position:absolute;right:clamp(16px,4vw,40px);top:16px;color:var(--navy);border-color:var(--navy)}
+  .mclose{position:absolute;right:clamp(16px,4vw,40px);top:16px;color:var(--navy);border-color:var(--navy);background:transparent} /* sits on the menu's own colour, so it follows the tint like the rows */
 </style>
 
 <script>
