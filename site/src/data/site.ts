@@ -68,17 +68,12 @@ export const projects: Project[] = [
     link: { label: 'GitHub ↗', href: 'https://github.com/jimmyreturnz/KatsuDonEditor' } },
 ];
 
+// Only skills the owner has used in real work and can defend in an interview (reviewed 2026-11-22). "Learning" = understood, not yet used for real.
 export const skills: { group: string; items: string[] }[] = [
-  { group: 'Data science & ML', items: ['Python', 'Machine learning', 'Deep learning (PyTorch)', 'Diffusion models', 'Audio / signal processing', 'Feature engineering', 'OCR', 'NumPy', 'SciPy', 'Jupyter'] },
-  { group: 'GenAI & LLMs', items: ['LLM orchestration', 'Prompt engineering', 'Multi-agent workflows', 'Claude / Anthropic API', 'AI-assisted development'] },
-  { group: 'Data analysis', items: ['SQL', 'R', 'Exploratory data analysis', 'Data profiling', 'Web scraping', 'Data visualisation', 'API data pipelines'] },
-  { group: 'Web & frontend', items: ['TypeScript', 'JavaScript', 'Astro', 'HTML / CSS', 'GSAP', 'Canvas 2D', 'Web Audio API', 'Accessibility (WCAG)', 'Web performance', 'Responsive design'] },
-  { group: 'Backend & software', items: ['FastAPI', 'REST APIs', 'Async Python', 'Rust', 'PySide6 / Qt (desktop apps)', 'Algorithms', 'Parsers / AST', 'Automation / bots'] },
-  { group: 'Tools & delivery', items: ['Git / GitHub', 'GitHub Actions (CI/CD)', 'Packaging & releases (PyInstaller)', 'Bun', 'uv', 'Cloudflare Pages'] },
+  { group: 'Data & ML', items: ['Python', 'pandas', 'Machine learning (classical)', 'Exploratory data analysis', 'OCR (fine-tuned PaddleOCR)', 'Web scraping'] },
+  { group: 'Apps & tools', items: ['Packaging & releases (PyInstaller)', 'Automation (Python + SMTP)', 'Git / GitHub', 'HTML / CSS'] },
+  { group: 'Learning', items: ['Deep learning (PyTorch)', 'SQL', 'Statistics'] },
 ];
-
-/** Skills a project on the Projects page backs up; the About page shows them in bold. Names must match `skills` exactly. */
-export const provenSkills = ['Python', 'OCR', 'Web scraping', 'PySide6 / Qt (desktop apps)', 'Packaging & releases (PyInstaller)'];
 
 /** osu!lazer mania: a note's fall time to the hit line is MANIA_MAX_TIME_RANGE / scroll speed (ms). */
 export const MANIA_MAX_TIME_RANGE = 11485;
