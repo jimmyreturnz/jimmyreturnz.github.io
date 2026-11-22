@@ -106,7 +106,8 @@ function run(el: HTMLElement) {
       .to(btn, { scale: 1.5, opacity: 0, duration: 0.25, ease: 'power2.out' }, 0)
       .to(q('.hint'), { opacity: 0, duration: 0.2 }, 0)
       .fromTo(el, { x: 0 }, { x: 5, duration: 0.04, repeat: 3, yoyo: true, clearProps: 'x' }, 0)
-      .fromTo(rip, { scale: 0.2, opacity: 1 }, { scale: 22, opacity: 0, duration: 1.2, stagger: 0.07, ease: 'power3.out' }, 0)
+      // svgOrigin: grow from the circles' own centre (0,0 in the viewBox); immediateRender off so each ripple stays hidden until its turn
+      .fromTo(rip, { scale: 0.2, opacity: 1, svgOrigin: '0 0' }, { scale: 22, opacity: 0, svgOrigin: '0 0', duration: 1.2, stagger: 0.07, ease: 'power3.out', immediateRender: false }, 0)
       .fromTo(flash, { scale: 0, opacity: 0.95 }, { scale: 1, opacity: 0, duration: 0.5, ease: 'power2.out' }, 0);
 
     // 2 · boot with a glitch
