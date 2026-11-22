@@ -24,7 +24,7 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   <ul>
     {pages.map((p) => (
       <li>
-        <a href={p.href} data-nav={p.href} data-tint={p.tint}>
+        <a href={p.href} data-nav={p.href} data-tint={p.tint} data-warp>
           <span class="mq" aria-hidden="true"><span>{row(p.label)}</span><span>{row(p.label)}</span></span>
           <b>{p.label}</b>
         </a>
@@ -115,7 +115,12 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
     menu.querySelectorAll<HTMLAnchorElement>('a[data-tint]').forEach((a) => {
       const tint = () => menu.style.setProperty('--tint', TINT[a.dataset.tint!] ?? '');
       a.addEventListener('pointerenter', tint); a.addEventListener('focus', tint);
-      a.addEventListener('click', () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); });
+      // the menu stays up until the new page is in, so the Warp's wash covers the change instead of the menu blinking away first
+      a.addEventListener('click', (e) => {
+        const hide = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+        if (a.dataset.nav === location.pathname.replace(/\/?$/, '/')) { e.preventDefault(); e.stopImmediatePropagation(); hide(); return; } // already here
+        document.addEventListener('astro:after-swap', hide, { once: true });
+      });
     });
   });
 </script>

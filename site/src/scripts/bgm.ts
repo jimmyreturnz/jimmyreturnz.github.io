@@ -13,7 +13,7 @@ if (cfg) {
   let want = store.get(), feature = false, lobby = false, raf = 0;
   const fadeTo = (v: number) => { // ~0.6 s linear fade on the element volume (1 = the normalised level); the music bus sets the real level
     v *= norm; cancelAnimationFrame(raf); const a = el.volume, t0 = performance.now();
-    const f = (t: number) => { const p = Math.min(1, (t - t0) / 600); el.volume = a + (v - a) * p; if (p < 1) raf = requestAnimationFrame(f); else if (v === 0) el.pause(); };
+    const f = (t: number) => { const p = Math.min(1, Math.max(0, (t - t0) / 600)); /* the first frame's timestamp can be a hair before t0 */ el.volume = a + (v - a) * p; if (p < 1) raf = requestAnimationFrame(f); else if (v === 0) el.pause(); };
     raf = requestAnimationFrame(f);
   };
   const soundOn = () => { try { return localStorage.getItem('jr.sound') === 'true'; } catch { return false; } };

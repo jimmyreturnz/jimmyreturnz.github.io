@@ -1,4 +1,4 @@
-// The Warp: Lobby → Portfolio. Ripples from the Enter button, a pink wash, hearts and arrows streaking at -35°,
+// The Warp: Lobby → Portfolio (Enter) and menu → page (any a[data-warp]). Ripples from the clicked link, a pink wash, hearts and arrows streaking at -35°,
 // then the wash shrinks into the header logo. About 0.9 s; flashes stay under 3 per second. Plain link otherwise.
 import { gsap } from 'gsap';
 import { navigate } from 'astro:transitions/client';
@@ -8,7 +8,7 @@ import { sfx } from './audio';
 let busy = false;
 document.addEventListener('click', (e) => {
   const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('a[data-warp]');
-  if (!a || reduced() || busy || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+  if (!a || reduced() || busy || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || new URL(a.href).pathname === location.pathname) return;
   e.preventDefault();
   busy = true;
   const warp = document.querySelector<HTMLElement>('.warp');
@@ -36,4 +36,4 @@ document.addEventListener('click', (e) => {
           .to(wash, { clipPath: `circle(0px at ${tx}px ${ty}px)`, duration: 0.4, ease: 'power3.inOut' });
       });
     }, 0.5);
-});
+}, true); // capture: Astro's router also handles link clicks on document (and prevents them) before a bubbling listener would run
