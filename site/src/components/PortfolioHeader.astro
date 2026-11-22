@@ -89,16 +89,18 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
     if (btn.dataset.on) return;
     btn.dataset.on = '1';
     const center = () => { const r = btn.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+    const radius = (x: number, y: number) => Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
     const close = (focusBtn = true) => {
       if (menu.hidden) return;
       const { x, y } = center();
       btn.setAttribute('aria-expanded', 'false');
       if (reduced()) menu.hidden = true;
-      else gsap.to(menu, { clipPath: `circle(0px at ${x}px ${y}px)`, duration: 0.45, ease: 'power3.inOut', onComplete: () => { menu.hidden = true; } });
+      // the open tween clears its clip-path when done, so start from the full circle explicitly: the exact reverse of open()
+      else gsap.fromTo(menu, { clipPath: `circle(${radius(x, y)}px at ${x}px ${y}px)` }, { clipPath: `circle(0px at ${x}px ${y}px)`, duration: 0.55, ease: 'power3.inOut', onComplete: () => { menu.hidden = true; gsap.set(menu, { clearProps: 'clipPath' }); } });
       if (focusBtn) btn.focus();
     };
     const open = () => {
-      const { x, y } = center(), R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      const { x, y } = center(), R = radius(x, y);
       menu.hidden = false; menu.style.removeProperty('--tint'); btn.setAttribute('aria-expanded', 'true');
       if (!reduced()) { sfx.swish(); gsap.fromTo(menu, { clipPath: `circle(0px at ${x}px ${y}px)` }, { clipPath: `circle(${R}px at ${x}px ${y}px)`, duration: 0.55, ease: 'power3.inOut', clearProps: 'clipPath' }); }
       menu.querySelector<HTMLElement>('a')?.focus();
@@ -118,7 +120,7 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
       // the menu stays up until the new page is in, so the Warp's wash covers the change instead of the menu blinking away first
       a.addEventListener('click', (e) => {
         const hide = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
-        if (a.dataset.nav === location.pathname.replace(/\/?$/, '/')) { e.preventDefault(); e.stopImmediatePropagation(); hide(); return; } // already here
+        if (a.dataset.nav === location.pathname.replace(/\/?$/, '/')) { e.preventDefault(); e.stopImmediatePropagation(); close(false); return; } // already here: the opening animation in reverse
         document.addEventListener('astro:after-swap', hide, { once: true });
       });
     });
