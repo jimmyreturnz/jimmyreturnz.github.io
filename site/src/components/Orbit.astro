@@ -59,7 +59,7 @@ const items = [
       open = on;
       orbs.forEach((o) => { o.tabIndex = on ? 0 : -1; });
       avatar.setAttribute('aria-expanded', String(on));
-      gsap.to(st, { p: on ? 1 : 0, duration: reduced() ? 0 : on ? 0.6 : 0.3, ease: on ? 'back.out(1.6)' : 'power2.in', stagger: reduced() ? 0 : on ? 0.06 : 0, onUpdate: place });
+      gsap.to(st, { p: on ? 1 : 0, duration: reduced() ? 0 : on ? 0.6 : 0.3, ease: on ? 'back.out(1.6)' : 'power2.in', stagger: reduced() ? 0 : on ? 0.06 : 0, overwrite: true, onUpdate: place });
     };
     const tick = (_t: number, dt: number) => { if (open && !hover && !reduced()) { angle += (dt / 1000) * (360 / 14); place(); } };
     gsap.ticker.add(tick);
@@ -69,8 +69,10 @@ const items = [
     // and closes only once the mouse leaves the whole orbit circle, so every icon can be hovered.
     const near = (e: PointerEvent) => { const r = avatar.getBoundingClientRect(); return Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2)) <= R() + 40; };
     const onMove = (e: PointerEvent) => { if (e.pointerType === 'mouse' && open && !near(e)) toggle(false); };
+    const onOut = (e: PointerEvent) => { if (e.pointerType === 'mouse' && !e.relatedTarget) toggle(false); }; // mouse left the window
     document.addEventListener('pointermove', onMove);
-    document.addEventListener('astro:before-swap', () => document.removeEventListener('pointermove', onMove), { once: true });
+    document.addEventListener('pointerout', onOut);
+    document.addEventListener('astro:before-swap', () => { document.removeEventListener('pointermove', onMove); document.removeEventListener('pointerout', onOut); }, { once: true });
     avatar.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') toggle(true); });
     avatar.addEventListener('click', (e) => { if ((e as PointerEvent).pointerType !== 'mouse' && !(e.target as Element).closest('[data-orb]')) toggle(!open); });
     avatar.addEventListener('focusin', () => { if (avatar.matches(':focus-visible') || avatar.querySelector(':focus-visible')) toggle(true); });
