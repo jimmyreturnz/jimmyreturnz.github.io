@@ -17,7 +17,8 @@ if (cfg) {
     raf = requestAnimationFrame(f);
   };
   const soundOn = () => { try { return localStorage.getItem('jr.sound') === 'true'; } catch { return false; } };
-  const introOn = () => document.documentElement.dataset.intro === 'on' && !lobby;
+  // held during the Intro and until 1 s after the Lobby has landed; Portfolio pages opened directly play straight away
+  const introOn = () => !lobby && (document.documentElement.dataset.intro === 'on' || !!document.querySelector('.lobby'));
   const btn = () => document.querySelector<HTMLButtonElement>('[data-bgm-toggle]');
   const sync = () => {
     const b = btn(); if (b) { b.textContent = want ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', String(!want)); }
@@ -33,7 +34,8 @@ if (cfg) {
   };
   document.addEventListener('astro:page-load', bind);
   document.addEventListener('jr:sound', sync);
-  document.addEventListener('jr:lobby', () => { lobby = true; sync(); });
+  let landing = 0; // the BGM comes in about 1 s after the Lobby lands (after the log-in chime)
+  document.addEventListener('jr:lobby', () => { if (!lobby && !landing) landing = window.setTimeout(() => { lobby = true; sync(); }, 1000); });
   document.addEventListener('jr:feature-audio', (e) => { feature = (e as CustomEvent).detail.playing; sync(); });
   addEventListener('pointerdown', sync, { once: true }); // first click anywhere: browsers allow sound now
   addEventListener('keydown', sync, { once: true }); // keyboard visitors too
