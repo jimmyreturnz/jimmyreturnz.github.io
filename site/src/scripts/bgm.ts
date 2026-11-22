@@ -7,7 +7,9 @@ const cfg = document.querySelector<HTMLElement>('[data-bgm-cfg]');
 if (cfg) {
   const el = new Audio(cfg.dataset.src); el.loop = true; el.preload = 'none'; el.volume = 0;
   const label = `BGM · ${cfg.dataset.name}`, norm = normGain(Number(cfg.dataset.lufs), BGM_LUFS);
-  const store = { get: () => { try { return localStorage.getItem('jr.bgm') !== 'off'; } catch { return true; } }, set: (on: boolean) => { try { localStorage.setItem('jr.bgm', on ? 'on' : 'off'); } catch { /* private mode */ } } };
+  // Pause lasts for this visit only (sessionStorage): remembered forever, one old Pause silenced every later visit, and the Lobby has no button to undo it
+  const store = { get: () => { try { return sessionStorage.getItem('jr.bgm') !== 'off'; } catch { return true; } }, set: (on: boolean) => { try { sessionStorage.setItem('jr.bgm', on ? 'on' : 'off'); } catch { /* private mode */ } } };
+  try { localStorage.removeItem('jr.bgm'); } catch { /* the old, permanent setting */ }
   let want = store.get(), feature = false, lobby = false, raf = 0;
   const fadeTo = (v: number) => { // ~0.6 s linear fade on the element volume (1 = the normalised level); the music bus sets the real level
     v *= norm; cancelAnimationFrame(raf); const a = el.volume, t0 = performance.now();
