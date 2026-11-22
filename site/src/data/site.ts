@@ -49,6 +49,7 @@ export type Project = {
   note?: string;
   cover: 'sky' | 'mint' | 'pink' | 'lav' | 'butter';
   icon: string; // vectorheart symbol id
+  logo?: string; // the project's own logo (shown instead of the icon)
 };
 
 export const projects: Project[] = [
@@ -61,7 +62,7 @@ export const projects: Project[] = [
     outcome: { value: '≥ ฿500k', text: 'saved compared with buying a dedicated vision system' },
     stack: 'Python · PaddleOCR · OPC UA / PLC · offline installer', role: 'Data Scientist intern, BMW Group', link: null, note: 'code private' },
   // download and star counts as of 2026-11-22 (GitHub releases)
-  { title: 'KatsuDon Editor', pinned: true, tags: ['dev', 'open source'], cover: 'butter', icon: 'vh-chevrons',
+  { title: 'KatsuDon Editor', pinned: true, tags: ['dev', 'open source'], cover: 'butter', icon: 'vh-chevrons', logo: '/projects/katsudon-logo.svg',
     summary: 'A desktop osu!taiko editor that arranges notes into shapes for gimmick charts, so mappers don’t place every note by hand.',
     outcome: { value: '258', text: 'downloads and 12 stars on GitHub' },
     stack: 'Python · PySide6 · PyInstaller', role: 'Solo',

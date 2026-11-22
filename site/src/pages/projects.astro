@@ -20,7 +20,7 @@ const tags = ['all', ...new Set(projects.flatMap((p) => p.tags))];
         <!-- the result is the first thing to read on each card -->
         <div class={`cover bg-${p.cover}`}>
           {p.pinned && <span class="pin">★ PINNED</span>}
-          <Vh name={p.icon} class="mark" />
+          {p.logo ? <img src={p.logo} alt="" class="mark" width="64" height="64" /> : <Vh name={p.icon} class="mark" />}
           {p.outcome.value && <p class="win"><b>{p.outcome.value}</b><span>{p.outcome.text}</span></p>}
         </div>
         <div class="body">
