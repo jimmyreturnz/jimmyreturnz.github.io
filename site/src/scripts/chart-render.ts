@@ -151,11 +151,12 @@ function setup(root: HTMLElement) {
     const yOf = (nt: number) => hitY - ((nt - t) / span) * 480 * sc;
     const LET = k === 7 ? ['S', 'D', 'F', '␣', 'J', 'K', 'L'] : ['C', 'V', ',', '.'];
     // which columns are being hit right now (autoplay presses a key for taps for 90 ms, and for the whole length of a hold)
-    const down = new Set<number>(), strikes: [number, number, boolean][] = [];
+    const down = new Set<number>(), strikes: [number, number][] = []; // [column, ms since hit]: note heads, and hold ends when released
     for (let i = Math.max(0, lower(d.notes, t - 4000) - 1); i < d.notes.length && d.notes[i]![0]! <= t; i++) {
       const n = d.notes[i]!, hold = n[2]! > 0;
       if (hold ? t < n[2]! : t - n[0]! < 90) down.add(n[1]!);
-      if (t - n[0]! < 160) strikes.push([n[1]!, t - n[0]!, hold]);
+      if (t - n[0]! < 160) strikes.push([n[1]!, t - n[0]!]);
+      if (hold && t >= n[2]! && t - n[2]! < 160) strikes.push([n[1]!, t - n[2]!]);
     }
     // 1 · lane backgrounds (Colour#), column lines
     colX.forEach((cx, i) => { const [r, gg, b, a] = c.colours[i]!; g.fillStyle = `rgba(${r},${gg},${b},${(a ?? 255) / 255})`; g.fillRect(x0 + cx * sc, 0, c.columnWidth[i]! * sc, 480 * sc); });
@@ -177,7 +178,7 @@ function setup(root: HTMLElement) {
       if (hold) {
         const yTail = yOf(n[2]!), tail = im(def.t) ?? head, th = tail ? (tail.naturalHeight * w) / tail.naturalWidth : 0, body = im(def.l);
         const top = yTail - th / 2, bot = yHead - hh / 2;
-        if (body && bot > top) { g.save(); g.globalAlpha = down.has(col) ? 1 : 0.9; g.drawImage(body, x, top, w, bot - top); g.restore(); }
+        if (body && bot > top) g.drawImage(body, x, top, w, bot - top);
         // 4K: the hold end reuses the head arrow, so draw it upside down (like the game does)
         if (tail && k === 4) { g.save(); g.translate(x, yTail); g.scale(1, -1); g.drawImage(tail, 0, 0, w, th); g.restore(); }
         else if (tail) g.drawImage(tail, x, yTail - th, w, th);
@@ -191,8 +192,8 @@ function setup(root: HTMLElement) {
     if (R) g.drawImage(R, x0 + sw * sc, 0, R.naturalWidth * px, 480 * sc);
     // 5 · lighting at the hit position (additive)
     g.save(); g.globalCompositeOperation = 'lighter';
-    for (const [col, age, hold] of strikes) {
-      const fr = hold ? c.lightingL : c.lightingN; if (!fr.length) continue;
+    for (const [col, age] of strikes) {
+      const fr = c.lightingN; if (!fr.length) continue;
       const f = im(fr[Math.min(fr.length - 1, Math.floor(age / (1000 / 60)))]!); if (!f) continue;
       const w = f.naturalWidth * px, h = f.naturalHeight * px; g.drawImage(f, x0 + (colX[col]! + c.columnWidth[col]! / 2) * sc - w / 2, hitY - h / 2, w, h);
     }
