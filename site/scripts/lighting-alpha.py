@@ -1,6 +1,5 @@
 # The skin's lightingN frames are additive art on opaque black. Turn brightness into alpha so the black disappears on any background.
-# The 4K hold heads/bodies and the 7K keys sit on opaque black too (black on osu!'s black lanes, but here it hides the receptors and the
-# stage hint): fade near-black pixels (max channel < 40) to transparent, leaving the coloured art untouched.
+# The 7K keys are 2x2 opaque black that would cover the stage hint: fade near-black pixels (max channel < 40) to transparent.
 # Run once after skin-to-json.mjs: python lighting-alpha.py
 import glob
 from PIL import Image
@@ -12,7 +11,7 @@ for f in glob.glob(D + 'lightingN-*.png'):
             r, g, b, _ = px[x, y]; a = max(r, g, b)
             px[x, y] = (255 * r // a, 255 * g // a, 255 * b // a, a) if a else (0, 0, 0, 0)
     im.save(f)
-for f in glob.glob(D + 'Arrownote_mania-note*[HL].png') + glob.glob(D + 'mania-key*.png'):
+for f in glob.glob(D + 'mania-key*.png'):
     im = Image.open(f).convert('RGBA'); px = im.load()
     for y in range(im.height):
         for x in range(im.width):
