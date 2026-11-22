@@ -211,7 +211,6 @@ function setup(root: HTMLElement) {
     if (data || cv) return;
     try { data = (await (await fetch(`/charts/${root.dataset.chart}.json`)).json()) as Data; await skinReady; buildEvents(); } catch { return; }
     comboT = (data.mode === 'taiko' ? data.notes.filter((n) => n[1]! <= 1).map((n) => n[0]!) : data.notes.flatMap((n) => (n[2]! > 0 ? [n[0]!, n[2]!] : [n[0]!]))).sort((a, b) => a - b);
-    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].forEach((c) => { pic(`/skin/${data!.mode}/combo-${c}.png`); });
     cv = document.createElement('canvas'); cv.className = 'notes'; cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
     stage.querySelectorAll('.taiko,.mania').forEach((e) => e.remove());
     stage.prepend(cv); resize(); new ResizeObserver(resize).observe(stage);
@@ -251,7 +250,8 @@ function setup(root: HTMLElement) {
     const dt = now - last; if (dt > 0 && dt < 0.25) autoplay(last, now);
     last = now; draw();
   });
-  root.querySelector('audio')?.addEventListener('play', () => void loadHits());
+  // hit sounds and combo digits (~190 KB for taiko) only once the song plays: the combo isn't shown before that
+  root.querySelector('audio')?.addEventListener('play', () => { void loadHits(); if (data) for (let c = 0; c < 10; c++) pic(`/skin/${data.mode}/combo-${c}.png`); });
   new IntersectionObserver((es, o) => { if (es.some((x) => x.isIntersecting)) { o.disconnect(); void start(); } }).observe(root);
   // stacked panels stay rendered but hidden: re-measure when a panel is shown
   new MutationObserver(resize).observe(root, { attributes: true, attributeFilter: ['hidden'] });

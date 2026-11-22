@@ -4,10 +4,10 @@ import Base from './Base.astro';
 import PortfolioHeader from '../components/PortfolioHeader.astro';
 import Footer from '../components/Footer.astro';
 import Sky from '../components/Sky.astro';
-interface Props { title: string; description?: string }
-const { title, description } = Astro.props;
+interface Props { title: string; description?: string; jp?: boolean }
+const { title, description, jp } = Astro.props;
 ---
-<Base title={`${title} · jimmyreturnz`} description={description}>
+<Base title={`${title} · jimmyreturnz`} description={description} jp={jp}>
   <Sky fixed />
   <div class="shell">
     <PortfolioHeader />
