@@ -4,7 +4,7 @@
 import { gsap } from 'gsap';
 import { reduced } from './motion';
 import { rollIn } from './roll';
-import { sfx, unlock, setSound, preloadHold } from './audio';
+import { sfx, unlock, setSound, prefetch, playOnce, SFX } from './audio';
 
 const root = document.documentElement;
 const LOBBY = ['.bar', '.sky .h1', '.sky .h2', '.sky .s1', '.sky .s2', '.bubble', '.id', '.role', '.about', '.facts', '.ctas', '.socials', '.player'].map((s) => `.lobby ${s}`).join(',');
@@ -21,6 +21,7 @@ const INTRO_SPEED = 0.5;
 
 export function lobbyIn(delay = 0) {
   document.dispatchEvent(new Event('jr:lobby')); // the BGM starts here
+  playOnce(SFX.welcome, { duck: false, wait: false }); // the log-in chime as the Lobby lands (skipped if the browser hasn't allowed sound yet)
   const els = gsap.utils.toArray<HTMLElement>(LOBBY);
   if (!els.length) return;
   if (reduced()) { gsap.set(els, { clearProps: 'all' }); return; }
@@ -54,7 +55,7 @@ function run(el: HTMLElement) {
     return;
   }
 
-  preloadHold(); // the hold sound, so it is ready by the first press
+  prefetch(SFX.hold, SFX.boom, SFX.loading); // the Intro's sounds, so they are ready by the first press
 
   // holding builds up: glow grows, the button shakes harder, a pink vignette closes in
   let shake: ((t: number, dt: number) => void) | null = null;
@@ -104,7 +105,7 @@ function run(el: HTMLElement) {
     tl.timeScale(INTRO_SPEED); // the whole Intro runs at this speed (0.5 = about 10 seconds)
 
     // 1 · ripples
-    tl.call(() => sfx.boom(), [], 0)
+    tl.call(() => playOnce(SFX.boom, { duck: false }), [], 0) // the TNT, from its start, on the burst
       .to(btn, { scale: 1.5, opacity: 0, duration: 0.25, ease: 'power2.out' }, 0)
       .to(q('.hint'), { opacity: 0, duration: 0.2 }, 0)
       .fromTo(el, { x: 0 }, { x: 5, duration: 0.04, repeat: 3, yoyo: true, clearProps: 'x' }, 0)
@@ -118,8 +119,8 @@ function run(el: HTMLElement) {
     const burst = (t: number) => tl!.call(() => { sfx.crackle(); bios.classList.remove('glitch'); void bios.offsetWidth; bios.classList.add('glitch'); }, [], t);
     burst(0.75); burst(1.4);
     BIOS.forEach((line, i) => tl!.call(() => { bios.textContent += `${line}\n`; sfx.tick(); }, [], 0.78 + i * 0.12));
-    tl.fromTo(logo, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' }, 1.45)
-      .call(() => sfx.chime(), [], 1.5)
+    tl.call(() => playOnce(SFX.loading, { duck: false }), [], 1.42) // just before the heart and its loading bar appear
+      .fromTo(logo, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' }, 1.45)
       .to(bar, { scaleX: 1, duration: 0.55, ease: 'power1.inOut' }, 1.5);
 
     // 3 · auto login, then the Lobby pops in (no desktop, no arrows, no wave)

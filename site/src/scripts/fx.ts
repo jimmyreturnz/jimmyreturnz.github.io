@@ -32,26 +32,32 @@ document.addEventListener('click', (e) => {
   from = { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height };
 }, true);
 
-function pageIn() {
+// While the Warp covers a page change, the new page waits (already in its start pose, under the wash) and rises only when
+// the wash is nearly gone (`jr:warp-out`, 0.1 s before it ends); without a Warp it rises straight away.
+const warpGate = (): Promise<void> => document.querySelector<HTMLElement>('.warp')?.style.display !== 'block' ? Promise.resolve()
+  : new Promise((res) => { document.addEventListener('jr:warp-out', () => res(), { once: true }); setTimeout(res, 11000); });
+
+function pageIn(gate: Promise<void>) {
   if (reduced()) return;
   const h1 = document.querySelector<HTMLElement>('.page-hero h1');
   if (h1 && from) {
     const r = h1.getBoundingClientRect(), f = from; from = null;
-    gsap.from(h1, { x: f.x - (r.left + r.width / 2), y: f.y - (r.top + r.height / 2), scale: Math.min(1, f.w / r.width), opacity: 0.2, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity' });
+    const tw = gsap.from(h1, { x: f.x - (r.left + r.width / 2), y: f.y - (r.top + r.height / 2), scale: Math.min(1, f.w / r.width), opacity: 0.2, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity', paused: true });
+    void gate.then(() => tw.play());
   }
   const hero = document.querySelector('.page-hero p');
-  if (hero) gsap.from(hero, { y: 16, opacity: 0, duration: 0.6, delay: 0.15, ease: 'power3.out', clearProps: 'all' });
+  if (hero) { const tw = gsap.from(hero, { y: 16, opacity: 0, duration: 0.6, delay: 0.15, ease: 'power3.out', clearProps: 'all', paused: true }); void gate.then(() => tw.play()); }
 }
 
 // ---- scroll reveals: blocks rise and fade in once, with a small stagger ----
-function reveals() {
+function reveals(gate: Promise<void>) {
   if (reduced()) return;
   const items = [...document.querySelectorAll<HTMLElement>('.page > *:not(.page-hero), .page .grid3 > *')];
   const seen = new Set<HTMLElement>();
   const io = new IntersectionObserver((es) => {
     const hit = es.filter((e) => e.isIntersecting).map((e) => e.target as HTMLElement);
     hit.forEach((el) => io.unobserve(el));
-    if (hit.length) gsap.to(hit, { y: 0, opacity: 1, duration: 0.65, ease: 'power3.out', stagger: 0.08, clearProps: 'transform,opacity' });
+    if (hit.length) void gate.then(() => gsap.to(hit, { y: 0, opacity: 1, duration: 0.65, ease: 'power3.out', stagger: 0.08, clearProps: 'transform,opacity' }));
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
   items.forEach((el) => { if (seen.has(el)) return; seen.add(el); gsap.set(el, { y: 26, opacity: 0 }); io.observe(el); });
 }
@@ -75,7 +81,8 @@ const done = () => {
 let first = true;
 document.addEventListener('astro:page-load', () => {
   done();
-  if (!first) pageIn();
+  const gate = warpGate();
+  if (!first) pageIn(gate);
   first = false;
-  if (!document.querySelector('.lobby')) reveals();
+  if (!document.querySelector('.lobby')) reveals(gate);
 });

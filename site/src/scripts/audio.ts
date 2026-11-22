@@ -57,13 +57,14 @@ export function tapBgm(el: HTMLAudioElement) {
   c.createMediaElementSource(el).connect(musicBus);
 }
 
-// taiko hit sounds (owner's skin samples in assets/sfx/), decoded once, played on the effects volume
+// taiko hit sounds (owner's skin samples, kept as WAV so they land on time), decoded once, played on the effects volume
+const HIT_FILE: Record<string, string> = { normal: 'taiko-don', clap: 'taiko-kat', finish: 'taiko-finish', whistle: 'taiko-whistle' };
 const buffers: Record<string, AudioBuffer> = {};
 export async function loadHits() {
   const c = unlock();
-  await Promise.all(['normal', 'clap', 'finish', 'whistle'].map(async (n) => {
+  await Promise.all(Object.entries(HIT_FILE).map(async ([n, file]) => {
     if (buffers[n]) return;
-    try { buffers[n] = await c.decodeAudioData(await (await fetch(`/sfx/taiko-normal-hit${n}.wav`)).arrayBuffer()); } catch { /* missing file: stay silent */ }
+    try { buffers[n] = await c.decodeAudioData(await (await fetch(`/sfx/${file}.wav`)).arrayBuffer()); } catch { /* missing file: stay silent */ }
   }));
 }
 export function hit(names: string[]) {
@@ -99,26 +100,32 @@ function noise(dur: number, gain = 0.15, at = 0, hp = 1500) {
   s.buffer = buf; f.type = 'highpass'; f.frequency.value = hp; g.gain.value = gain;
   s.connect(f).connect(g).connect(sfxBus); s.start(t);
 }
-/** Play a sound file once on the effects volume (fetched only when called). Waits for the first click/key if the browser
- *  hasn't allowed sound yet, and fades the BGM out meanwhile (`jr:feature-audio`). */
-export async function playOnce(url: string) {
-  if (muted()) return;
-  const bytes = await fetch(url).then((r) => r.arrayBuffer()).catch(() => null);
-  if (!bytes) return;
-  const go = async () => {
-    const c = unlock(), buf = await c.decodeAudioData(bytes).catch(() => null);
-    if (!buf || muted()) return;
-    const s = c.createBufferSource(); s.buffer = buf; s.connect(sfxBus);
-    const duck = (playing: boolean) => document.dispatchEvent(new CustomEvent('jr:feature-audio', { detail: { playing, id: url } }));
-    s.onended = () => duck(false); duck(true); s.start();
-  };
-  if (navigator.userActivation?.hasBeenActive ?? true) void go();
-  else { const once = () => { removeEventListener('pointerdown', once); removeEventListener('keydown', once); void go(); }; addEventListener('pointerdown', once); addEventListener('keydown', once); }
+// sound files in assets/sfx/: each fetched once (when first asked for) and decoded once
+export const SFX = { hold: '/sfx/intro-hold.m4a', boom: '/sfx/intro-boom.mp3', loading: '/sfx/intro-loading.m4a', welcome: '/sfx/lobby-welcome.m4a', error: '/sfx/error.m4a' } as const;
+const fileBytes = new Map<string, Promise<ArrayBuffer>>(), fileBufs = new Map<string, Promise<AudioBuffer | null>>();
+/** Start downloading sound files now so they're ready when played (no sound context needed yet). */
+export function prefetch(...urls: string[]) { for (const u of urls) if (!fileBytes.has(u)) fileBytes.set(u, fetch(u).then((r) => (r.ok ? r.arrayBuffer() : new ArrayBuffer(0))).catch(() => new ArrayBuffer(0))); }
+function fileBuffer(url: string) {
+  prefetch(url);
+  let p = fileBufs.get(url);
+  if (!p) { const c = unlock(); p = fileBytes.get(url)!.then((b) => (b.byteLength ? c.decodeAudioData(b) : null)).catch(() => null); fileBufs.set(url, p); }
+  return p;
 }
 
-// the power-button hold sound (assets/sfx/pill-guiiin.m4a): fetched when the Intro shows, decoded on the first press
-let holdBytes: Promise<ArrayBuffer> | null = null, holdBuf: Promise<AudioBuffer | null> | null = null;
-export function preloadHold() { holdBytes ??= fetch('/sfx/pill-guiiin.m4a').then((r) => r.arrayBuffer()).catch(() => new ArrayBuffer(0)); }
+/** Play a sound file once on the effects volume. `duck` fades the BGM out while it plays (`jr:feature-audio`).
+ *  `wait`: if the browser hasn't allowed sound yet, play on the first click/key instead of skipping it. */
+export function playOnce(url: string, { duck = true, wait = true } = {}) {
+  if (muted()) return;
+  const go = async () => {
+    const buf = await fileBuffer(url); if (!buf || muted()) return;
+    const c = unlock(), s = c.createBufferSource(); s.buffer = buf; s.connect(sfxBus);
+    const tell = (playing: boolean) => document.dispatchEvent(new CustomEvent('jr:feature-audio', { detail: { playing, id: url } }));
+    if (duck) { s.onended = () => tell(false); tell(true); }
+    s.start();
+  };
+  if (navigator.userActivation?.hasBeenActive ?? true) void go();
+  else if (wait) { const once = () => { removeEventListener('pointerdown', once); removeEventListener('keydown', once); void go(); }; addEventListener('pointerdown', once); addEventListener('keydown', once); }
+}
 
 export const sfx = {
   /** The hold sound, starting at the press and following the hold: if decoding takes a moment it starts that far in,
@@ -127,9 +134,8 @@ export const sfx = {
     if (!ctx || muted()) return (_fade?: number) => {};
     const c = ctx, t0 = c.currentTime, g = c.createGain(); g.connect(sfxBus);
     let src: AudioBufferSourceNode | null = null, stopped = false;
-    preloadHold();
-    holdBuf ??= holdBytes!.then((b) => (b.byteLength ? c.decodeAudioData(b) : null)).catch(() => null);
-    void holdBuf.then((buf) => {
+    void fileBuffer(SFX.boom); // decode the boom now too, so it lands exactly on the burst
+    void fileBuffer(SFX.hold).then((buf) => {
       if (!buf || stopped) return;
       const at = c.currentTime - t0; if (at >= buf.duration) return;
       src = c.createBufferSource(); src.buffer = buf; src.connect(g); src.start(0, at);
@@ -139,7 +145,6 @@ export const sfx = {
       g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + fade); src?.stop(t + fade + 0.02);
     };
   },
-  boom() { tone(90, 0.5, 'sine', 0.5, 40); noise(0.25, 0.12, 0, 600); },
   chime() { tone(659, 0.5, 'triangle', 0.2); tone(988, 0.7, 'triangle', 0.18, undefined, 0.12); tone(1318, 0.9, 'sine', 0.12, undefined, 0.24); },
   crackle() { noise(0.12, 0.18, 0, 800); },
   tick() { tone(1800, 0.03, 'square', 0.05); },

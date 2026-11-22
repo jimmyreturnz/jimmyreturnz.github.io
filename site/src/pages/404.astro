@@ -13,9 +13,9 @@ import Page from '../layouts/Page.astro';
 </Page>
 
 <script>
-  import { playOnce } from '../scripts/audio';
+  import { playOnce, SFX } from '../scripts/audio';
   // the error sound, each time this page is shown (also after a client-side page change)
-  document.addEventListener('astro:page-load', () => { if (document.querySelector('[data-miss]')) void playOnce('/sfx/bluescreen.m4a'); });
+  document.addEventListener('astro:page-load', () => { if (document.querySelector('[data-miss]')) void playOnce(SFX.error); });
 </script>
 
 <style>
