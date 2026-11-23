@@ -53,11 +53,11 @@ export type Project = {
 };
 
 export const projects: Project[] = [
-  { title: 'Shipment Tracking', pinned: true, tags: ['data', 'work'], cover: 'sky', icon: 'vh-eq',
+  { title: 'Shipment Tracking', pinned: true, tags: ['data', 'work'], cover: 'sky', icon: 'vh-container',
     summary: 'Tracks inbound sea containers, predicts which will arrive late from carrier plans, vessel positions and weather, and alerts the team early.',
     outcome: { value: '−35%', text: 'chance of a line stop from late parts, and 15% lower airfreight cost' },
     stack: 'Python · pandas · web scraping · Power Automate', role: 'Data Scientist intern, BMW Group', link: null, note: 'code private' },
-  { title: 'Production-scale OCR', pinned: true, tags: ['data', 'work'], cover: 'mint', icon: 'vh-target',
+  { title: 'Production-scale OCR', pinned: true, tags: ['data', 'work'], cover: 'mint', icon: 'vh-camera',
     summary: 'Reads hand-stamped codes on cast parts from the line camera, checks them against the PLC in seconds, and rejects any code it isn’t sure of.',
     outcome: { value: '≥ ฿500k', text: 'saved compared with buying a dedicated vision system' },
     stack: 'Python · PaddleOCR · OPC UA / PLC · offline installer', role: 'Data Scientist intern, BMW Group', link: null, note: 'code private' },
