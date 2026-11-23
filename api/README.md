@@ -9,7 +9,7 @@ cd api
 bun install
 cp .dev.vars.example .dev.vars   # test secrets; the Turnstile one always passes
 bun run db:local                 # create the table in the local database (after a schema change: drop the table first)
-bun run dev                      # http://localhost:8787
+bun run dev                      # http://localhost:8790 (8787 is taken by the Headroom proxy)
 bun run test                     # input rules
 ```
 

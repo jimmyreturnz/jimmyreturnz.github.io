@@ -119,7 +119,7 @@ function run(el: HTMLElement) {
       .to(bar, { scaleX: 1, duration: 0.55, ease: 'power1.inOut' }, 1.5);
 
     // 3 · auto login, then on to the Lobby, whose pieces pop in there
-    tl.to(logo, { opacity: 0, duration: 0.15 }, 2.05)
+    tl.to([logo, bios], { opacity: 0, duration: 0.15 }, 2.05)
       .fromTo(login, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.2, ease: 'back.out(2)' }, 2.05)
       .to(login, { opacity: 0, duration: 0.15 }, 2.4)
       .call(() => sfx.swish(), [], 2.45)

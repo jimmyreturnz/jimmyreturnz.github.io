@@ -31,11 +31,33 @@ import ThemeSwitch from './ThemeSwitch.astro';
   .snd:hover .vols label:nth-child(2),.snd:focus-within .vols label:nth-child(2){transition-delay:.16s}
   .vols input{width:72px;accent-color:var(--accent);cursor:pointer}
   @media (max-width:520px){ .vols input{width:56px} }
+  /* touch screens have no hover: the first tap on the speaker opens the volumes as a small drop-down under it (taps after that mute/unmute
+     as usual), and a tap anywhere else closes it */
+  @media (hover:none){
+    .snd{position:relative}
+    .vols{position:absolute;right:0;top:calc(100% + 8px);z-index:50;height:auto;padding:10px 14px;margin:0;grid-template-columns:1fr;border-color:var(--ink);
+          box-shadow:3px 3px 0 var(--ink);transform:translateY(-6px);pointer-events:none}
+    .snd:hover .vols,.snd:focus-within .vols{opacity:0;margin:0;padding:10px 14px;transform:translateY(-6px)}
+    .snd.open .vols{opacity:1;transform:none;pointer-events:auto}
+    .vols .in{flex-direction:column;align-items:stretch;gap:12px}
+    .vols label,.snd:hover .vols label{opacity:1;transform:none;gap:10px}
+    .vols input{width:150px;height:28px}
+  }
 </style>
 
 <script>
   import { vol, setVolume } from '../scripts/audio';
+  const touch = matchMedia('(hover: none)');
   document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLElement>('.snd').forEach((snd) => {
+      if (snd.dataset.bound) return; snd.dataset.bound = '1';
+      // capture phase: the first tap opens the volumes instead of reaching the mute button
+      snd.addEventListener('click', (e) => {
+        if (!touch.matches || snd.classList.contains('open') || !(e.target as Element).closest('.sound')) return;
+        e.preventDefault(); e.stopPropagation(); snd.classList.add('open');
+      }, true);
+      document.addEventListener('pointerdown', (e) => { if (!snd.contains(e.target as Node)) snd.classList.remove('open'); });
+    });
     document.querySelectorAll<HTMLInputElement>('[data-vol]').forEach((r) => {
       const k = r.dataset.vol as 'sfx' | 'music';
       r.value = String(Math.round(vol[k] * 100));

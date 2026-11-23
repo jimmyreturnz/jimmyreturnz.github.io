@@ -83,7 +83,7 @@ function setup(root: HTMLElement) {
     return since < 100 ? 1 : 1 - (since - 100) / 50;
   };
   function taiko(g: CanvasRenderingContext2D, W: number, Hc: number, t: number) {
-    const d = data!, H = Math.min(Hc, Math.max(170, W / 6.8267)), top = Math.max(0, Math.min(Hc - H, Hc * 0.32 - H / 2)), u = H / 200, cy = top + H / 2, hitX = 1.28 * H;
+    const d = data!, H = Math.min(Hc, Math.max(W < 640 ? 92 : 170, W / 6.8267)), top = Math.max(0, Math.min(Hc - H, Hc * 0.32 - H / 2)), u = H / 200, cy = top + H / 2, hitX = 1.28 * H;
     const r = 0.2375 * H, R = r / 0.65, ppms = (v: number) => (1.12 * H * d.sm * v) / 300, xAt = (tt: number) => hitX + (tt - t) * ppms(vAt(tt));
     const bg = g.createLinearGradient(0, 0, 0, Hc); bg.addColorStop(0, '#1d2233'); bg.addColorStop(1, '#0d1017');
     g.fillStyle = bg; g.fillRect(0, 0, W, Hc);

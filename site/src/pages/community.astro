@@ -82,6 +82,7 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
     const when = (t: number) => { const d = new Date(t); return d.toDateString() === new Date().toDateString() ? `Today at ${time.format(d)}` : day.format(d); };
     let page = 1, more = false, loading = false;
 
+    const sig = (m: Msg) => `${m.name}|${m.body}|${m.link ?? ''}|${m.edited_at ?? ''}`;
     // names and messages go in with textContent only: always plain text, never HTML
     const item = (m: Msg) => {
       const li = document.createElement('li');
@@ -118,7 +119,7 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
         });
         head.append(eb);
       }
-      li.append(av, text); return li;
+      li.dataset.id = String(m.id); li.dataset.sig = sig(m); li.append(av, text); return li;
     };
     // newest at the bottom, like a chat; scrolling to the top loads older messages above without moving what you're reading
     const load = async () => {
@@ -137,6 +138,31 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
     };
     feed.addEventListener('scroll', () => { if (more && feed.scrollTop < 80) void load(); }, { passive: true });
     void load();
+
+    // live: every 10 s while the tab is visible, fetch the newest page and merge it in: new messages appear at the bottom, edits and
+    // profile links update in place (not while you're editing that one), and messages the owner deleted disappear
+    // ponytail: polling; a WebSocket (Durable Object) only pays off if the board gets busy
+    const sync = async () => {
+      if (document.hidden || loading || page === 1) return;
+      const d = await fetch(`${api}/messages?page=1`).then((r) => (r.ok ? r.json() : null)).catch(() => null) as { items: Msg[]; more: boolean } | null;
+      if (!d) return;
+      const byId = new Map([...list.children].map((li) => [(li as HTMLElement).dataset.id!, li as HTMLElement]));
+      const atBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 40, oldest = d.more ? d.items.at(-1)!.id : 0, added: HTMLElement[] = [];
+      for (const m of d.items.slice().reverse()) {
+        const li = byId.get(String(m.id));
+        if (!li) { const n = item(m); list.append(n); added.push(n); }
+        else if (li.dataset.sig !== sig(m) && !li.querySelector('.editbox')) li.replaceWith(item(m));
+      }
+      // missing from the newest page (or from the whole board when it all fits on one page): deleted by the owner
+      const live = new Set(d.items.map((m) => String(m.id)));
+      byId.forEach((li, id) => { if (Number(id) > oldest && !live.has(id)) li.remove(); });
+      if (added.length) { if (atBottom) feed.scrollTop = feed.scrollHeight; gsap.from(added, { y: 14, opacity: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out', clearProps: 'all' }); }
+      state.hidden = !!list.children.length;
+    };
+    const timer = setInterval(() => void sync(), 10_000);
+    const onVis = () => { if (!document.hidden) void sync(); };
+    document.addEventListener('visibilitychange', onVis);
+    document.addEventListener('astro:before-swap', () => { clearInterval(timer); document.removeEventListener('visibilitychange', onVis); }, { once: true });
 
     let ts: Turnstile | null = null, wid = '', token = '';
     const ensureTs = async () => {
