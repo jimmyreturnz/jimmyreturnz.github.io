@@ -1,11 +1,11 @@
-# Rebuilds the site once a day so the Stats Cards (osu!, TETR.IO) stay fresh.
+# Rebuilds the site once a day at midnight UTC+7 so the Stats Cards (osu!, TETR.IO) stay fresh.
 # The build itself runs on Cloudflare Pages (`bun run build` fetches stats first).
 # Setup: Cloudflare Pages → project → Settings → Builds → Deploy hooks → create one,
 # then add its URL as the repo secret CF_PAGES_DEPLOY_HOOK.
 name: Daily rebuild
 on:
   schedule:
-    - cron: '17 21 * * *' # 04:17 Bangkok time
+    - cron: '0 17 * * *' # midnight Bangkok time (UTC+7)
   workflow_dispatch:
 permissions: {}
 jobs:

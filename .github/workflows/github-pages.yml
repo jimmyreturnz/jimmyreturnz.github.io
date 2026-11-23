@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '17 21 * * *' # 04:17 Bangkok time
+    - cron: '0 17 * * *' # midnight Bangkok time (UTC+7)
   workflow_dispatch:
 permissions: {}
 concurrency:
