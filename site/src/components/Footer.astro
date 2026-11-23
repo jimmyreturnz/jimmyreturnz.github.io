@@ -7,7 +7,7 @@ import { pages } from '../data/pages';
 <footer class="foot">
   <div class="wrap fgrid">
     <div>
-      <a class="wordmark" href="/"><Vh name="vh-heart" />jimmyreturnz</a>
+      <a class="wordmark" href="/lobby/"><Vh name="vh-heart" />jimmyreturnz</a>
       <p class="meta">{profile.role} · {profile.location}</p>
       <nav aria-label="Footer" class="fnav">{pages.map((p) => <a href={p.href}>{p.label}</a>)}</nav>
     </div>
@@ -28,7 +28,7 @@ import { pages } from '../data/pages';
       <p class="meta">Songs by <a href={camelliaUrl} target="_blank" rel="noopener noreferrer">Camellia</a></p>
     </div>
   </div>
-  <p class="wrap tiny">© {new Date().getFullYear()} jimmyreturnz · <a href="/">Back to the Lobby</a> · <a href="/?intro=1" data-astro-reload>Replay intro</a></p>
+  <p class="wrap tiny">© {new Date().getFullYear()} jimmyreturnz · <a href="/lobby/">Back to the Lobby</a> · <a href="/" data-astro-reload>Replay intro</a></p>
 </footer>
 
 <style>

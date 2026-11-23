@@ -18,7 +18,7 @@ export function GET({ site }: { site?: URL }) {
     ...timeline.map((t) => `- ${t.from} to ${t.to ?? 'present'}${t.expected ? ' (expected)' : ''}: ${t.what}, ${t.where}${t.blurb ? `. ${t.blurb}` : ''}`),
     '',
     '## Pages',
-    `- [Lobby](${url('/')})`,
+    `- [Lobby](${url('/lobby/')})`,
     ...pages.map((p) => `- [${p.label}](${url(p.href)})`),
     '',
     '## Contact',

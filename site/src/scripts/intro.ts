@@ -6,6 +6,8 @@ import { reduced } from './motion';
 import { rollIn } from './roll';
 import { sfx, unlock, setSound, prefetch, playOnce, SFX } from './audio';
 
+import { navigate } from 'astro:transitions/client';
+
 const root = document.documentElement;
 const LOBBY = ['.bar', '.sky .h1', '.sky .h2', '.sky .s1', '.sky .s2', '.bubble', '.id', '.role', '.about', '.facts', '.ctas', '.socials', '.player'].map((s) => `.lobby ${s}`).join(',');
 const BIOS = [
@@ -30,12 +32,8 @@ export function lobbyIn(delay = 0) {
   gsap.fromTo(els, { y: 24, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.6, delay, stagger: 0.06, ease: 'back.out(1.4)', clearProps: root.dataset.intro ? '' : 'all' });
 }
 
-function finish(el: HTMLElement) {
-  document.dispatchEvent(new Event('jr:lobby'));
-  try { localStorage.setItem('jr.intro', 'done'); } catch { /* private mode */ }
-  delete root.dataset.intro;
-  el.style.display = 'none';
-}
+// on to the Lobby page; a client-side change, so the sound unlocked by the power button carries over
+const finish = () => navigate('/lobby/');
 
 function run(el: HTMLElement) {
   const q = <T extends Element = HTMLElement>(s: string) => el.querySelector<T>(s)!;
@@ -44,13 +42,12 @@ function run(el: HTMLElement) {
   const rip = [...el.querySelectorAll<SVGCircleElement>('.ripples circle')], flash = q('.flash'), skip = q('[data-skip]');
   const W = () => innerWidth, H = () => innerHeight;
   let started = false, held = false, tween: gsap.core.Tween | null = null, stopHum = (_fade?: number) => {}, tl: gsap.core.Timeline | null = null;
-  const lobbyEls = gsap.utils.toArray<HTMLElement>(LOBBY);
 
   // --- reduced motion: a still title card instead of the sequence ---
   if (reduced()) {
     btn.hidden = true; q('.hint').hidden = true; skip.hidden = true;
     const still = q('.still'); still.style.display = 'grid'; still.style.justifyItems = 'center';
-    q<HTMLButtonElement>('[data-enter]').addEventListener('click', () => { gsap.set(lobbyEls, { clearProps: 'all' }); finish(el); }, { once: true });
+    q<HTMLButtonElement>('[data-enter]').addEventListener('click', finish, { once: true });
     q<HTMLButtonElement>('[data-enter]').focus({ preventScroll: true });
     return;
   }
@@ -93,15 +90,13 @@ function run(el: HTMLElement) {
 
   skip.addEventListener('click', () => {
     started = true; tween?.kill(); stopHum(); tl?.kill();
-    gsap.set(lobbyEls, { opacity: 0 });
-    gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => { finish(el); lobbyIn(); } });
+    gsap.to(el, { opacity: 0, duration: 0.3, onComplete: finish });
   });
 
   function go() {
     if (started) return;
     started = true; stopHum(0.15); // hold complete: the sound hands over to the boom
-    gsap.set(lobbyEls, { opacity: 0 });
-    tl = gsap.timeline({ onComplete: () => { finish(el); gsap.set(lobbyEls, { clearProps: 'all' }); } });
+    tl = gsap.timeline({ onComplete: finish });
     tl.timeScale(INTRO_SPEED); // the whole Intro runs at this speed (0.5 = about 10 seconds)
 
     // 1 · ripples
@@ -123,17 +118,13 @@ function run(el: HTMLElement) {
       .fromTo(logo, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(2)' }, 1.45)
       .to(bar, { scaleX: 1, duration: 0.55, ease: 'power1.inOut' }, 1.5);
 
-    // 3 · auto login, then the Lobby pops in (no desktop, no arrows, no wave)
+    // 3 · auto login, then on to the Lobby, whose pieces pop in there
     tl.to(logo, { opacity: 0, duration: 0.15 }, 2.05)
       .fromTo(login, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.2, ease: 'back.out(2)' }, 2.05)
       .to(login, { opacity: 0, duration: 0.15 }, 2.4)
       .call(() => sfx.swish(), [], 2.45)
       .to(skip, { autoAlpha: 0, duration: 0.1 }, 2.4) // gone before the Lobby bar (theme switch under it) pops in
-      .to(boot, { opacity: 0, duration: 0.2 }, 2.5)
-      .to(el, { backgroundColor: 'transparent', duration: 0.01 }, 2.55)
-      .fromTo('svg.floor', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 2.6);
-    tl.add(() => lobbyIn(), 2.55).to(el, { opacity: 0, duration: 0.2 }, 3.1);
-    tl.add(() => {}, 3.3);
+      .to(boot, { opacity: 0, duration: 0.2 }, 2.5);
     (window as unknown as { __introTl?: gsap.core.Timeline }).__introTl = tl; // handy for stepping through it in the console
   }
 }
@@ -141,6 +132,5 @@ function run(el: HTMLElement) {
 document.addEventListener('astro:page-load', () => {
   const el = document.getElementById('intro');
   if (el && root.dataset.intro === 'on') run(el);
-  else if (document.querySelector('.lobby')) lobbyIn(0.05);
 });
 

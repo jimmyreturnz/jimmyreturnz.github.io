@@ -11,7 +11,7 @@ Recruiters and the osu!/TETR.IO community, equally. Identity: **Data Scientist &
 - SEO and AI search: Open Graph, JSON-LD `Person`, `/llms.txt`, `/robots.txt`, `/sitemap.xml`. Set `SITE_URL` at build time for canonical links and the sitemap. `assets/og.png` is a stand-in until the brand pass.
 
 ## Flow
-1. **Intro**: game-like, first visit only (remembered in localStorage). **Skip** is a focusable button from the very first frame (Esc also skips). At most **4 s** (adjustable later). It ends *as* the Lobby, not before it.
+1. **Intro**: game-like, at `/` on every visit, then on to the Lobby at `/lobby/` (owner, 2026-11-23; was first visit only). **Skip** is a focusable button from the very first frame (Esc also skips). At most **4 s** (adjustable later). It ends *as* the Lobby, not before it.
 2. **Lobby**: role headline ("Data Scientist & Developer"), avatar, short info, player card, status chips (open to, location, study), a **contact row** (email, GitHub, LinkedIn). **Enter** is the one main button, beside "Say hi", on the first screen (panel review 2026-11-22: one door, no separate "Projects" link).
 3. **Warp**: under **0.8 s**, max 3 flashes per second. *(animation + sound TBD)*
 - Links straight to a section (e.g. `/#projects`, used on CV and LinkedIn) skip the Intro, Lobby and Warp.

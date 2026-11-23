@@ -1,18 +1,11 @@
 ---
 // The Intro (docs/FEATURES.md, design-mocks/intro-storyboard.html): hold the power button → ripples → boot with a
-// glitch → the Lobby pops in. Shown once per browser; `/?intro=1` replays it.
+// glitch → on to the Lobby (/lobby/). Plays on every visit to /; Base.astro switches it on before the first paint.
 import Vh from './Vh.astro';
 import { profile } from '../data/site';
 import rawStats from '../data/stats.json';
 const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
 ---
-<script is:inline>
-  // decide before first paint whether the Intro covers the Lobby
-  try {
-    if (location.search.includes('intro=1') || localStorage.getItem('jr.intro') !== 'done') document.documentElement.dataset.intro = 'on';
-  } catch (e) { document.documentElement.dataset.intro = 'on'; }
-</script>
-
 <div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Intro">
   <div class="layer power" data-l="power">
     <button class="pbtn" type="button" aria-label="Power on. Hold the button, or press Space or Enter.">
@@ -85,8 +78,6 @@ const avatar = (rawStats as { osu?: { avatar?: string | null } }).osu?.avatar;
 
   .intro .w1{left:12%;top:24%}.intro .w2{right:12%;top:34%}
   .intro .skip{position:absolute;right:16px;top:16px;z-index:5;border:2px solid #ffd0e4;background:none;color:#ffd0e4;border-radius:99px;padding:6px 14px;font:700 12px var(--hud);cursor:pointer}
-  /* while the Intro runs the Lobby waits underneath; the script pops each piece in at the end */
-  html[data-intro="on"] .lobby .bar,html[data-intro="on"] .lobby .sky .h1,html[data-intro="on"] .lobby .sky .h2,html[data-intro="on"] .lobby .sky .s1,html[data-intro="on"] .lobby .sky .s2,html[data-intro="on"] .lobby .bubble,html[data-intro="on"] .lobby .id,html[data-intro="on"] .lobby .role,html[data-intro="on"] .lobby .about,html[data-intro="on"] .lobby .facts,html[data-intro="on"] .lobby .ctas,html[data-intro="on"] .lobby .socials,html[data-intro="on"] .lobby .player,html[data-intro="on"] .lobby .enter{opacity:0}
 </style>
 
 <script>
