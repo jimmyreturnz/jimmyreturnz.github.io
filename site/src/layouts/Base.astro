@@ -53,8 +53,9 @@ const person = {
     <script is:inline>
       try {
         const r = document.documentElement;
+        r.dataset.motion = 'full'; // default even if storage throws below
         if (localStorage.getItem('jr.theme') === 'dark') r.dataset.theme = 'dark';
-        if (localStorage.getItem('jr.motion') === 'full' || location.search.includes('motion=full')) r.dataset.motion = 'full';
+        r.dataset.motion = (localStorage.getItem('jr.motion') === 'system' && !location.search.includes('motion=full')) || location.search.includes('motion=system') ? 'system' : 'full';
       } catch {}
     </script>
     <!-- client-side page changes: pages animate into each other and the header/BGM persists -->
