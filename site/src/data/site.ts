@@ -53,7 +53,7 @@ export type Project = {
 };
 
 export const projects: Project[] = [
-  { title: 'Shipment Tracking', pinned: true, tags: ['data', 'work'], cover: 'sky', icon: 'vh-container',
+  { title: 'Shipment Tracking', pinned: true, tags: ['data', 'work'], cover: 'sky', icon: 'vh-ship',
     summary: 'Tracks inbound sea containers, predicts which will arrive late from carrier plans, vessel positions and weather, and alerts the team early.',
     outcome: { value: '−35%', text: 'chance of a line stop from late parts, and 15% lower airfreight cost' },
     stack: 'Python · pandas · web scraping · Power Automate', role: 'Data Scientist intern, BMW Group', link: null, note: 'code private' },
