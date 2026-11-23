@@ -15,10 +15,10 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
   <Showcase id="shoutouts" title="Shoutouts" lead="Friends and people I look up to." motif="vh-sparkle" tint="butter">
     <div class="card pad shout">
       {shoutouts.map((g) => (
-        <section>
+        <section style={`--t:var(--${g.tint})`}>
           <h3>{g.group}</h3>
           <ul class="names">
-            {g.people.map((p) => <li>{p.link ? <a class="chip" href={p.link} target="_blank" rel="noopener noreferrer">{p.name}</a> : <span class="chip">{p.name}</span>}</li>)}
+            {g.people.map((p) => <li style={p.tint ? `--t:${p.tint}` : undefined}>{p.link ? <a class="chip" href={p.link} target="_blank" rel="noopener noreferrer">{p.name}</a> : <span class="chip">{p.name}</span>}</li>)}
           </ul>
           {g.note && <p class="note">{g.note}</p>}
         </section>
@@ -196,9 +196,9 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
   .shout{display:grid;gap:20px}
   .shout h3{margin:0 0 10px;font:16px var(--display)}
   .names{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
-  .names .chip{min-height:36px;padding-inline:14px;font-size:14px}
-  .names a.chip{text-decoration:none;color:var(--ink)}
-  .names a.chip:hover,.names a.chip:focus-visible{background:var(--ink);color:var(--bg)}
+  .names .chip{min-height:36px;padding-inline:14px;font-size:14px;background:var(--t);color:var(--on-pastel);border-color:var(--on-pastel)}
+  .names a.chip{text-decoration:none;transition:transform .15s,box-shadow .15s}
+  .names a.chip:hover,.names a.chip:focus-visible{transform:translateY(-2px);box-shadow:0 3px 0 var(--on-pastel)}
   .shout .note{margin:10px 0 0;color:var(--muted)}
   .thanks{display:flex;align-items:center;gap:10px;margin:4px 0 0;padding-top:16px;border-top:2px dashed color-mix(in srgb,var(--ink) 25%,transparent);font-weight:700}
   .thanks :global(.vh){width:26px;flex:none;color:var(--pink)}
