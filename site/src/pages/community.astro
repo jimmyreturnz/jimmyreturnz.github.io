@@ -13,11 +13,18 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
   </header>
 
   <Showcase id="shoutouts" title="Shoutouts" lead="Friends and people I look up to." motif="vh-sparkle" tint="butter">
-    {shoutouts.length ? (
-      <div class="grid3">{shoutouts.map((s) => <div class="card pad"><b>{s.name}</b>{s.quote && <p>“{s.quote}”</p>}</div>)}</div>
-    ) : (
-      <div class="card pad empty"><Vh name="vh-heart-outline" /><p>No shoutouts yet.</p></div>
-    )}
+    <div class="card pad shout">
+      {shoutouts.map((g) => (
+        <section>
+          <h3>{g.group}</h3>
+          <ul class="names">
+            {g.people.map((p) => <li>{p.link ? <a class="chip" href={p.link} target="_blank" rel="noopener noreferrer">{p.name}</a> : <span class="chip">{p.name}</span>}</li>)}
+          </ul>
+          {g.note && <p class="note">{g.note}</p>}
+        </section>
+      ))}
+      <p class="thanks"><Vh name="vh-heart" />Those people have been an important part of my life, thanks for always being my friend!</p>
+    </div>
   </Showcase>
 
   {api && sitekey && (
@@ -186,6 +193,15 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
 </script>
 
 <style>
+  .shout{display:grid;gap:20px}
+  .shout h3{margin:0 0 10px;font:16px var(--display)}
+  .names{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+  .names .chip{min-height:36px;padding-inline:14px;font-size:14px}
+  .names a.chip{text-decoration:none;color:var(--ink)}
+  .names a.chip:hover,.names a.chip:focus-visible{background:var(--ink);color:var(--bg)}
+  .shout .note{margin:10px 0 0;color:var(--muted)}
+  .thanks{display:flex;align-items:center;gap:10px;margin:4px 0 0;padding-top:16px;border-top:2px dashed color-mix(in srgb,var(--ink) 25%,transparent);font-weight:700}
+  .thanks :global(.vh){width:26px;flex:none;color:var(--pink)}
   .chat{display:flex;flex-direction:column;height:min(560px,72vh);padding:0;overflow:hidden}
   .chat-top{padding:12px 18px;border-bottom:2px solid color-mix(in srgb,var(--ink) 15%,transparent)}
   .chat-top b{font:15px var(--display)} .chat-top b span{color:var(--accent)}

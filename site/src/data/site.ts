@@ -157,4 +157,16 @@ export const timeline: Moment[] = [
   { what: 'Data Scientist (Internship)', short: 'BMW Group', where: 'BMW Group · Rayong, Thailand · Production team of BMW Parts Manufacturing', from: '2026-06', to: null, lane: 2 },
 ];
 
-export const shoutouts: { name: string; quote: string | null; link: string | null }[] = [];
+// Shoutouts (owner's list, 2026-11-23): names exactly as the owner typed them, each group sorted A–Z ignoring case.
+type Person = { name: string; link: string | null };
+const az = (list: Person[]) => list.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base', numeric: true }));
+const osu = (name: string): Person => ({ name, link: `https://osu.ppy.sh/users/${encodeURIComponent(name)}` });
+// TETR.IO profile URLs use the lowercase username; `id` covers names typed differently from the account (checked 2026-11-23)
+const tetrio = (name: string, id = name.toLowerCase()): Person => ({ name, link: `https://ch.tetr.io/u/${encodeURIComponent(id)}` });
+export const shoutouts: { group: string; people: Person[]; note?: string }[] = [
+  { group: 'My mentors at BMW Parts Manufacturing', people: [{ name: 'K. Surachai', link: null }, { name: 'K. Nerannit', link: null }],
+    note: 'They always helped and supported me during my 6-month internship, and I learned a lot from them.' },
+  { group: 'Friends', people: az(['Penumbra (SGR)', 'SakuraSK', 'Deadman033', 'U2', 'JameZK', 'Mayo', 'Acetyline', 'uoioza.123', 'Malika'].map((name) => ({ name, link: null }))) },
+  { group: 'osu!', people: az([...['riunosk', 'HowToPlayLN', 'Ph0eNiiXZ', 'niboshii', 'Edge2q', 'shiffon2q', 'nisio', 'marusuke75', 'KGYMN2q', 'maruaki101', 'suthepzaza', 'KenZ', 'LostCool', 'haru', 'banan'].map(osu), { name: 'Raytoly', link: null }]) },
+  { group: 'TETR.IO', people: az([...['Nakamura', 'Mickeyzch', 'Realohmkung', 'Noelthewitch', 'Xylizca', '13asuu', 'efu', 'Yuya_', 'Takaboutfruit', 'Junseokyee', 'xx_rufisback_xx', 'Opico_123_JP'].map((n) => tetrio(n)), tetrio('Xen1al', 'xenial'), tetrio('Khetsophon', 'khetsopon')]) },
+];
