@@ -93,7 +93,7 @@ p{text-wrap:pretty}
 [data-tilt]{position:relative;transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .6s cubic-bezier(.2,.8,.2,1)}
 [data-tilt].tilting{transition:transform .1s linear}
 [data-tilt]::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .5s;
-  background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgb(255 255 255/.16),transparent 55%)}
+  background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgb(31 30 51/.18),transparent 60%)}
 [data-tilt].tilting::after{opacity:1}
 @media (prefers-reduced-motion:reduce){:root:not([data-motion="full"]) *,:root:not([data-motion="full"]) *::before,:root:not([data-motion="full"]) *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
