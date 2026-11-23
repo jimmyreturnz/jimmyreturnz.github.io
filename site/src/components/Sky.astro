@@ -4,9 +4,14 @@
 import Vh from './Vh.astro';
 interface Props { fixed?: boolean }
 const { fixed = false } = Astro.props;
+// snow: small flakes drifting down; negative delays so the sky is already full on load
+const r = (a: number, b: number) => a + Math.random() * (b - a);
+const flakes = Array.from({ length: 36 }, () =>
+  `left:${r(0, 100).toFixed(1)}%;--s:${r(2, 5).toFixed(1)}px;--dx:${r(-40, 40).toFixed(0)}px;--o:${r(0.5, 0.95).toFixed(2)};animation-duration:${r(16, 32).toFixed(1)}s;animation-delay:-${r(0, 32).toFixed(1)}s`);
 ---
 <div class:list={['sky', { fixed }]} aria-hidden="true">
   <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+  {flakes.map((style) => <i class="flake" style={style}></i>)}
   <Vh name="vh-rings" class="r1" />
   <Vh name="vh-rings" class="r2" />
   <Vh name="vh-heart" class="h1" /><Vh name="vh-heart-outline" class="h2" /><Vh name="vh-sparkle" class="s1" /><Vh name="vh-sparkle" class="s2" />
@@ -39,5 +44,15 @@ const { fixed = false } = Astro.props;
   .sky :global(.r2){animation:ring-pulse 7.5s ease-in-out -3s infinite}
   @keyframes ring-pulse{0%,100%{transform:scale(1);opacity:.45}50%{transform:scale(1.08);opacity:.7}}
   :global(:root[data-theme="dark"]) .sky::before{opacity:.08}
-  @media (max-width:520px){ .sky :global(.h1){display:none} }
+  /* snow: transform-only fall + sway; container units so it spans the Lobby box or the viewport */
+  .sky{container-type:size}
+  .flake{position:absolute;top:-12px;width:var(--s);height:var(--s);border-radius:50%;background:#fff;opacity:var(--o);
+         box-shadow:0 0 6px 1px color-mix(in srgb,var(--lav) 80%,transparent);animation:snow linear infinite;will-change:transform}
+  @keyframes snow{
+    0%{transform:translate3d(0,0,0)}
+    50%{transform:translate3d(var(--dx),calc(50cqh + 12px),0)}
+    100%{transform:translate3d(0,calc(100cqh + 24px),0)}
+  }
+  @media (max-width:520px){ .sky :global(.h1){display:none} .flake:nth-of-type(n+20){display:none} }
+  @media (prefers-reduced-motion:reduce){ :global(:root:not([data-motion="full"])) .flake{display:none} }
 </style>
