@@ -10,7 +10,7 @@ export const profile = {
   bio: [
     'I build data and ML tools for the production team at BMW Group in Rayong, such as a shipment tracker that cut airfreight cost by 15% and an OCR system for the line.',
     'You might also know me from osu!taiko, osu!mania or TETR.IO :D',
-    'I’m also a big fan of hardcore EDM, J-CORE, Speedcore, artcore, classical pieces, and Maplestory OST!',
+    'I’m also a big fan of hardcore EDM, J-CORE, Speedcore, artcore, classical pieces, and MapleStory OST!',
   ],
   study: 'Mahidol University, graduating 2027',
   location: 'Bangkok, Thailand' as string | null,
