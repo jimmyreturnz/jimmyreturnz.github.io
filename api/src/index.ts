@@ -8,9 +8,10 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { bearerAuth } from 'hono/bearer-auth';
+import { bodyLimit } from 'hono/body-limit';
 import { checkMessage, checkLink, PAGE_SIZE } from './rules';
 
-type Env = { DB: D1Database; ALLOWED_ORIGINS: string; TURNSTILE_SECRET: string; VISITOR_SECRET: string; ADMIN_TOKEN: string };
+type Env = { DB: D1Database; RL: RateLimit; ALLOWED_ORIGINS: string; TURNSTILE_SECRET: string; VISITOR_SECRET: string; ADMIN_TOKEN: string };
 const app = new Hono<{ Bindings: Env }>();
 
 app.use('*', (c, next) => cors({ origin: c.env.ALLOWED_ORIGINS.split(',').map((s) => s.trim()), allowMethods: ['GET', 'POST', 'PUT', 'DELETE'], allowHeaders: ['Content-Type', 'Authorization'], maxAge: 86400 })(c, next));
@@ -24,8 +25,19 @@ const hmac = async (key: string, data: string) => {
  *  reversed or linked across days. The raw IP is never stored. */
 const visitorId = async (secret: string, ip: string) => hmac(await hmac(secret, new Date().toISOString().slice(0, 10)), ip);
 
+// flood guard for every route, keyed on the daily visitor fingerprint (never the raw IP); limits in wrangler.toml [[ratelimits]].
+// ponytail: per-visitor only; a botnet spreading over many IPs needs the Cloudflare WAF rate-limiting rule (api/README.md)
+app.use('*', async (c, next) => {
+  if (c.req.method === 'OPTIONS') return next();
+  const { success } = await c.env.RL.limit({ key: await visitorId(c.env.VISITOR_SECRET, c.req.header('CF-Connecting-IP') ?? '0.0.0.0') });
+  if (!success) return c.json({ error: 'Too many requests. Please slow down a little.' }, 429);
+  await next();
+});
+// real requests are a few hundred bytes; refuse big bodies before parsing them
+app.use('*', bodyLimit({ maxSize: 8 * 1024, onError: (c) => c.json({ error: 'That request is too large.' }, 413) }));
+
 const sha256 = async (s: string) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
-const COOLDOWN_MS = 60_000;
+const COOLDOWN_MS = 60_000, EDIT_COOLDOWN_MS = 10_000;
 
 const turnstileOk = async (secret: string, token: unknown, ip: string) => {
   if (typeof token !== 'string' || !token) return false;
@@ -72,11 +84,17 @@ app.put('/messages/:id', async (c) => {
   const msg = checkMessage({ name: row.name, message: input.message });
   if (!msg.ok) return c.json({ error: msg.error }, 400);
   const at = Date.now();
-  await c.env.DB.prepare('UPDATE messages SET body = ?, edited_at = ? WHERE id = ?').bind(msg.body, at, id).run();
+  // one edit every 10 s per message, so a held edit key can't be used to churn the board
+  const r = await c.env.DB.prepare('UPDATE messages SET body = ?, edited_at = ? WHERE id = ? AND (edited_at IS NULL OR edited_at < ?)').bind(msg.body, at, id, at - EDIT_COOLDOWN_MS).run();
+  if (!r.meta.changes) return c.json({ error: 'Please wait a few seconds before editing again.', retryAfter: EDIT_COOLDOWN_MS / 1000 }, 429);
   return c.json({ id, body: msg.body, edited_at: at });
 });
 
-app.use('/admin/*', bearerAuth({ verifyToken: async (t, c) => { const want = (c.env as Env).ADMIN_TOKEN; return !!want && t === want; } }));
+// a short or missing ADMIN_TOKEN locks the inbox instead of leaving it guessable; compared in constant time
+app.use('/admin/*', bearerAuth({ verifyToken: async (t, c) => {
+  const want = enc.encode((c.env as Env).ADMIN_TOKEN ?? ''), got = enc.encode(t);
+  return want.length >= 32 && got.length === want.length && crypto.subtle.timingSafeEqual(got, want);
+} }));
 
 // the inbox: the latest 100, uncached
 app.get('/admin/messages', async (c) => {

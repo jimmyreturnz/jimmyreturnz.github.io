@@ -1,0 +1,15 @@
+# Cloudflare Pages response headers (assets/ is the publicDir, so this lands at the site root).
+# CSP sources: Turnstile (script + frame), SoundCloud player (frame), Cloudflare Web Analytics (script + beacon),
+# the Message Board API on workers.dev (connect). Moving the API to its own domain? Add it to connect-src.
+# 'unsafe-inline' scripts: Base.astro's theme/intro checks run inline before paint. Visitor text only ever goes in via textContent.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self' https://*.workers.dev https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com https://w.soundcloud.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+
+/community/admin/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store
