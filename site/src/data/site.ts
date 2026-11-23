@@ -73,7 +73,7 @@ export const projects: Project[] = [
 export const skills: { group: string; items: string[] }[] = [
   { group: 'Data & ML', items: ['Python', 'pandas', 'Machine learning (classical)', 'SQL', 'Statistics', 'Exploratory data analysis', 'OCR (fine-tuned PaddleOCR)', 'Web scraping'] },
   { group: 'Apps & tools', items: ['Packaging & releases (PyInstaller)', 'Automation (Python + SMTP)', 'Git / GitHub', 'HTML / CSS'] },
-  { group: 'Learning', items: ['Deep learning (PyTorch)'] },
+  { group: 'Learning', items: ['Deep learning (PyTorch)', 'LLM APIs & prompting', 'RAG (retrieval-augmented generation)', 'AI agents & tool use', 'LLM evaluation', 'Model deployment & MLOps'] },
 ];
 
 /** osu!lazer mania: a note's fall time to the hit line is MANIA_MAX_TIME_RANGE / scroll speed (ms). */
