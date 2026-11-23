@@ -54,16 +54,16 @@ export type Project = {
 
 export const projects: Project[] = [
   { title: 'Shipment Tracking', pinned: true, tags: ['data', 'work'], cover: 'sky', icon: 'vh-ship',
-    summary: 'Tracks inbound sea containers, predicts which will arrive late from carrier plans, vessel positions and weather, and alerts the team early.',
+    summary: 'Tracks shipments and predicts their ETA with an automated pipeline that sends a daily email notification to the logistics team.',
     outcome: { value: '−35%', text: 'chance of a line stop from late parts, and 15% lower airfreight cost' },
     stack: 'Python · pandas · web scraping · Power Automate', role: 'Data Scientist intern, BMW Group', link: null, note: 'code private' },
   { title: 'Production-scale OCR', pinned: true, tags: ['data', 'work'], cover: 'mint', icon: 'vh-camera',
-    summary: 'Reads hand-stamped codes on cast parts from the line camera, checks them against the PLC in seconds, and rejects any code it isn’t sure of.',
+    summary: 'Fine-tuned an OCR model (PaddleOCR PP-OCRv6) for internally developed software to verify the completeness of hand-stamped transmission indices.',
     outcome: { value: '≥ ฿500k', text: 'saved compared with buying a dedicated vision system' },
-    stack: 'Python · PaddleOCR · OPC UA / PLC · offline installer', role: 'Data Scientist intern, BMW Group', link: null, note: 'code private' },
+    stack: 'Python · PaddleOCR (PP-OCRv6) · OPC UA / PLC', role: 'Data Scientist intern, BMW Group', link: null, note: 'code private' },
   // download and star counts as of 2026-11-22 (GitHub releases)
   { title: 'KatsuDon Editor', pinned: true, tags: ['dev', 'open source'], cover: 'butter', icon: 'vh-chevrons', logo: '/projects/katsudon-logo.svg',
-    summary: 'A desktop osu!taiko editor that arranges notes into shapes for gimmick charts, so mappers don’t place every note by hand.',
+    summary: 'An external osu!taiko editor that arranges notes into shapes and handles complex speed alterations, making gimmick map creation a more comfortable experience for mappers.',
     outcome: { value: '258', text: 'downloads and 12 stars on GitHub' },
     stack: 'Python · PySide6 · PyInstaller', role: 'Solo',
     link: { label: 'GitHub ↗', href: 'https://github.com/jimmyreturnz/KatsuDonEditor' } },
