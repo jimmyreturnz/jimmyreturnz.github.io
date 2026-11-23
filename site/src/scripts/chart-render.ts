@@ -28,6 +28,10 @@ function digits(g: CanvasRenderingContext2D, dir: string, n: number, cx: number,
 /** How many of the sorted times are at or before t, and a short "pop" (1 -> 1.2 -> 1) after the latest one. */
 function comboAt(times: number[], t: number) { const n = lower2(times, t + 0.001); const since = n ? t - times[n - 1]! : 1e9; return { n, pop: 1 + 0.2 * Math.max(0, 1 - since / 110) }; }
 const COMBO_Y = 130; // skin.ini ComboPosition for 4K and 7K
+// every skin image a chart needs, decoded before its first frame, so it never draws without the owner's skin
+const TAIKO_SKIN = ['bar-left', 'bar-right', 'barline', 'big', 'big-overlay', 'circle', 'circle-overlay', 'drum-inner', 'drum-outer', 'ring', 'roll-end', 'roll-middle', 'scorepoint'].map((n) => `/skin/taiko/${n}.png`);
+const files = (o: unknown): string[] => (typeof o === 'string' ? (o.endsWith('.png') ? [o] : []) : o && typeof o === 'object' ? Object.values(o).flatMap(files) : []);
+const preload = (srcs: string[]) => Promise.all(srcs.map((src) => pic(src).decode().catch(() => {})));
 const skinReady = fetch('/skin/mania.json').then((r) => r.json()).then((j) => { skin = j; }).catch(() => {});
 
 interface Data { sm: number; mode: 'taiko' | 'mania'; keys: number; bars: number[][]; knots: number[][]; notes: number[][] }
@@ -209,10 +213,9 @@ function setup(root: HTMLElement) {
 
   const start = async () => {
     if (data || cv) return;
-    try { data = (await (await fetch(`/charts/${root.dataset.chart}.json`)).json()) as Data; await skinReady; buildEvents(); } catch { return; }
+    try { data = (await (await fetch(`/charts/${root.dataset.chart}.json`)).json()) as Data; await skinReady; await preload(data.mode === 'taiko' ? TAIKO_SKIN : files(skin?.[`k${data.keys as 4 | 7}`]).map((f) => `/skin/mania/${f}`)); buildEvents(); } catch { return; }
     comboT = (data.mode === 'taiko' ? data.notes.filter((n) => n[1]! <= 1).map((n) => n[0]!) : data.notes.flatMap((n) => (n[2]! > 0 ? [n[0]!, n[2]!] : [n[0]!]))).sort((a, b) => a - b);
     cv = document.createElement('canvas'); cv.className = 'notes'; cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
-    stage.querySelectorAll('.taiko,.mania').forEach((e) => e.remove());
     stage.prepend(cv); resize(); new ResizeObserver(resize).observe(stage);
   };
   // autoplay (like KatsuDon): hands alternate per circle starting on the right, restarting after a 4-beat gap; big notes use both hands;
@@ -252,9 +255,10 @@ function setup(root: HTMLElement) {
   });
   // hit sounds and combo digits (~190 KB for taiko) only once the song plays: the combo isn't shown before that
   root.querySelector('audio')?.addEventListener('play', () => { void loadHits(); if (data) for (let c = 0; c < 10; c++) pic(`/skin/${data.mode}/combo-${c}.png`); });
-  new IntersectionObserver((es, o) => { if (es.some((x) => x.isIntersecting)) { o.disconnect(); void start(); } }).observe(root);
+  // start loading a screen ahead, so the skin is decoded by the time the player scrolls into view
+  new IntersectionObserver((es, o) => { if (es.some((x) => x.isIntersecting)) { o.disconnect(); void start(); } }, { rootMargin: '100% 0px' }).observe(root);
   // stacked panels stay rendered but hidden: re-measure when a panel is shown
-  new MutationObserver(resize).observe(root, { attributes: true, attributeFilter: ['hidden'] });
+  new MutationObserver(() => { if (!root.hidden) void start(); resize(); }).observe(root, { attributes: true, attributeFilter: ['hidden'] }); // a hidden panel (7K) starts loading when shown
 }
 
 document.addEventListener('astro:page-load', () => document.querySelectorAll<HTMLElement>('[data-chart]').forEach(setup));
