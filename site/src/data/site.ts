@@ -169,5 +169,5 @@ export const shoutouts: { group: string; tint: 'sky' | 'pink' | 'lav'; people: P
     note: 'They always helped and supported me during my 6-month internship, and I learned a lot from them.' },
   { group: 'Friends', tint: 'sky', people: az([{ name: 'Penumbra (SGR)', link: null, tint: '#ff7eb6' }, ...['SakuraSK', 'Suthep', 'Deadman033', 'U2', 'JameZK', 'Mayo', 'Acetyline', 'uoioza.123', 'Malika'].map((name) => ({ name, link: null }))]) },
   { group: 'osu!', tint: 'pink', people: az([...['riunosk', 'HowToPlayLN', 'Ph0eNiiXZ', 'niboshii', 'Edge2q', 'shiffon2q', 'nisio', 'marusuke75', 'KGYMN2q', 'maruaki101', 'suthepzaza', 'KenZ', 'LostCool', 'haru', 'banan'].map(osu), { name: 'Raytoly', link: null }]) },
-  { group: 'TETR.IO', tint: 'lav', people: az([...['Nakamura', 'Mickeyzch', 'Realohmkung', 'Noelthewitch', 'Xylizca', '13asuu', 'efu', 'Yuya_', 'Takaboutfruit', 'Junseokyee', 'xx_rufisback_xx', 'Opico_123_JP'].map((n) => tetrio(n)), tetrio('Xen1al', 'xenial'), tetrio('Khetsophon', 'khetsopon')]) },
+  { group: 'TETR.IO', tint: 'lav', people: az([...['Nakamura', 'Mickeyzch', 'Realohmkung', 'Noelthewitch', 'Xylizca', '13asuu', 'efu', 'Yuya_', 'Takaboutfruit', 'Junseokyee', 'xx_rufisback_xx', 'Opico_123_JP'].map((n) => tetrio(n)), tetrio('Xen1al', 'xen1el'), tetrio('Khetsophon', 'khetsopon')]) },
 ];

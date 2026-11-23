@@ -98,6 +98,7 @@ p{text-wrap:pretty}
 @media (prefers-reduced-motion:reduce){:root:not([data-motion="full"]) *,:root:not([data-motion="full"]) *::before,:root:not([data-motion="full"]) *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 /* odometer digits (scripts/roll.ts) */
+[data-roll]{white-space:nowrap;font-variant-numeric:tabular-nums} /* a rolling number never wraps: no breaks between digit columns */
 .rc{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top}
 .rc-i{display:block}
 .rc-i>span{display:block;height:1.15em}
