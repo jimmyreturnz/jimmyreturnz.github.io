@@ -16,7 +16,7 @@ const tags = ['all', ...new Set(projects.flatMap((p) => p.tags))];
   <p class="sr-only" aria-live="polite" data-count></p>
   <div class="projects">
     {projects.map((p) => (
-      <article class="card proj" data-tags={p.tags.join(',')}>
+      <article class="card proj" data-tilt data-tags={p.tags.join(',')}>
         <!-- the result is the first thing to read on each card -->
         <div class={`cover bg-${p.cover}`}>
           {p.pinned && <span class="pin">★ PINNED</span>}

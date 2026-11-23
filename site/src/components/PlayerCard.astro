@@ -55,7 +55,7 @@ const tabs: { id: string; label: string; icon: 'github' | 'osu-taiko' | 'osu-man
   ] },
 ];
 ---
-<section class="card player" aria-labelledby="pc-title" data-tabs>
+<section class="card player" data-tilt aria-labelledby="pc-title" data-tabs>
   <header><strong id="pc-title">Player Card</strong></header>
   <div class="tabs" role="tablist" aria-label="Platforms">
     {tabs.map((t, i) => (

@@ -2,6 +2,10 @@
 import Page from '../layouts/Page.astro';
 import Ph from '../components/Ph.astro';
 import { stats, fmt, rank } from '../lib/stats';
+import { hasAsset } from '../lib/assets';
+// playlist: tetrio-1.mp4, tetrio-2.mp4, ... in order (site/scripts/encode-video.sh makes them)
+const clips: string[] = [];
+while (hasAsset(`video/tetrio-${clips.length + 1}.mp4`)) clips.push(`/video/tetrio-${clips.length + 1}.mp4`);
 const { tetrio } = stats;
 ---
 <Page title="TETR.IO" description="TETR.IO stats for Jimmy (jimmyreturnz), including Tetra League rank, TR, level, APM and PPS.">
@@ -10,9 +14,15 @@ const { tetrio } = stats;
     <p>Stacking since 2021.</p>
   </header>
 
-  <!-- gameplay video slot comes back when the owner's clip exists (docs/FEATURES.md) -->
-  <div class="tetrio">
-    <div class="card pad tstats">
+  <!-- gameplay clips play one after another, then round again; each loads only when its turn comes -->
+  <div class:list={['tetrio', { 'has-video': clips.length > 0 }]}>
+    {clips.length > 0 && (
+      <div class="card video" data-tilt>
+        <video data-clips={JSON.stringify(clips)} src={clips[0]} muted playsinline preload="none" poster="/video/tetrio.webp"
+               width="1280" height="720" aria-label="TETR.IO gameplay clips"></video>
+      </div>
+    )}
+    <div class="card pad tstats" data-tilt>
       <div class="tid">
         {tetrio.avatar && <img src={tetrio.avatar} alt="TETR.IO avatar" width="56" height="56" decoding="async" />}
         <div><b>{tetrio.username}</b><small>Tetra League · {tetrio.country === 'TH' ? '🇹🇭 Thailand' : tetrio.country}</small></div>
@@ -33,6 +43,10 @@ const { tetrio } = stats;
 
 <style>
   .tetrio{max-width:620px;margin:24px 0 30px}
+  .tetrio.has-video{max-width:none;display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:start}
+  .video{overflow:hidden;background:var(--navy);padding:0}
+  .video video{display:block;width:100%;height:auto}
+  @media (max-width:900px){ .tetrio.has-video{grid-template-columns:1fr} }
   .tstats{display:flex;flex-direction:column;gap:12px}
   .tid{display:flex;align-items:center;gap:12px}
   .tid img{width:56px;height:56px;border-radius:14px;border:2px solid var(--ink);object-fit:cover}
@@ -47,7 +61,17 @@ const { tetrio } = stats;
   // The stat numbers roll up odometer-style when the page opens (no drop-in).
   import { gsap } from 'gsap';
   import { rollIn } from '../scripts/roll';
+  import { reduced } from '../scripts/motion';
   document.addEventListener('astro:page-load', () => {
+    // gameplay clips: muted, play only while on screen, next clip when one ends; poster only for reduced motion
+    const v = document.querySelector<HTMLVideoElement>('video[data-clips]');
+    if (v && !reduced()) {
+      const clips: string[] = JSON.parse(v.dataset.clips!);
+      let i = 0;
+      v.loop = clips.length === 1;
+      v.addEventListener('ended', () => { i = (i + 1) % clips.length; v.src = clips[i]; v.play().catch(() => {}); });
+      new IntersectionObserver(([e]) => { e.isIntersecting ? v.play().catch(() => {}) : v.pause(); }, { threshold: 0.25 }).observe(v);
+    }
     const g = document.querySelector<HTMLElement>('[data-drop]');
     if (g) gsap.delayedCall(0.25, () => rollIn(g));
   });

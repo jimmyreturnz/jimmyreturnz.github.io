@@ -11,7 +11,7 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   <div class="bar">
     <a class="wordmark" href="/" title="Back to the Lobby"><Vh name="vh-heart" />jimmyreturnz</a>
     <BgmPill />
-    <button type="button" class="chip menubtn" aria-expanded="false" aria-controls="menu" data-menu-btn><span aria-hidden="true">☰</span> Menu</button>
+    <button type="button" class="chip menubtn" aria-expanded="false" aria-controls="menu" data-menu-btn aria-label="Menu"><span aria-hidden="true">☰</span><span class="ml" aria-hidden="true">Menu</span></button>
     <Settings />
   </div>
   <nav class="sections" aria-label="Portfolio pages">
@@ -46,6 +46,12 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   .sections::-webkit-scrollbar{display:none}
   .sections .chip{flex:0 0 auto;min-width:108px;display:inline-flex;align-items:center;justify-content:center;text-align:center}
   .sections .chip[aria-current="page"]{background:var(--ink);color:var(--bg)}
+  @media (max-width:520px){
+    /* phones: pills size to their label, the row fades at the edges so it reads as scrollable, and snaps per pill */
+    .sections{gap:5px;scroll-snap-type:x proximity;mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent)}
+    .sections .chip{min-width:0;padding-inline:12px;scroll-snap-align:center}
+  }
+  @media (max-width:440px){ .menubtn{width:var(--ctl);padding:0} .menubtn .ml{display:none} }
 
   /* full-screen menu: circle reveal from the button, one marquee row per page, hover tints the screen */
   .menu{position:fixed;inset:0;z-index:50;background:var(--tint,var(--bg));transition:background .35s;display:grid;align-content:center;padding:clamp(16px,4vw,48px);overflow:hidden}
@@ -77,6 +83,9 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
     document.querySelectorAll<HTMLAnchorElement>('[data-nav]').forEach((a) => {
       if (a.dataset.nav === here) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
+    // phones: the pill row scrolls, so bring the current page's pill into view
+    const cur = top.querySelector<HTMLElement>('.sections [aria-current="page"]'), row = cur?.parentElement;
+    if (cur && row && row.scrollWidth > row.clientWidth) row.scrollTo({ left: cur.offsetLeft - (row.clientWidth - cur.offsetWidth) / 2, behavior: 'instant' });
 
     top.classList.toggle('slim', scrollY > 140);
     const cv = top.querySelector<HTMLCanvasElement>('.viz')!;
