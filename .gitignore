@@ -13,3 +13,6 @@ CLAUDE.md
 .wrangler/
 .dev.vars
 node_modules/
+
+# production inbox password (ADMIN_TOKEN), local copy for the owner only
+api/.admin-token

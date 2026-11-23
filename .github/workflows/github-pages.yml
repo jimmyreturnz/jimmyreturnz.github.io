@@ -1,6 +1,6 @@
 # Builds the site and publishes it at https://jimmyreturnz.github.io/ (owner, 2026-11-23: GitHub Pages first, Cloudflare Pages later).
 # Runs on every push to main and once a day so the Stats Cards stay fresh. GitHub Pages ignores assets/_headers (no CSP there)
-# and the Message Board stays hidden until the API exists (no PUBLIC_API_URL).
+# The Message Board talks to the Worker in api/ (deployed with `bun run deploy` there).
 name: GitHub Pages
 on:
   push:
@@ -27,6 +27,9 @@ jobs:
       - run: bun run build
         env:
           SITE_URL: https://jimmyreturnz.github.io
+          # public values (the Turnstile secret and ADMIN_TOKEN live only in the Worker)
+          PUBLIC_API_URL: https://jimmyreturnz-api.jimmyreturnz.workers.dev
+          PUBLIC_TURNSTILE_SITEKEY: 0x4AAAAAAGPFeUoQT9ssSVGV
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/dist
