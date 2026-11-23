@@ -71,9 +71,9 @@ export const projects: Project[] = [
 
 // Only skills the owner has used in real work and can defend in an interview (reviewed 2026-11-22). "Learning" = understood, not yet used for real.
 export const skills: { group: string; items: string[] }[] = [
-  { group: 'Data & ML', items: ['Python', 'pandas', 'Machine learning (classical)', 'Exploratory data analysis', 'OCR (fine-tuned PaddleOCR)', 'Web scraping'] },
+  { group: 'Data & ML', items: ['Python', 'pandas', 'Machine learning (classical)', 'SQL', 'Statistics', 'Exploratory data analysis', 'OCR (fine-tuned PaddleOCR)', 'Web scraping'] },
   { group: 'Apps & tools', items: ['Packaging & releases (PyInstaller)', 'Automation (Python + SMTP)', 'Git / GitHub', 'HTML / CSS'] },
-  { group: 'Learning', items: ['Deep learning (PyTorch)', 'SQL', 'Statistics'] },
+  { group: 'Learning', items: ['Deep learning (PyTorch)'] },
 ];
 
 /** osu!lazer mania: a note's fall time to the hit line is MANIA_MAX_TIME_RANGE / scroll speed (ms). */
