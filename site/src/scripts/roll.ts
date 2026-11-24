@@ -51,7 +51,8 @@ export function watchRolls(root: ParentNode = document): void {
     rollIn(e.target.parentElement!);
   }), { threshold: 0.6 });
   root.querySelectorAll<HTMLElement>('[data-roll]').forEach((el) => {
-    el.dataset.rv = el.textContent ?? '';
+    // keep a value already stored: mid-roll, textContent is the digit columns ("0123456789" per digit), not the number
+    el.dataset.rv ??= el.textContent ?? '';
     if (!el.closest('[role="tabpanel"], [data-keys-panel]')) io.observe(el);
   });
 }

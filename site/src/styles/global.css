@@ -106,6 +106,9 @@ p{text-wrap:pretty}
 
 /* odometer digits (scripts/roll.ts) */
 [data-roll]{white-space:nowrap;font-variant-numeric:tabular-nums} /* a rolling number never wraps: no breaks between digit columns */
+/* Lobby: its pieces stay hidden from the first paint until lobbyIn() (scripts/intro.ts) starts their entrance and adds .in;
+   keep this list in step with LOBBY there. lobby.astro's <noscript> shows them without JavaScript. */
+.lobby:not(.in) :is(.bar,.sky .h1,.sky .h2,.sky .s1,.sky .s2,.bubble,.id,.role,.about,.facts,.ctas,.socials,.player){opacity:0}
 .rc{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top}
 .rc-i{display:block}
 .rc-i>span{display:block;height:1.15em}

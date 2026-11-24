@@ -26,12 +26,15 @@ const HOLD = 1.4;
 export function lobbyIn(delay = 0) {
   document.dispatchEvent(new Event('jr:lobby')); // the BGM starts here
   playOnce(SFX.welcome, { duck: false, wait: false }); // the log-in chime as the Lobby lands (skipped if the browser hasn't allowed sound yet)
-  const els = gsap.utils.toArray<HTMLElement>(LOBBY);
-  if (!els.length) return;
-  if (reduced()) { gsap.set(els, { clearProps: 'all' }); return; }
+  const els = gsap.utils.toArray<HTMLElement>(LOBBY), lobby = document.querySelector<HTMLElement>('.lobby');
+  // global.css keeps these hidden until .lobby gets .in, so the Lobby never shows fully drawn before its entrance
+  const show = () => lobby?.classList.add('in');
+  if (!els.length) return show();
+  if (reduced()) { gsap.set(els, { clearProps: 'all' }); return show(); }
   // the Player Card numbers count up as it arrives (stacked tab panels aren't seen by scroll observers)
   gsap.delayedCall(delay + 0.45, () => { const pc = document.querySelector<HTMLElement>('.lobby .player'); if (pc) rollIn(pc); });
   gsap.fromTo(els, { y: 24, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.6, delay, stagger: 0.06, ease: 'back.out(1.4)', clearProps: root.dataset.intro ? '' : 'all' });
+  show(); // the tween has already set them to their hidden start, so the CSS rule can let go
 }
 
 // on to the Lobby page; a client-side change, so the sound unlocked by the power button carries over
