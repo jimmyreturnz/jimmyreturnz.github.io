@@ -1,6 +1,6 @@
 # Message Board API
 
-Hono on Cloudflare Workers, messages in Cloudflare D1. The Community page reads and posts here; messages go public as soon as they pass the checks. The owner can delete them or attach a profile link at `/community/admin/`.
+Hono on Cloudflare Workers, messages in Cloudflare D1. The Message Board (the Chat panel in the site header) reads and posts here; messages go public as soon as they pass the checks. The owner can delete them or attach a profile link at `/community/admin/`.
 
 ## Local
 

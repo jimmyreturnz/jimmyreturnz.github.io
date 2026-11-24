@@ -3,6 +3,7 @@ import Settings from './Settings.astro';
 import Vh from './Vh.astro';
 import { pages } from '../data/pages';
 import BgmPill from './BgmPill.astro';
+import MessageBoard from './MessageBoard.astro';
 const here = Astro.url.pathname.replace(/\/?$/, '/');
 const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·  ') + '  ·  ';
 ---
@@ -11,6 +12,7 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   <div class="bar">
     <a class="wordmark" href="/lobby/" title="Back to the Lobby"><Vh name="vh-heart" />jimmyreturnz</a>
     <BgmPill />
+    <MessageBoard />
     <button type="button" class="chip menubtn" aria-expanded="false" aria-controls="menu" data-menu-btn aria-label="Menu"><span aria-hidden="true">☰</span><span class="ml" aria-hidden="true">Menu</span></button>
     <Settings />
   </div>
@@ -41,6 +43,7 @@ const row = (label: string) => Array.from({ length: 8 }, () => label).join('  ·
   .top.slim .sections{max-height:0;padding-bottom:0;opacity:0;overflow:hidden}
   .top.slim .bar{padding-block:5px}
   .menubtn{height:var(--ctl);margin-left:auto}
+  :global(.chatbtn) ~ .menubtn{margin-left:0}
   .menubtn + :global(.settings){margin-left:0}
   .sections{display:flex;gap:6px;overflow-x:auto;padding:0 clamp(16px,4vw,40px) 10px;scrollbar-width:none}
   .sections::-webkit-scrollbar{display:none}

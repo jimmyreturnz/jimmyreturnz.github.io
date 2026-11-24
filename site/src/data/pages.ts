@@ -4,5 +4,5 @@ export const pages = [
   { href: '/projects/', label: 'Projects', tint: 'butter' },
   { href: '/rhythm/', label: 'osu!', tint: 'pink' },
   { href: '/tetrio/', label: 'TETR.IO', tint: 'sky' },
-  { href: '/community/', label: 'Community', tint: 'lav' },
+  { href: '/shoutouts/', label: 'Shoutouts', tint: 'lav' },
 ] as const;

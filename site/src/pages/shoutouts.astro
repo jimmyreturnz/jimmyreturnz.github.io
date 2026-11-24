@@ -1,0 +1,44 @@
+---
+import Page from '../layouts/Page.astro';
+import Vh from '../components/Vh.astro';
+import { shoutouts } from '../data/site';
+---
+<Page title="Shoutouts" description="Shoutouts to friends, fellow players and people jimmyreturnz looks up to." jp>
+  <header class="page-hero">
+    <h1>Shoutouts</h1>
+    <p>Friends and people I look up to.</p>
+  </header>
+
+  <div class="card pad shout">
+    {shoutouts.map((g) => (
+      <section style={`--t:var(--${g.tint})`}>
+        <h2><span class="ico"><Vh name="vh-heart" /></span>{g.group}<small class="n" aria-label={`${g.people.length} people`}>{g.people.length}</small></h2>
+        <ul class="names">
+          {g.people.map((p) => <li style={p.tint ? `--t:${p.tint}` : undefined}>{p.link ? <a class="chip" href={p.link} target="_blank" rel="noopener noreferrer"><span>{p.name}</span></a> : <span class="chip"><span>{p.name}</span></span>}</li>)}
+        </ul>
+        {g.note && <p class="note">{g.note}</p>}
+      </section>
+    ))}
+    <p class="thanks"><Vh name="vh-heart" />Those people have been an important part of my life, thanks for always being my friend!</p>
+  </div>
+
+</Page>
+
+<style>
+  .shout{columns:300px;column-gap:16px}
+  .shout section{background:color-mix(in srgb,var(--t) 16%,var(--paper));border:2px solid var(--ink);border-radius:var(--radius);padding:16px;break-inside:avoid;margin-bottom:16px}
+  .shout h2{display:flex;align-items:center;gap:10px;margin:0 0 14px;font:16px var(--display)}
+  .shout h2 .ico{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:50%;background:var(--t);border:2px solid var(--ink);color:var(--on-pastel)}
+  .shout h2 .ico :global(.vh){width:16px}
+  .shout h2 .n{margin-left:auto;font:700 12px var(--hud);color:var(--muted)}
+  .names{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+  .names .chip{position:relative;min-height:44px;padding-inline:16px;font-size:14px;background:var(--t);color:var(--on-pastel);border-color:var(--on-pastel);white-space:normal;text-align:center;overflow-wrap:anywhere}
+  .names .chip > span{display:block;transition:transform .15s}
+  .names a.chip::after{content:"";position:absolute;inset:-5px;border:2px solid var(--accent);border-radius:99px;opacity:0;transition:opacity .15s;pointer-events:none}
+  .names a.chip:hover::after,.names a.chip:focus-visible::after{opacity:1}
+  .names a.chip:hover > span,.names a.chip:focus-visible > span{transform:scale(1.06)}
+  .shout .note{margin:12px 0 0;color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){.names .chip > span,.names a.chip::after{transition:none}.names a.chip:hover > span,.names a.chip:focus-visible > span{transform:none}}
+  .thanks{column-span:all;display:flex;align-items:center;gap:10px;margin:4px 0 0;padding-top:16px;border-top:2px dashed color-mix(in srgb,var(--ink) 25%,transparent);font-weight:700}
+  .thanks :global(.vh){width:26px;flex:none;color:var(--pink)}
+</style>

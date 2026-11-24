@@ -6,8 +6,8 @@ import ThemeSwitch from './ThemeSwitch.astro';
   <div class="snd">
     <div class="vols">
      <div class="in">
-      <label title="Music volume"><span aria-hidden="true">♪</span><span class="sr-only">Music volume</span><input type="range" min="0" max="100" step="1" data-vol="music" /></label>
-      <label title="Effects volume"><span aria-hidden="true">fx</span><span class="sr-only">Effects volume</span><input type="range" min="0" max="100" step="1" data-vol="sfx" /></label>
+      <label title="Music volume"><span class="i" aria-hidden="true">♪</span><span class="w">Music</span><input type="range" min="0" max="100" step="1" data-vol="music" /></label>
+      <label title="Hitsounds and effects volume"><span class="i" aria-hidden="true">fx</span><span class="w">Hitsounds</span><input type="range" min="0" max="100" step="1" data-vol="sfx" /></label>
      </div>
     </div>
     <SoundToggle />
@@ -31,9 +31,11 @@ import ThemeSwitch from './ThemeSwitch.astro';
   .snd:hover .vols label:nth-child(2),.snd:focus-within .vols label:nth-child(2){transition-delay:.16s}
   .vols input{width:72px;accent-color:var(--accent);cursor:pointer}
   @media (max-width:520px){ .vols input{width:56px} }
+  /* the words show only in the phone drop-down; elsewhere they stay for screen readers */
+  .vols .w{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
   /* touch screens have no hover: the first tap on the speaker opens the volumes as a small drop-down under it (taps after that mute/unmute
      as usual), and a tap anywhere else closes it */
-  @media (hover:none){
+  @media (hover:none),(pointer:coarse){
     .snd{position:relative}
     .vols{position:absolute;right:0;top:calc(100% + 8px);z-index:50;height:auto;padding:10px 14px;margin:0;grid-template-columns:1fr;border-color:var(--ink);
           box-shadow:3px 3px 0 var(--ink);transform:translateY(-6px);pointer-events:none}
@@ -42,12 +44,15 @@ import ThemeSwitch from './ThemeSwitch.astro';
     .vols .in{flex-direction:column;align-items:stretch;gap:12px}
     .vols label,.snd:hover .vols label{opacity:1;transform:none;gap:10px}
     .vols input{width:150px;height:28px}
+    .vols label{flex-direction:column;align-items:stretch;gap:2px;font:700 12px var(--body)}
+    .vols .i{display:none}
+    .vols .w{position:static;width:auto;height:auto;overflow:visible;clip-path:none}
   }
 </style>
 
 <script>
   import { vol, setVolume } from '../scripts/audio';
-  const touch = matchMedia('(hover: none)');
+  const touch = matchMedia('(hover: none), (pointer: coarse)');
   document.addEventListener('astro:page-load', () => {
     document.querySelectorAll<HTMLElement>('.snd').forEach((snd) => {
       if (snd.dataset.bound) return; snd.dataset.bound = '1';

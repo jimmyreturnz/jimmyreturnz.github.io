@@ -9,5 +9,5 @@ export default defineConfig({
   publicDir: '../assets',
   build: { format: 'directory' },
   // the old one-page Portfolio address
-  redirects: { '/portfolio': '/projects/' },
+  redirects: { '/portfolio': '/projects/', '/community': '/shoutouts/' },
 });

@@ -1,5 +1,5 @@
 // The Intro timeline (see components/Intro.astro and design-mocks/intro-storyboard.html).
-// hold the power button 0.7 s → ripples → boot with a glitch → the Lobby pops in
+// hold the power button 1.4 s → ripples → boot with a glitch → the Lobby pops in
 // About 3.3 s after the hold at full speed; Skip is always there.
 import { gsap } from 'gsap';
 import { reduced } from './motion';
@@ -20,6 +20,8 @@ const BIOS = [
 
 /** The Lobby's pieces pop in one by one (also used on its own when the Intro is not shown). */
 const INTRO_SPEED = 0.5;
+// the hold sound (intro-hold.m4a) is audible until about 1.6 s: the hold completes 0.2 s before it ends
+const HOLD = 1.4;
 
 export function lobbyIn(delay = 0) {
   document.dispatchEvent(new Event('jr:lobby')); // the BGM starts here
@@ -76,14 +78,13 @@ function run(el: HTMLElement) {
     gsap.to(btn, { scale: 1.12, duration: dur, ease: 'power2.in' });
     buildUp();
   };
-  btn.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse') startHold(0.7); else { held = true; unlock(); setSound(true); } });
-  btn.addEventListener('pointerup', (e) => {
-    if (e.pointerType === 'mouse') cancelHold();
-    else if (!started) { stopHum(); stopHum = sfx.hum(); tween = gsap.to(ring, { strokeDashoffset: 0, duration: 0.25, onComplete: go }); } // phone: one tap
-  });
-  btn.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') cancelHold(); });
+  // mouse and touch alike: hold to power on, letting go early cancels
+  btn.addEventListener('pointerdown', () => startHold(HOLD));
+  btn.addEventListener('pointerup', cancelHold);
+  btn.addEventListener('pointerleave', cancelHold);
+  btn.addEventListener('contextmenu', (e) => e.preventDefault()); // phones: a long press would open the context menu
   btn.addEventListener('pointercancel', cancelHold);
-  btn.addEventListener('keydown', (e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); startHold(0.7); } });
+  btn.addEventListener('keydown', (e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); startHold(HOLD); } });
   btn.addEventListener('keyup', (e) => { if (e.key === ' ' || e.key === 'Enter') cancelHold(); });
   btn.addEventListener('click', () => { if (!held && !started) { unlock(); setSound(true); go(); } held = false; }); // screen readers: a plain press
   btn.focus({ preventScroll: true });

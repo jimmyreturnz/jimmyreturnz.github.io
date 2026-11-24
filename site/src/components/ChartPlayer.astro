@@ -78,7 +78,7 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).
   /* taiko: info hugs the left, the lane gets the room; mania: tall stage */
   .p-taiko{grid-template-columns:1fr}
   .p-taiko .stage{order:-1;aspect-ratio:6.8267/1;min-height:0;border-left:0;border-bottom:var(--stroke) solid var(--ink)} /* just the play lane, full width */
-  @media (max-width:820px){ .p-taiko .stage{aspect-ratio:auto;height:150px} }
+  @media (max-width:820px){ .p-taiko .stage{aspect-ratio:auto;height:clamp(84px,24vw,150px)} } /* phones: a shorter strip keeps the lane long; the renderer fills it top to bottom */
   .p-mania .stage{min-height:520px}
   .info{padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
   h3{font-size:clamp(14px,1.6vw,22px);margin:0;white-space:nowrap}

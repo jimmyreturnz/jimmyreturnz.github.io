@@ -83,8 +83,11 @@ function setup(root: HTMLElement) {
     return since < 100 ? 1 : 1 - (since - 100) / 50;
   };
   function taiko(g: CanvasRenderingContext2D, W: number, Hc: number, t: number) {
-    const d = data!, H = Math.min(Hc, Math.max(W < 640 ? 92 : 170, W / 6.8267)), top = Math.max(0, Math.min(Hc - H, Hc * 0.32 - H / 2)), u = H / 200, cy = top + H / 2, hitX = 1.28 * H;
-    const r = 0.2375 * H, R = r / 0.65, ppms = (v: number) => (1.12 * H * d.sm * v) / 300, xAt = (tt: number) => hitX + (tt - t) * ppms(vAt(tt));
+    // the strip fills the whole stage. Like osu!taiko, the same stretch of time fits the lane at every size: the speed is set from the
+    // lane's length (hit x to the right edge), so on a narrow screen notes move slower instead of appearing late. On the 6.8267:1 desktop
+    // stage the lane is 5.5467 H long, which gives KatsuDon's 1.12 H scroll exactly.
+    const d = data!, H = Hc, top = 0, u = H / 200, cy = H / 2, hitX = 1.28 * H;
+    const r = 0.2375 * H, R = r / 0.65, ppms = (v: number) => ((1.12 / 5.5467) * (W - hitX) * d.sm * v) / 300, xAt = (tt: number) => hitX + (tt - t) * ppms(vAt(tt));
     const bg = g.createLinearGradient(0, 0, 0, Hc); bg.addColorStop(0, '#1d2233'); bg.addColorStop(1, '#0d1017');
     g.fillStyle = bg; g.fillRect(0, 0, W, Hc);
     for (const [gx, gy, gc] of [[0.2, 0.85, '255,179,209'], [0.8, 0.7, '166,216,255'], [0.55, 1, '201,182,255']] as const) { // soft pastel glows in the empty play view

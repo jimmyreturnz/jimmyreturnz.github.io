@@ -17,7 +17,7 @@ The transition that morphs the visitor from the Lobby into the Portfolio. Moving
 _Avoid_: Morph, enter animation
 
 **Portfolio**:
-Everything after the Lobby: a set of pages (Projects, osu!, TETR.IO, About, Community) sharing one header.
+Everything after the Lobby: a set of pages (Projects, osu!, TETR.IO, About, Shoutouts) sharing one header, which also holds the Chat button for the Message Board.
 _Avoid_: Main page, dashboard
 
 **Portfolio page**:
