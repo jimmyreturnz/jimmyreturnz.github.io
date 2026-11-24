@@ -1,5 +1,5 @@
 ---
-// The Message Board: a chat panel opened from the header's Chat button, on every Portfolio page.
+// The Message Board: a chat panel opened from the Chat button in the Portfolio header and in the Lobby's top bar.
 // It shows only when the site is built with the API address (PUBLIC_API_URL) and a Turnstile site key.
 const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY as string | undefined;
 ---
@@ -58,25 +58,27 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
     if (!root || !dlg || !opener || root.dataset.on) return;
     root.dataset.on = '1';
     let opened = false;
-    // opening pops the panel in and blurs the page behind (.shown fades the backdrop in CSS); closing plays the same tween
-    // backwards and fades the blur out, then closes the dialog. Closing mid-entry reverses from wherever it got to.
-    let enter: gsap.core.Tween | null = null;
+    // opening pops the panel in while the page behind blurs and dims (--bd 0 -> 1, read by ::backdrop), in one timeline;
+    // closing plays that timeline backwards, then closes the dialog. Closing mid-entry reverses from wherever it got to.
+    let enter: gsap.core.Timeline | null = null;
     opener.addEventListener('click', () => {
       sfx.swish(); dlg.showModal(); opener.setAttribute('aria-expanded', 'true');
-      requestAnimationFrame(() => dlg.classList.add('shown'));
       if (!opened) { opened = true; void load(); } else { void sync(); feed.scrollTop = feed.scrollHeight; }
       enter?.kill(); gsap.set(dlg, { clearProps: 'all' });
-      enter = reduced() ? null : gsap.fromTo(dlg, { y: 24, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.35, ease: 'back.out(1.4)' });
+      if (reduced()) { enter = null; dlg.style.setProperty('--bd', '1'); return; }
+      enter = gsap.timeline()
+        .fromTo(dlg, { y: 24, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.35, ease: 'back.out(1.4)' }, 0)
+        .fromTo(dlg, { '--bd': 0 }, { '--bd': 1, duration: 0.35, ease: 'power2.out' }, 0);
     });
     const hide = () => {
       if (!dlg.open || dlg.classList.contains('leaving')) return;
-      dlg.classList.add('leaving'); dlg.classList.remove('shown');
+      dlg.classList.add('leaving');
       const done = () => { dlg.classList.remove('leaving'); dlg.close(); gsap.set(dlg, { clearProps: 'all' }); enter = null; };
       if (enter && enter.progress() > 0) enter.eventCallback('onReverseComplete', done).reverse(); else done();
     };
     dlg.querySelector('[data-chat-close]')!.addEventListener('click', hide);
     dlg.addEventListener('cancel', (e) => { e.preventDefault(); hide(); }); // Escape
-    dlg.addEventListener('close', () => { dlg.classList.remove('shown', 'leaving'); opener.setAttribute('aria-expanded', 'false'); });
+    dlg.addEventListener('close', () => { dlg.classList.remove('leaving'); opener.setAttribute('aria-expanded', 'false'); });
     dlg.addEventListener('click', (e) => { if (e.target === dlg) hide(); }); // a click on the backdrop closes it
     const q = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
     const api = root.dataset.api!, feed = q('[data-feed]'), list = q('ol'), state = q('.state');
@@ -164,13 +166,14 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
     const timer = setInterval(() => void sync(), 10_000);
     const onVis = () => { if (!document.hidden) void sync(); };
     document.addEventListener('visibilitychange', onVis);
-    // leaving the Portfolio (the Lobby has no header): the panel goes away, so stop its timers
-    const leave = (e: Event) => {
-      if ((e as Event & { newDocument: Document }).newDocument.querySelector('[data-board]')) return;
-      clearInterval(timer); clearInterval(coolTimer); document.removeEventListener('visibilitychange', onVis); document.removeEventListener('astro:before-swap', leave);
+    // this panel survives page changes inside the Portfolio (persistent header) but not Lobby <-> Portfolio (a new copy):
+    // once it's gone from the page, stop its timers
+    const leave = () => {
+      if (root.isConnected) return;
+      clearInterval(timer); clearInterval(coolTimer); document.removeEventListener('visibilitychange', onVis); document.removeEventListener('astro:after-swap', leave);
       if (ts && wid) ts.remove(wid);
     };
-    document.addEventListener('astro:before-swap', leave);
+    document.addEventListener('astro:after-swap', leave);
 
     let ts: Turnstile | null = null, wid = '', token = '';
     const ensureTs = async () => {
@@ -226,12 +229,13 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
 
 <style>
   .chatbtn{margin-left:auto}
+  .chatbtn ~ :global(.settings){margin-left:0} /* the Lobby: the Chat button takes the push to the right */
   .chatbtn .ic{font-size:15px;line-height:1}
   @media (max-width:820px){ .chatbtn span.ic{display:inline} } /* .tg hides its label spans on small screens; keep the icon */
   /* the panel: docked bottom-right on wide screens, nearly full screen on phones */
   .board{border:0;padding:0;background:none;width:min(440px,calc(100vw - 32px));max-width:none;max-height:none;margin:auto 16px 16px auto;overflow:visible;color:var(--ink)}
-  .board::backdrop{background:transparent;backdrop-filter:blur(0);transition:background .35s ease,backdrop-filter .35s ease}
-  .board.shown::backdrop{background:color-mix(in srgb,#1f1e33 35%,transparent);backdrop-filter:blur(2px)}
+  .board::backdrop{background:color-mix(in srgb,#1f1e33 calc(var(--bd,0) * 35%),transparent);
+    -webkit-backdrop-filter:blur(calc(var(--bd,0) * 2px));backdrop-filter:blur(calc(var(--bd,0) * 2px))} /* --bd: set on the dialog by the open/close timeline */
   .board.leaving{pointer-events:none} /* no clicks on a panel that's on its way out */
   .chat{display:flex;flex-direction:column;height:min(620px,calc(100dvh - 32px));padding:0;overflow:hidden}
   @media (max-width:560px){ .board{margin:auto auto 8px;width:calc(100vw - 16px)} .chat{height:calc(100dvh - 16px)} }

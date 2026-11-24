@@ -3,6 +3,7 @@
 import Base from '../layouts/Base.astro';
 import Settings from '../components/Settings.astro';
 import BgmPill from '../components/BgmPill.astro';
+import MessageBoard from '../components/MessageBoard.astro';
 import PlayerCard from '../components/PlayerCard.astro';
 import Socials from '../components/Socials.astro';
 import Vh from '../components/Vh.astro';
@@ -25,6 +26,7 @@ const avatar = stats.osu.avatar;
     <div class="bar">
       <a class="wordmark" href="/lobby/"><Vh name="vh-heart" />jimmyreturnz</a>
       <BgmPill />
+      <MessageBoard />
       <Settings />
     </div>
 
