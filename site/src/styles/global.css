@@ -109,9 +109,13 @@ p{text-wrap:pretty}
 /* Lobby: its pieces stay hidden from the first paint until lobbyIn() (scripts/intro.ts) starts their entrance and adds .in;
    keep this list in step with LOBBY there. lobby.astro's <noscript> shows them without JavaScript. */
 .lobby:not(.in) :is(.bar,.sky .h1,.sky .h2,.sky .s1,.sky .s2,.bubble,.id,.role,.about,.facts,.ctas,.socials,.player){opacity:0}
-.rc{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top}
-.rc-i{display:block}
-.rc-i>span{display:block;height:1.15em}
+/* rolling digit (scripts/roll.ts): .rc-s is the final digit, invisible, giving the column its exact size and baseline;
+   .rc-i is the 0-9 strip on top, one row tall, each row the column's height, moved by yPercent -100 per digit */
+.rc{position:relative;display:inline-block;clip-path:inset(0)} /* clip-path, not overflow: overflow would move the baseline to the bottom edge */
+.rc-s{visibility:hidden}
+[data-roll]{font-kerning:none;font-feature-settings:"kern" 0} /* split into one span per character while rolling, which drops kerning: so the finished number has none either */
+.rc-i{position:absolute;inset:0}
+.rc-i>span{display:block;height:100%;text-align:center}
 
 /* theme switch: circular reveal (scripts/settings.ts) */
 :root[data-vt="theme"]::view-transition-old(root),:root[data-vt="theme"]::view-transition-new(root){animation:none;mix-blend-mode:normal}

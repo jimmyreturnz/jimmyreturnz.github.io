@@ -20,17 +20,20 @@ export function rollTo(el: HTMLElement, to: string, from: string = el.dataset.rv
   const nodes = [...to].map((c, i) => {
     if (!isDigit(c)) { const s = document.createElement('span'); s.setAttribute('aria-hidden', 'true'); s.textContent = c; return s; }
     const fc = from[from.length - (to.length - i)]; // the old character in the same place from the right
+    // the column is sized by its final digit (an invisible copy in the flow), so a rolling number takes exactly the width and
+    // baseline of the finished one and nothing shifts when the plain text comes back; the 0-9 strip sits on top of it
     const col = document.createElement('span');
     col.className = 'rc'; col.setAttribute('aria-hidden', 'true');
+    const sizer = Object.assign(document.createElement('span'), { className: 'rc-s', textContent: c });
     const inner = document.createElement('span'); inner.className = 'rc-i';
     for (const n of ONE_TO_NINE) { const r = document.createElement('span'); r.textContent = n; inner.append(r); }
-    col.append(inner);
+    col.append(sizer, inner);
     cols.push({ col: inner, d: Number(c), d0: fc && isDigit(fc) ? Number(fc) : 0 });
     return col;
   });
   el.replaceChildren(...nodes);
   const tl = gsap.timeline({ onComplete: () => { el.textContent = to; el.removeAttribute('aria-label'); } });
-  cols.forEach(({ col, d, d0 }, i) => tl.fromTo(col, { yPercent: -d0 * 10 }, { yPercent: -d * 10, duration: DURATION, ease: 'power3.out' }, (cols.length - 1 - i) * STAGGER));
+  cols.forEach(({ col, d, d0 }, i) => tl.fromTo(col, { yPercent: -d0 * 100 }, { yPercent: -d * 100, duration: DURATION, ease: 'power3.out' }, (cols.length - 1 - i) * STAGGER));
   tweens.set(el, tl);
 }
 
