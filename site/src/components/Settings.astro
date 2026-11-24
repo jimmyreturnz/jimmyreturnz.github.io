@@ -41,7 +41,9 @@ import ThemeSwitch from './ThemeSwitch.astro';
           box-shadow:3px 3px 0 var(--ink);transform:translateY(-6px);pointer-events:none}
     .snd:hover .vols,.snd:focus-within .vols{opacity:0;margin:0;padding:10px 14px;transform:translateY(-6px)}
     .snd.open .vols{opacity:1;transform:none;pointer-events:auto}
-    .vols .in{flex-direction:column;align-items:stretch;gap:12px}
+    /* a plain block sized to its sliders: the desktop's 0fr/1fr grid track shrinks to nothing in an absolutely placed box */
+    .vols{display:block;width:max-content;border-radius:16px}
+    .vols .in{flex-direction:column;align-items:stretch;gap:12px;overflow:visible}
     .vols label,.snd:hover .vols label{opacity:1;transform:none;gap:10px}
     .vols input{width:150px;height:28px}
     .vols label{flex-direction:column;align-items:stretch;gap:2px;font:700 12px var(--body)}
