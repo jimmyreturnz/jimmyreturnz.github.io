@@ -58,8 +58,8 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
     if (!root || !dlg || !opener || root.dataset.on) return;
     root.dataset.on = '1';
     let opened = false;
-    // opening pops the panel in while the page behind blurs and dims (--bd 0 -> 1, read by ::backdrop), in one timeline;
-    // closing plays that timeline backwards, then closes the dialog. Closing mid-entry reverses from wherever it got to.
+    // opening pops the panel in while the page behind blurs and dims (--bd 0 -> 1, read by ::backdrop); closing takes the same
+    // 0.35 s with the same fast start, the panel and the blur on one curve, from wherever the opening got to
     let enter: gsap.core.Timeline | null = null;
     opener.addEventListener('click', () => {
       sfx.swish(); dlg.showModal(); opener.setAttribute('aria-expanded', 'true');
@@ -74,7 +74,9 @@ const api = import.meta.env.PUBLIC_API_URL as string | undefined, sitekey = impo
       if (!dlg.open || dlg.classList.contains('leaving')) return;
       dlg.classList.add('leaving');
       const done = () => { dlg.classList.remove('leaving'); dlg.close(); gsap.set(dlg, { clearProps: 'all' }); enter = null; };
-      if (enter && enter.progress() > 0) enter.eventCallback('onReverseComplete', done).reverse(); else done();
+      if (!enter) return done(); // reduced motion: no tween
+      enter.kill(); enter = null;
+      gsap.to(dlg, { y: 24, opacity: 0, scale: 0.97, '--bd': 0, duration: 0.35, ease: 'power2.out', onComplete: done });
     };
     dlg.querySelector('[data-chat-close]')!.addEventListener('click', hide);
     dlg.addEventListener('cancel', (e) => { e.preventDefault(); hide(); }); // Escape
